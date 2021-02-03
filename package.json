@@ -1,0 +1,69 @@
+{
+  "contributors": [
+    {
+      "name": "Zaim Imran",
+      "email": "zaim.imran@gmail.com",
+      "url": "https://zaim.no"
+    },
+    {
+      "name": "Max Torre Schau",
+      "email": "max.torre.schau@gmail.com",
+      "url:": "https://maxtorreschau.no"
+    }
+  ],
+  "name": "trak",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint --fix .",
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
+  "dependencies": {
+    "@emotion/react": "^11.1.4",
+    "@emotion/styled": "^11.0.0",
+    "@material-ui/core": "^5.0.0-alpha.24",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/styles": "^4.11.3",
+    "@types/material-ui": "^0.21.8",
+    "eslint-plugin-json": "^2.1.2",
+    "next": "10.0.6",
+    "react": "17.0.1",
+    "react-dom": "17.0.1"
+  },
+  "devDependencies": {
+    "@prisma/cli": "^2.16.0",
+    "@types/node": "^14.14.22",
+    "@types/react": "^17.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "eslint": "^7.19.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-import-resolver-babel-module": "^5.2.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.3",
+    "prettier": "^2.2.1",
+    "typescript": "^4.1.3"
+  }
+}

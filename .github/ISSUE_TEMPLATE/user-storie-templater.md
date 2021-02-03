@@ -4,12 +4,12 @@ about: User Storie
 title: UserStorieTemplate
 labels: ''
 assignees: ''
-
 ---
 
-Som en 
-Ønsker jeg 
+Som en
+Ønsker jeg
 Slik at
 
 Oppgaver:
+
 - [ ]
