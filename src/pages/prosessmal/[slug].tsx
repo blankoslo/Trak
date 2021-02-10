@@ -1,10 +1,14 @@
-import { Avatar, IconButton, makeStyles, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { Avatar, Button, IconButton, makeStyles, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { Edit as EditIcon } from '@material-ui/icons';
 import AddButton from 'components/AddButton';
+import Modal from 'components/Modal';
+import TextField from 'components/TextField';
 import Typo from 'components/Typo';
 import prisma from 'lib/prisma';
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { IPhase, IProcessTemplate, ITask } from 'utils/types';
 
 export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
@@ -67,6 +71,11 @@ const useStyles = makeStyles((theme) => ({
     height: theme.spacing(4),
     marginRight: theme.spacing(1),
   },
+  grid: {
+    display: 'grid',
+    gridTemplateRows: 'auto',
+    rowGap: 32,
+  },
 }));
 
 const ProcessTemplate = ({ processTemplates }: InferGetStaticPropsType<typeof getStaticProps>) => {
@@ -105,12 +114,13 @@ const Phase = ({ phase }: { phase: IPhase }) => {
           <EditIcon />
         </IconButton>
       </div>
-      <TemplateTable tasks={phase.tasks} />
+      <TemplateTable phaseTitle={phase.title} tasks={phase.tasks} />
     </div>
   );
 };
 
-const TemplateTable = ({ tasks }: { tasks: ITask[] }) => {
+const TemplateTable = ({ tasks, phaseTitle }: { tasks: ITask[]; phaseTitle: string }) => {
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const classes = useStyles();
   return (
     <Table aria-label='Prosessmal tabel' className={classes.table}>
@@ -148,10 +158,46 @@ const TemplateTable = ({ tasks }: { tasks: ITask[] }) => {
         ))}
         <TableRow className={classes.hideLastBorder}>
           <TableCell>
-            <AddButton onClick={() => undefined} text='Legg til oppgave' />
+            <AddButton onClick={() => setModalIsOpen(true)} text='Legg til oppgave' />
+            <CreateTaskModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} phaseTitle={phaseTitle} />
           </TableCell>
         </TableRow>
       </TableBody>
     </Table>
+  );
+};
+
+const CreateTaskModal = ({ phaseTitle, modalIsOpen, closeModal }: { phaseTitle: string; modalIsOpen: boolean; closeModal: () => void }) => {
+  const classes = useStyles();
+
+  const { register, handleSubmit, errors } = useForm();
+
+  const onSubmit = handleSubmit((data) => data);
+
+  return (
+    <Modal
+      buttonGroup={[
+        <Button key={'avbryt'} onClick={closeModal}>
+          Avbryt
+        </Button>,
+        <Button key={'create'} onClick={() => undefined} type='submit'>
+          Lag oppgave
+        </Button>,
+      ]}
+      header={'Lag ny oppgave'}
+      onClose={closeModal}
+      onSubmit={onSubmit}
+      open={modalIsOpen}
+      subheader={
+        <>
+          til <b>Fase {phaseTitle}</b>
+        </>
+      }>
+      <div className={classes.grid}>
+        <TextField errors={errors} label='Oppgavetittel' name='title' register={register} required />
+        <TextField errors={errors} label='Oppgavebeskrivelse' maxRows={4} multiline name='description' register={register} rows={4} />
+        <TextField errors={errors} label='Oppgaveansvarlig' name='responsible' register={register} />
+      </div>
+    </Modal>
   );
 };

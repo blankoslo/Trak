@@ -21,7 +21,7 @@ const theme = createMuiTheme({
       paper: '#EADEF4',
     },
     text: {
-      primary: '#2f2f2f',
+      primary: '#2F2F2F',
       secondary: '#F2F2F2',
       disabled: '#6A6A6A',
     },
@@ -41,5 +41,69 @@ const theme = createMuiTheme({
     },
   },
 });
+
+theme.components = {
+  ...theme.components,
+  MuiDialog: {
+    styleOverrides: {
+      root: {
+        color: theme.palette.text.primary,
+      },
+    },
+  },
+  MuiDialogContent: {
+    styleOverrides: {
+      root: {
+        paddingTop: 16,
+      },
+    },
+  },
+  MuiInputLabel: {
+    styleOverrides: {
+      root: {
+        color: theme.palette.text.disabled,
+        top: '-15px !important',
+        marginLeft: 6,
+        '&$focused': {
+          marginLeft: 0,
+          color: theme.palette.secondary.main,
+        },
+      },
+      shrink: {
+        marginLeft: 0,
+      },
+    },
+  },
+  MuiInput: {
+    styleOverrides: {
+      formControl: {
+        'label + &': {
+          marginTop: 0,
+        },
+      },
+      root: {},
+      underline: {
+        '&:after': {
+          borderBottom: `2px solid ${theme.palette.secondary.main}`,
+        },
+      },
+    },
+  },
+  MuiInputBase: {
+    styleOverrides: {
+      input: {
+        marginLeft: 6,
+        marginRight: 6,
+      },
+    },
+  },
+  MuiTextField: {
+    styleOverrides: {
+      root: {
+        backgroundColor: theme.palette.background.default,
+      },
+    },
+  },
+};
 
 export default theme;
