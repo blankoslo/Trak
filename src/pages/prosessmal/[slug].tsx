@@ -7,15 +7,22 @@ import ToggleButtonGroup from 'components/ToggleButtonGroup';
 import Typo from 'components/Typo';
 import prisma from 'lib/prisma';
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IPhase, IProcessTemplate, IProfession, ITask } from 'utils/types';
 
 export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
+  const processTemplates = await prisma.processTemplate.findMany();
+
   return {
-    paths: [],
-    fallback: 'blocking',
+    paths: processTemplates.map((processTemplate) => ({
+      params: {
+        slug: processTemplate.slug,
+      },
+    })),
+    fallback: false,
   };
 };
 
@@ -90,18 +97,23 @@ const ProcessTemplate = ({ processTemplates, professions }: InferGetStaticPropsT
   const processTemplate: IProcessTemplate = processTemplates.find((processTemplate) => processTemplate.slug === slug);
 
   return (
-    <div className={classes.root}>
-      <div className={classes.header}>
-        <Typo className={classes.title} variant='h1'>
-          Prosessmal
-        </Typo>
-        <Typo className={classes.template_title}>{processTemplate.title}</Typo>
+    <>
+      <Head>
+        <title>Prosessmal - {slug}</title>
+      </Head>
+      <div className={classes.root}>
+        <div className={classes.header}>
+          <Typo className={classes.title} variant='h1'>
+            Prosessmal
+          </Typo>
+          <Typo className={classes.template_title}>{processTemplate.title}</Typo>
+        </div>
+        {processTemplate.phases.map((phase: IPhase) => (
+          <Phase key={phase.id} phase={phase} professions={professions} />
+        ))}
+        <AddButton onClick={() => undefined} text='Legg til fase' />
       </div>
-      {processTemplate.phases.map((phase: IPhase) => (
-        <Phase key={phase.id} phase={phase} professions={professions} />
-      ))}
-      <AddButton onClick={() => undefined} text='Legg til fase' />
-    </div>
+    </>
   );
 };
 
