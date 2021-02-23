@@ -19,7 +19,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --fix .",
-    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+    "db": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres"
   },
   "husky": {
     "hooks": {
@@ -46,7 +47,8 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-hook-form": "^6.15.1",
-    "safe-json-stringify": "^1.2.0"
+    "safe-json-stringify": "^1.2.0",
+    "swr": "^0.4.2"
   },
   "devDependencies": {
     "@types/node": "^14.14.22",
