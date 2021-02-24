@@ -22,7 +22,8 @@
     "format": "prettier --write --pattern './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
     "fastformat": "pretty-quick --staged './**/*.{js,jsx,ts,tsx,css,md,json}'",
     "db": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
-    "precommit": "yarn fastformat && yarn lint"
+    "precommit": "yarn fastformat && yarn lint",
+    "heroku-postbuild": "heroku-nextjs-build"
   },
   "husky": {
     "hooks": {
