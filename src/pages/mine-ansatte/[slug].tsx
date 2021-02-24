@@ -1,7 +1,6 @@
-import { Box, IconButton } from '@material-ui/core';
-import { Search as SearchIcon, Tune as TuneIcon } from '@material-ui/icons';
+import { Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import classNames from 'classnames';
+import SearchFilter from 'components/SearchFilter';
 import Typo from 'components/Typo';
 import PhaseCard, { PhaseCardProps } from 'components/views/mine-ansatte/PhaseCard';
 import prisma from 'lib/prisma';
@@ -180,20 +179,7 @@ const MyEmployees = ({ myEmployees, allPhases }: InferGetServerSidePropsType<typ
           <Typo variant='h1'>Mine ansatte</Typo>
           <Typo variant='h2'>{processTemplate.title}</Typo>
         </Box>
-        <Box display='flex' justifyContent='flex-end'>
-          <Box className={classNames(classes.pointer, classes.centeringRow)} onClick={() => null} padding={theme.spacing(2)}>
-            <IconButton aria-label='Søk'>
-              <SearchIcon />
-              <Typo variant='body2'>Søk</Typo>
-            </IconButton>
-          </Box>
-          <Box className={classNames(classes.pointer, classes.centeringRow)} padding={theme.spacing(2)}>
-            <IconButton aria-label='Filter'>
-              <TuneIcon />
-              <Typo variant='body2'>Filter</Typo>
-            </IconButton>
-          </Box>
-        </Box>
+        <SearchFilter />
         {phases.map((phase: PhaseCardProps) => {
           return (
             <Box key={phase.id} mb={theme.spacing(2)}>
