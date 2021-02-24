@@ -22,8 +22,9 @@ export type PhaseCardProps = {
   title: string;
   amount: number;
   employees: EmployeeRow[];
+  slug: string;
 };
-const PhaseCard = ({ title, amount, employees }: PhaseCardProps) => {
+const PhaseCard = ({ title, amount, employees, slug }: PhaseCardProps) => {
   const classes = useStyles();
   const [hidden, setIsHidden] = useState(!employees.length);
   return (
@@ -48,7 +49,7 @@ const PhaseCard = ({ title, amount, employees }: PhaseCardProps) => {
               </TableRow>
             </TableHead>
             {employees.map((employee) => {
-              return <UserRow employee={employee} key={employee.id} />;
+              return <UserRow employee={employee} key={employee.id} slug={slug} />;
             })}
           </Table>
         ) : (

@@ -31,10 +31,10 @@ const theme = createMuiTheme({
       fontSize: '2.75rem',
     },
     h2: {
-      fontSize: '1.5rem',
+      fontSize: '1.75rem',
     },
     body1: {
-      fontSize: '1.4rem',
+      fontSize: '1.25rem',
     },
     body2: {
       fontSize: '0.75rem',
@@ -116,6 +116,20 @@ theme.components = {
         backgroundColor: theme.palette.background.default,
         border: `0.6px solid ${theme.palette.primary.main} `,
         fontSize: '1rem',
+      },
+    },
+  },
+  MuiMenuItem: {
+    styleOverrides: {
+      root: {
+        fontSize: '1rem',
+      },
+    },
+  },
+  MuiChip: {
+    styleOverrides: {
+      root: {
+        minWidth: '32px',
       },
     },
   },

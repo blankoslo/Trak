@@ -1,7 +1,8 @@
 import { Avatar, Box, makeStyles, TableCell, TableRow } from '@material-ui/core';
 import Typo from 'components/Typo';
+import { useRouter } from 'next/router';
 import theme from 'theme';
-import { IEmployee, IProfession } from 'utils/types';
+import { IEmployee, IEmployeeTask, IProfession } from 'utils/types';
 
 const useStyles = makeStyles({
   pointer: {
@@ -28,18 +29,21 @@ export type EmployeeRow = {
   hrManager: IEmployee;
   tasksFinished: number;
   totalTasks: number;
+  employeeTask: IEmployeeTask[];
 };
 
 type UserRowProps = {
   employee: EmployeeRow;
+  slug: string;
 };
 
-const UserRow = ({ employee }: UserRowProps) => {
+const UserRow = ({ employee, slug }: UserRowProps) => {
   const classes = useStyles();
   const typoVariant = 'body2';
+  const router = useRouter();
   return (
     <TableRow className={classes.pointer} hover>
-      <TableCell>
+      <TableCell onClick={() => router.push(`/ansatt/${employee.id}?år=${new Date(employee.employeeTask[0].year).getFullYear()}&prosess=${slug}`)}>
         <div className={classes.userRow} tabIndex={0}>
           <Avatar alt={'Logged in user photo'} className={classes.avatar} src={'/dummy_avatar.png'} />
           <Typo variant={typoVariant}>
