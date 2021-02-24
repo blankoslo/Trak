@@ -45,7 +45,7 @@ model Phase {
   id                String          @id @default(uuid())
   title             String
   processTemplateId String
-  order             Int
+  createdAt         DateTime        @default(now())
   processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
   tasks             Task[]
 }
@@ -77,6 +77,7 @@ model Task {
   global        Boolean        @default(true)
   phaseId       String
   responsibleId Int?
+  createdAt     DateTime       @default(now())
   phase         Phase          @relation(fields: [phaseId], references: [id])
   responsible   Employee?      @relation("responsible_tasks", fields: [responsibleId], references: [id])
   employeeTask  EmployeeTask[]
