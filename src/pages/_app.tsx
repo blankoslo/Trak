@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-
+import ContextProvider from 'pages/ContextProvider';
+import { useEffect } from 'react';
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
@@ -7,7 +7,11 @@ function MyApp({ Component, pageProps }) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
   }, []);
-  return <Component {...pageProps} />;
+  return (
+    <ContextProvider>
+      <Component {...pageProps} />
+    </ContextProvider>
+  );
 }
 
 export default MyApp;
