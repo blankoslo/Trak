@@ -154,8 +154,8 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
         </div>
         <SearchFilter />
         <div>
-          {timeSections.map((section: TimeSectionType, key: number) => (
-            <TimeSection first={key === 0} key={key} section={section} />
+          {timeSections.map((section: TimeSectionType, index: number) => (
+            <TimeSection first={index === 0} key={index} section={section} />
           ))}
         </div>
       </div>

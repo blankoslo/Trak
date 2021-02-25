@@ -45,7 +45,6 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
   return (
     <Modal
       buttonGroup={[
-        <div key={'whitespace'}></div>,
         <Button key={'avbryt'} onClick={closeModal} type='button'>
           Avbryt
         </Button>,

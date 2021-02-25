@@ -14,16 +14,12 @@ const SearchFilter = () => {
   const classes = useStyles();
   return (
     <div className={classes.centeringRow}>
-      <div>
-        <Button aria-label='Søk' color='primary' startIcon={<Search />}>
-          Søk
-        </Button>
-      </div>
-      <div>
-        <Button aria-label='Filter' color='primary' startIcon={<Tune />}>
-          Filter
-        </Button>
-      </div>
+      <Button aria-label='Søk' color='primary' startIcon={<Search />}>
+        Søk
+      </Button>
+      <Button aria-label='Filter' color='primary' startIcon={<Tune />}>
+        Filter
+      </Button>
     </div>
   );
 };

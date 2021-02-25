@@ -29,7 +29,7 @@ const TaskRow = ({ employeeTask }: TaskRowProps) => {
 
   return (
     <Box display='flex'>
-      <Box alignItems='center' display='flex' flexGrow={2}>
+      <Box alignItems='center' display='flex' flex={2}>
         {employeeTask.completed ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
         <Typo className={employeeTask.completed && classes.completedTask} color={!employeeTask.completed && 'disabled'} noWrap variant='body1'>
           {employeeTask.task.title}
@@ -40,7 +40,7 @@ const TaskRow = ({ employeeTask }: TaskRowProps) => {
         {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={employeeTask.id} modalIsOpen={modalIsOpen} />}
       </Box>
       {employeeTask.responsible && (
-        <Box alignItems='center' display='flex' flexDirection='row' flexGrow={1}>
+        <Box alignItems='center' display='flex' flex={1} flexDirection='row'>
           <Avatar
             className={classes.avatar}
             firstName={employeeTask.responsible.firstName}
