@@ -14,5 +14,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       },
     });
     res.json(newPhase);
+  } else {
+    res.status(405);
+    res.end();
   }
 }

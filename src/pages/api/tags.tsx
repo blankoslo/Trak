@@ -11,5 +11,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       },
     });
     res.json(tags);
+  } else {
+    res.status(405);
+    res.end();
   }
 }

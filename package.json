@@ -19,7 +19,7 @@
     "build": "next build",
     "start": "next start -p $PORT",
     "lint": "eslint --fix --max-warnings=0 .",
-    "format": "prettier --write --pattern './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+    "format": "prettier --write --check --config ./.prettierrc './src/**/*.{js,jsx,ts,tsx,css,md,json}'",
     "fastformat": "pretty-quick --staged './**/*.{js,jsx,ts,tsx,css,md,json}'",
     "db": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
     "precommit": "yarn fastformat && yarn lint",
@@ -54,6 +54,7 @@
     "react-dom": "17.0.1",
     "react-hook-form": "^6.15.1",
     "safe-json-stringify": "^1.2.0",
+    "sortof": "^0.7.0",
     "swr": "^0.4.2"
   },
   "devDependencies": {

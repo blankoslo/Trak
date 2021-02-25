@@ -13,6 +13,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     PUT(req, res, task_id);
   } else if (req.method === 'DELETE') {
     DELETE(res, task_id);
+  } else {
+    res.status(405);
+    res.end();
   }
 }
 
