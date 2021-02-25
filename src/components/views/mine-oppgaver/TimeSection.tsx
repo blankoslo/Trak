@@ -46,10 +46,10 @@ const TimeSection = ({ section, first }: TimeSectionProps) => {
           {open ? <ExpandLess /> : <ExpandMore />}
         </IconButton>
       </div>
-      <Typo disabled variant='body2'>
+      <Typo color='disabled' variant='body2'>
         {first && 'Prosess'}
       </Typo>
-      <Typo disabled variant='body2'>
+      <Typo color='disabled' variant='body2'>
         {first && 'Gjelder'}
       </Typo>
       {open && section.data.map((data) => <TaskRow data={data} key={data.id} />)}

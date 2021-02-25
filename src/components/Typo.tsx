@@ -1,22 +1,12 @@
-import { makeStyles, Typography, TypographyProps } from '@material-ui/core';
-import theme from 'theme';
+import { Typography, TypographyProps } from '@material-ui/core';
 
 type TypoProps = {
   variant?: 'h1' | 'h2' | 'body1' | 'body2';
-  disabled?: boolean;
 } & TypographyProps;
 
-const useStyles = makeStyles({
-  disabled: {
-    color: theme.palette.text.disabled,
-  },
-});
-
-const Typo = ({ color = 'textPrimary', variant = 'body1', disabled = false, children, ...args }: TypoProps) => {
-  const classes = useStyles();
-
+const Typo = ({ color = 'textPrimary', variant = 'body1', children, ...args }: TypoProps) => {
   return (
-    <Typography className={disabled ? classes.disabled : undefined} color={color} {...args} variant={variant}>
+    <Typography color={color} {...args} variant={variant}>
       {children}
     </Typography>
   );
