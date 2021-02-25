@@ -46,7 +46,7 @@ const SnackbarProvider = ({ children }: { children: ReactNode }) => {
         setQueue((prev) => prev.slice(1));
       }, 150);
     }
-    return () => clearInterval(timeout);
+    return () => clearTimeout(timeout);
   }, [queue, snackbarOpen]);
 
   const value = useMemo(() => showSnackbar, [showSnackbar]);

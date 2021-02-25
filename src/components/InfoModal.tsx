@@ -1,4 +1,4 @@
-import { Box, Button, Chip, makeStyles } from '@material-ui/core';
+import { Box, Button, Chip, makeStyles, Skeleton } from '@material-ui/core';
 import axios from 'axios';
 import Modal from 'components/Modal';
 import Typo from 'components/Typo';
@@ -12,6 +12,17 @@ const useStyles = makeStyles({
   },
   gutterBottom: {
     marginBottom: theme.spacing(2),
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'fit-content(100%) auto',
+    columnGap: theme.spacing(2),
+  },
+  centeringRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: theme.spacing(2),
   },
 });
 
@@ -39,31 +50,48 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           Avbryt
         </Button>,
       ]}
-      header={employeeTask?.task.title}
+      header={employeeTask ? <>{employeeTask?.task.title}</> : <Skeleton />}
       onClose={closeModal}
       onSubmit={null}
       open={modalIsOpen}>
-      {employeeTask ? (
-        <>
+      <>
+        <div className={classes.grid}>
           <Typo variant='body1'>
-            <b>Ansvarlig:</b> {employeeTask?.responsible && `${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}`}
+            <b>Ansvarlig:</b>
           </Typo>
           <Typo variant='body1'>
-            <b>Gjelder:</b> {employeeTask?.employee.firstName} {employeeTask?.employee.lastName}
+            {employeeTask ? `${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}` : <Skeleton width={theme.spacing(32)} />}
           </Typo>
-          <Typo className={classes.gutterBottom} variant='body1'>
-            <b>Fase:</b> {employeeTask?.task.phase.title}
+          <Typo variant='body1'>
+            <b>Gjelder:</b>
           </Typo>
-          <Box className={classes.gutterBottom}>
-            {employeeTask?.task.tags.map((tag) => {
-              return <Chip className={classes.chip} color='primary' key={tag.id} label={tag.title} size='small' />;
-            })}
-          </Box>
-          <Typo variant='body2'>{employeeTask?.task.description}</Typo>
-        </>
-      ) : (
-        <div>Laster...</div>
-      )}
+          <Typo variant='body1'>
+            {employeeTask ? `${employeeTask?.employee.firstName} ${employeeTask?.employee.lastName}` : <Skeleton width={theme.spacing(32)} />}
+          </Typo>
+          <Typo variant='body1'>
+            <b>Fase:</b>
+          </Typo>
+          <Typo variant='body1'>{employeeTask ? `${employeeTask?.task.phase.title}` : <Skeleton width={theme.spacing(32)} />}</Typo>
+        </div>
+        <Box className={classes.gutterBottom}>
+          {employeeTask ? (
+            <>
+              {employeeTask?.task.tags.map((tag) => {
+                return <Chip className={classes.chip} color='primary' key={tag.id} label={tag.title} size='small' />;
+              })}
+            </>
+          ) : (
+            <div className={classes.centeringRow}>
+              {Array(5).map((_, i) => (
+                <Skeleton key={i}>
+                  <Chip />
+                </Skeleton>
+              ))}
+            </div>
+          )}
+        </Box>
+        <Typo variant='body2'>{employeeTask ? <>{employeeTask?.task.description}</> : <Skeleton height={theme.spacing(24)} />}</Typo>
+      </>
     </Modal>
   );
 };

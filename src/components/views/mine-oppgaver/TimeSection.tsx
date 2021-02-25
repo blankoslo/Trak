@@ -18,6 +18,7 @@ const useStyles = makeStyles({
     gridTemplateColumns: '2fr 1fr 1fr',
     alignItems: 'end',
     marginRight: '30px',
+    marginBottom: theme.spacing(1),
   },
   centeringRow: {
     display: 'flex',

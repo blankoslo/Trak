@@ -31,7 +31,7 @@ const GET = async (res, phase_id) => {
     });
     res.json(phase);
   } catch (err) {
-    res.status(404).send({ message: err.meta.cause });
+    res.status(404).send({ message: err?.meta?.cause });
   }
 };
 
@@ -50,7 +50,7 @@ const PUT = async (req, res, phase_id) => {
     });
     res.json(updatedPhase);
   } catch (err) {
-    res.status(404).send({ message: err.meta.cause });
+    res.status(404).send({ message: err?.meta?.cause });
   }
 };
 const DELETE = async (res, phase_id) => {
@@ -58,6 +58,6 @@ const DELETE = async (res, phase_id) => {
     const deletedPhase = await prisma.phase.delete({ where: { id: phase_id.toString() } });
     res.json(deletedPhase);
   } catch (err) {
-    res.status(404).send({ message: err.meta.cause });
+    res.status(404).send({ message: err?.meta?.cause });
   }
 };

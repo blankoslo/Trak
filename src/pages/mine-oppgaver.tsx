@@ -3,10 +3,11 @@ import SearchFilter from 'components/SearchFilter';
 import Typo from 'components/Typo';
 import TimeSection from 'components/views/mine-oppgaver/TimeSection';
 import prisma from 'lib/prisma';
-import _ from 'lodash';
+import { compact, differenceBy } from 'lodash';
 import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import safeJsonStringify from 'safe-json-stringify';
 import { nextMonth, thisMonth, thisWeek, today, tomorrow } from 'sortof';
 import { IEmployeeTask } from 'utils/types';
@@ -47,6 +48,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     select: {
       id: true,
       dueDate: true,
+      completed: true,
       employee: {
         select: {
           firstName: true,
@@ -85,18 +87,20 @@ export type TimeSectionType = {
 
 const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const classes = useStyles();
+  const router = useRouter();
+  const { fullført: completed } = router.query;
 
   const splitIntoTimeSections = (myTasks) => {
     const taskToday = today(myTasks, 'dueDate');
-    const withoutToday = _.differenceBy(myTasks, taskToday, 'id');
+    const withoutToday = differenceBy(myTasks, taskToday, 'id');
     const taskTomorrow = tomorrow(withoutToday, 'dueDate');
-    const withoutTomorrow = _.differenceBy(withoutToday, taskTomorrow, 'id');
+    const withoutTomorrow = differenceBy(withoutToday, taskTomorrow, 'id');
     const taskThisWeek = thisWeek(withoutTomorrow, 'dueDate');
-    const withoutThisWeek = _.differenceBy(withoutTomorrow, taskThisWeek, 'id');
+    const withoutThisWeek = differenceBy(withoutTomorrow, taskThisWeek, 'id');
     const taskThisMonth = thisMonth(withoutThisWeek, 'dueDate');
-    const withoutThisMonth = _.differenceBy(withoutThisWeek, taskThisMonth, 'id');
+    const withoutThisMonth = differenceBy(withoutThisWeek, taskThisMonth, 'id');
     const taskNextMonth = nextMonth(withoutThisMonth, 'dueDate');
-    const withoutNextMonth = _.differenceBy(withoutThisMonth, taskNextMonth, 'id');
+    const withoutNextMonth = differenceBy(withoutThisMonth, taskNextMonth, 'id');
 
     const data = [
       taskToday.length && {
@@ -131,7 +135,7 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
       },
     ];
 
-    return data;
+    return compact(data);
   };
 
   const timeSections: TimeSectionType[] = splitIntoTimeSections(myTasks);
@@ -146,7 +150,7 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
           <Typo className={classes.title} variant='h1'>
             Mine oppgaver
           </Typo>
-          <Typo className={classes.template_title}>Aktive oppgaver</Typo>
+          <Typo className={classes.template_title}>{completed ? 'Fullførte' : 'Aktive'} oppgaver</Typo>
         </div>
         <SearchFilter />
         <div>

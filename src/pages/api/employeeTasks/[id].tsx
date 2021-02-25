@@ -69,6 +69,6 @@ const GET = async (res, id) => {
     });
     res.json(employeeTask);
   } catch (err) {
-    res.status(404).send({ message: err.meta.cause });
+    res.status(404).send({ message: err?.meta?.cause });
   }
 };

@@ -54,7 +54,7 @@ const GET = async (res, task_id) => {
     });
     res.json(task);
   } catch (err) {
-    res.status(404).send({ message: err.meta.cause });
+    res.status(404).send({ message: err?.meta?.cause });
   }
 };
 
@@ -116,7 +116,7 @@ const PUT = async (req, res, task_id) => {
     });
     res.json(updatedTask);
   } catch (err) {
-    res.status(404).send({ message: err.meta.cause });
+    res.status(404).send({ message: err?.meta?.cause });
   }
 };
 const DELETE = async (res, task_id) => {
@@ -124,6 +124,6 @@ const DELETE = async (res, task_id) => {
     const deletedTask = await prisma.task.delete({ where: { id: task_id.toString() } });
     res.json(deletedTask);
   } catch (err) {
-    res.status(404).send({ message: err.meta.cause });
+    res.status(404).send({ message: err?.meta?.cause });
   }
 };
