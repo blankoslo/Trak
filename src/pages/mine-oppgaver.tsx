@@ -26,6 +26,7 @@ const useStyles = makeStyles({
     marginLeft: '3px',
   },
 });
+
 const LOGGED_IN_USER = 1;
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { fullført: completed } = query;
@@ -36,6 +37,9 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
         id: LOGGED_IN_USER,
       },
       completed: completed.toString() === 'true',
+      dueDate: {
+        gte: moment().startOf('day').toDate(),
+      },
     },
     orderBy: {
       dueDate: 'asc',
@@ -79,7 +83,7 @@ export type TimeSectionType = {
   data: IEmployeeTask[];
 };
 
-const ProcessTemplate = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const classes = useStyles();
 
   const splitIntoTimeSections = (myTasks) => {
@@ -88,7 +92,7 @@ const ProcessTemplate = ({ myTasks }: InferGetServerSidePropsType<typeof getServ
     const taskTomorrow = tomorrow(withoutToday, 'dueDate');
     const withoutTomorrow = _.differenceBy(withoutToday, taskTomorrow, 'id');
     const taskThisWeek = thisWeek(withoutTomorrow, 'dueDate');
-    const withoutThisWeek = _.differenceBy(taskThisWeek, taskThisWeek, 'id');
+    const withoutThisWeek = _.differenceBy(withoutTomorrow, taskThisWeek, 'id');
     const taskThisMonth = thisMonth(withoutThisWeek, 'dueDate');
     const withoutThisMonth = _.differenceBy(withoutThisWeek, taskThisMonth, 'id');
     const taskNextMonth = nextMonth(withoutThisMonth, 'dueDate');
@@ -121,7 +125,7 @@ const ProcessTemplate = ({ myTasks }: InferGetServerSidePropsType<typeof getServ
         date: moment(taskNextMonth[0]?.dueDate).format('MMMM'),
       },
       withoutNextMonth.length && {
-        title: 'Rest',
+        title: 'Resterende',
         data: withoutNextMonth,
         date: '',
       },
@@ -155,4 +159,4 @@ const ProcessTemplate = ({ myTasks }: InferGetServerSidePropsType<typeof getServ
   );
 };
 
-export default ProcessTemplate;
+export default MyTasks;
