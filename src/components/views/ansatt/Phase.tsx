@@ -30,7 +30,7 @@ const Phase = ({ title, tasksFinished, totalTasks, employeeTasks }: PhaseProps) 
           {title}
         </Typo>
         <Button size='medium' startIcon={<AlarmIcon />}>
-          {moment(tasks[0].dueDate).format('DD.MM.YYYY')}
+          {moment(employeeTasks[0].dueDate).format('DD.MM.YYYY')}
         </Button>
       </Box>
       <Box display='flex'>
