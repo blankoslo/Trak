@@ -33,7 +33,7 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
         <IconButton onClick={() => undefined} size='small'>
           {data.completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
         </IconButton>
-        <Typo className={data.completed && classes.completedTask}>{data.task.title}</Typo>
+        <Typo className={data.completed ? classes.completedTask : undefined}>{data.task.title}</Typo>
         <IconButton onClick={() => setModalIsOpen(true)} size='small'>
           <Info color={data.completed ? 'inherit' : 'primary'} />
         </IconButton>

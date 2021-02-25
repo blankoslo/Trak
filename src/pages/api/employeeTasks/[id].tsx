@@ -2,6 +2,12 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const {
     query: { id },
@@ -10,7 +16,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     GET(res, id);
   } else {
     res.status(405);
-    res.end();
   }
 }
 
@@ -67,8 +72,12 @@ const GET = async (res, id) => {
         },
       },
     });
-    res.json(employeeTask);
+    res.status(200).json(employeeTask);
   } catch (err) {
-    res.status(404).send({ message: err?.meta?.cause });
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
   }
 };

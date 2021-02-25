@@ -2,6 +2,7 @@ import { Box, Button, Chip, makeStyles, Skeleton } from '@material-ui/core';
 import axios from 'axios';
 import Modal from 'components/Modal';
 import Typo from 'components/Typo';
+import useSnackbar from 'context/Snackbar';
 import { useEffect, useState } from 'react';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
@@ -35,11 +36,17 @@ type InfoModalProps = {
 const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps) => {
   const classes = useStyles();
   const [employeeTask, setEmployeeTask] = useState<IEmployeeTask | undefined>(undefined);
+  const showSnackbar = useSnackbar();
 
   useEffect(() => {
-    axios.get(`/api/employeeTasks/${employee_task_id}`).then((res) => {
-      setEmployeeTask(res.data);
-    });
+    axios
+      .get(`/api/employeeTasks/${employee_task_id}`)
+      .then((res) => {
+        setEmployeeTask(res.data);
+      })
+      .catch((error) => {
+        showSnackbar(error.response.data?.message, 'error');
+      });
   }, [employee_task_id]);
 
   return (
@@ -81,11 +88,13 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             </>
           ) : (
             <div className={classes.centeringRow}>
-              {Array(5).map((_, i) => (
-                <Skeleton key={i}>
-                  <Chip />
-                </Skeleton>
-              ))}
+              {Array(5)
+                .fill()
+                .map((_, i) => (
+                  <Skeleton key={i}>
+                    <Chip />
+                  </Skeleton>
+                ))}
             </div>
           )}
         </Box>

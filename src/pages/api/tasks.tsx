@@ -43,6 +43,5 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     res.json(newTask);
   } else {
     res.status(405);
-    res.end();
   }
 }

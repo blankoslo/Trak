@@ -2,6 +2,12 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const {
     query: { phase_id },
@@ -14,7 +20,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     DELETE(res, phase_id);
   } else {
     res.status(405);
-    res.end();
   }
 }
 
@@ -29,9 +34,13 @@ const GET = async (res, phase_id) => {
         title: true,
       },
     });
-    res.json(phase);
+    res.status(200).json(phase);
   } catch (err) {
-    res.status(404).send({ message: err?.meta?.cause });
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
   }
 };
 
@@ -48,16 +57,24 @@ const PUT = async (req, res, phase_id) => {
         title: data.title,
       },
     });
-    res.json(updatedPhase);
+    res.status(200).json(updatedPhase);
   } catch (err) {
-    res.status(404).send({ message: err?.meta?.cause });
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
   }
 };
 const DELETE = async (res, phase_id) => {
   try {
     const deletedPhase = await prisma.phase.delete({ where: { id: phase_id.toString() } });
-    res.json(deletedPhase);
+    res.status(200).json(deletedPhase);
   } catch (err) {
-    res.status(404).send({ message: err?.meta?.cause });
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
   }
 };

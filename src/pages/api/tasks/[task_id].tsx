@@ -3,6 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ITag } from 'utils/types';
 const prisma = new PrismaClient();
 
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const {
     query: { task_id },
@@ -15,7 +21,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     DELETE(res, task_id);
   } else {
     res.status(405);
-    res.end();
   }
 }
 
@@ -52,9 +57,13 @@ const GET = async (res, task_id) => {
         },
       },
     });
-    res.json(task);
+    res.status(200).json(task);
   } catch (err) {
-    res.status(404).send({ message: err?.meta?.cause });
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
   }
 };
 
@@ -114,16 +123,24 @@ const PUT = async (req, res, task_id) => {
         },
       },
     });
-    res.json(updatedTask);
+    res.status(200).json(updatedTask);
   } catch (err) {
-    res.status(404).send({ message: err?.meta?.cause });
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
   }
 };
 const DELETE = async (res, task_id) => {
   try {
     const deletedTask = await prisma.task.delete({ where: { id: task_id.toString() } });
-    res.json(deletedTask);
+    res.status(200).json(deletedTask);
   } catch (err) {
-    res.status(404).send({ message: err?.meta?.cause });
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
   }
 };
