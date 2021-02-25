@@ -51,7 +51,7 @@ model Phase {
   processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
   tasks             Task[]
 
-  @@unique([processTemplateId, order], name: "Phase.processTemplateId_order_unique")
+  @@unique([processTemplateId, order], name: "processTemplateId_order_unique")
 }
 
 model ProcessTemplate {
