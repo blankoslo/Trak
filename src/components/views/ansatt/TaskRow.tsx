@@ -41,7 +41,7 @@ const TaskRow = ({ employeeTask }: TaskRowProps) => {
         </IconButton>
         {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={employeeTask.id} modalIsOpen={modalIsOpen} />}
       </Box>
-      {task.responsible.id !== employee.hrManager.id && (
+      {employeeTask.responsible.id !== employee.hrManager.id && (
         <Box alignItems='center' display='flex' flex={1} flexDirection='row'>
           <Avatar
             className={classes.avatar}
