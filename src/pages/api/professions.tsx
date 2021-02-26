@@ -11,5 +11,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       },
     });
     res.json(professions);
+  } else {
+    res.status(405);
   }
 }

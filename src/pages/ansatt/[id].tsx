@@ -61,6 +61,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
         },
         select: {
           dueDate: true,
+          id: true,
           completed: true,
           year: true,
           responsible: {
@@ -242,7 +243,9 @@ const Employee = ({ employee, phasesWithTasks, year, process, history }: InferGe
         </Box>
         <EmployeeContext.Provider value={{ employee }}>
           {phasesWithTasks.map((phase) => {
-            return <Phase key={phase.title} tasks={phase.tasks} tasksFinished={phase.finishedTasks} title={phase.title} totalTasks={phase.totalTasks} />;
+            return (
+              <Phase employeeTasks={phase.tasks} key={phase.title} tasksFinished={phase.finishedTasks} title={phase.title} totalTasks={phase.totalTasks} />
+            );
           })}
         </EmployeeContext.Provider>
       </div>

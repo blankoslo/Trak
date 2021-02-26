@@ -32,6 +32,7 @@ export type IPhase = {
   id: string;
   title: string;
   processTemplateId: string;
+  processTemplate?: IProcessTemplate;
   tasks?: ITask[];
 };
 

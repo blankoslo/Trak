@@ -16,12 +16,12 @@ export const urls: section[] = [
     links: [
       {
         title: 'Aktive oppgaver',
-        link: '/',
+        link: '/mine-oppgaver?fullført=false',
         aria_label: 'Til mine aktive oppgaver',
       },
       {
         title: 'Fullførte oppgaver',
-        link: '/',
+        link: '/mine-oppgaver?fullført=true',
         aria_label: 'Til mine fullførte oppgaver',
       },
     ],

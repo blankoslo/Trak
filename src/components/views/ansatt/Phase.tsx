@@ -3,11 +3,10 @@ import AlarmIcon from '@material-ui/icons/Alarm';
 import { makeStyles } from '@material-ui/styles';
 import AddButton from 'components/AddButton';
 import Typo from 'components/Typo';
+import TaskRow from 'components/views/ansatt/TaskRow';
 import moment from 'moment';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
-
-import TaskRow from './TaskRow';
 
 const useStyles = makeStyles({
   spaceRight: {
@@ -19,10 +18,10 @@ type PhaseProps = {
   title: string;
   tasksFinished: number;
   totalTasks: number;
-  tasks: IEmployeeTask[];
+  employeeTasks: IEmployeeTask[];
 };
 
-const Phase = ({ title, tasksFinished, totalTasks, tasks }: PhaseProps) => {
+const Phase = ({ title, tasksFinished, totalTasks, employeeTasks }: PhaseProps) => {
   const classes = useStyles();
   return (
     <Box marginBottom={theme.spacing(2)}>
@@ -31,7 +30,7 @@ const Phase = ({ title, tasksFinished, totalTasks, tasks }: PhaseProps) => {
           {title}
         </Typo>
         <Button size='medium' startIcon={<AlarmIcon />}>
-          {moment(tasks[0].dueDate).format('DD.MM.YYYY')}
+          {moment(employeeTasks[0].dueDate).format('DD.MM.YYYY')}
         </Button>
       </Box>
       <Box display='flex'>
@@ -44,8 +43,8 @@ const Phase = ({ title, tasksFinished, totalTasks, tasks }: PhaseProps) => {
           <Typo variant='body2'>Ansvarlig</Typo>
         </Box>
       </Box>
-      {tasks.map((task) => {
-        return <TaskRow key={task.taskId} task={task} />;
+      {employeeTasks.map((employeeTask) => {
+        return <TaskRow employeeTask={employeeTask} key={employeeTask.taskId} />;
       })}
       <AddButton onClick={() => undefined} text='Legg til oppgave' />
     </Box>

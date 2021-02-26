@@ -47,8 +47,11 @@ model Phase {
   title             String
   processTemplateId String
   createdAt         DateTime        @default(now())
+  order             Int             @default(1)
   processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
   tasks             Task[]
+
+  @@unique([processTemplateId, order], name: "processTemplateId_order_unique")
 }
 
 model ProcessTemplate {
