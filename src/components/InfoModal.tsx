@@ -89,7 +89,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           ) : (
             <div className={classes.centeringRow}>
               {Array(5)
-                .fill()
+                .fill(0)
                 .map((_, i) => (
                   <Skeleton key={i}>
                     <Chip />
