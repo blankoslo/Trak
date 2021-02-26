@@ -14,6 +14,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   } = req;
   if (req.method === 'GET') {
     GET(res, id);
+  } else if (req.method === 'PUT') {
+    PUT(req, res, id);
   } else {
     res.status(405);
   }
@@ -73,6 +75,39 @@ const GET = async (res, id) => {
       },
     });
     res.status(200).json(employeeTask);
+  } catch (err) {
+    if (err) {
+      res.status(404).send({ message: err?.meta?.cause });
+    } else {
+      res.status(500).send({ message: 'Noe gikk galt med serveren' });
+    }
+  }
+};
+
+type employeeTaskUpdateData = {
+  body: {
+    completed: boolean;
+    dueDate: Date;
+    responsibleId: number;
+  };
+};
+
+const PUT = async (req, res, id) => {
+  const {
+    body: { completed, dueDate, responsibleId },
+  }: employeeTaskUpdateData = req;
+  try {
+    const updatedEmployeeTask = await prisma.employeeTask.update({
+      where: {
+        id: id.toString(),
+      },
+      data: {
+        completed: completed,
+        dueDate: dueDate,
+        responsibleId: responsibleId,
+      },
+    });
+    res.status(200).json(updatedEmployeeTask);
   } catch (err) {
     if (err) {
       res.status(404).send({ message: err?.meta?.cause });

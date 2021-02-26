@@ -1,9 +1,11 @@
 import { Box, IconButton } from '@material-ui/core';
 import { CheckBox as CheckBoxIcon, CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, Info as InfoIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
+import axios from 'axios';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import Typo from 'components/Typo';
+import useSnackbar from 'context/Snackbar';
 import { EmployeeContext } from 'pages/ansatt/[id]';
 import { useContext, useState } from 'react';
 import theme from 'theme';
@@ -28,16 +30,36 @@ const TaskRow = ({ employeeTask }: TaskRowProps) => {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const classes = useStyles();
   const { employee } = useContext(EmployeeContext);
+  const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
+  const showSnackbar = useSnackbar();
+
+  const toggelCheckBox = () => {
+    axios
+      .put(`/api/employeeTasks/${employeeTask.id}`, {
+        completed: !completed,
+        dueDate: employeeTask.dueDate,
+        responsibleId: employeeTask.responsibleId,
+      })
+      .then(() => {
+        showSnackbar('Oppgave fullført', 'success');
+        setCompleted(!completed);
+      })
+      .catch((error) => {
+        showSnackbar(error.response.data?.message, 'error');
+      });
+  };
 
   return (
     <Box display='flex'>
       <Box alignItems='center' display='flex' flex={2}>
-        {employeeTask.completed ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
-        <Typo className={employeeTask.completed && classes.completedTask} color={!employeeTask.completed && 'disabled'} noWrap variant='body1'>
+        <IconButton onClick={toggelCheckBox} size='small'>
+          {completed ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+        </IconButton>
+        <Typo className={completed && classes.completedTask} color={!completed && 'disabled'} noWrap variant='body1'>
           {employeeTask.task.title}
         </Typo>
         <IconButton onClick={() => setModalIsOpen(true)} size='small'>
-          <InfoIcon color={employeeTask.completed ? 'inherit' : 'primary'} />
+          <InfoIcon color={completed ? 'inherit' : 'primary'} />
         </IconButton>
         {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={employeeTask.id} modalIsOpen={modalIsOpen} />}
       </Box>
