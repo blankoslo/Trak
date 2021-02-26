@@ -1,7 +1,6 @@
 import { Box, IconButton } from '@material-ui/core';
 import { CheckBox as CheckBoxIcon, CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, Info as InfoIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
-import axios from 'axios';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import Typo from 'components/Typo';
@@ -10,6 +9,7 @@ import { EmployeeContext } from 'pages/ansatt/[id]';
 import { useContext, useState } from 'react';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
+import { toggleCheckBox } from 'utils/utils';
 
 const useStyles = makeStyles({
   avatar: {
@@ -33,26 +33,10 @@ const TaskRow = ({ employeeTask }: TaskRowProps) => {
   const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
   const showSnackbar = useSnackbar();
 
-  const toggelCheckBox = () => {
-    axios
-      .put(`/api/employeeTasks/${employeeTask.id}`, {
-        completed: !completed,
-        dueDate: employeeTask.dueDate,
-        responsibleId: employeeTask.responsibleId,
-      })
-      .then(() => {
-        showSnackbar('Oppgave fullført', 'success');
-        setCompleted(!completed);
-      })
-      .catch((error) => {
-        showSnackbar(error.response.data?.message, 'error');
-      });
-  };
-
   return (
     <Box display='flex'>
       <Box alignItems='center' display='flex' flex={2}>
-        <IconButton onClick={toggelCheckBox} size='small'>
+        <IconButton onClick={() => toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar)} size='small'>
           {completed ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
         </IconButton>
         <Typo className={completed && classes.completedTask} color={!completed && 'disabled'} noWrap variant='body1'>

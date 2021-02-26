@@ -1,6 +1,5 @@
 import { IconButton, makeStyles } from '@material-ui/core';
 import { CheckBox, CheckBoxOutlineBlank, Info } from '@material-ui/icons';
-import axios from 'axios';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import Typo from 'components/Typo';
@@ -8,6 +7,7 @@ import useSnackbar from 'context/Snackbar';
 import { useState } from 'react';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
+import { toggleCheckBox } from 'utils/utils';
 
 const useStyles = makeStyles({
   avatar: {
@@ -31,26 +31,10 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
   const [completed, setCompleted] = useState<boolean>(data.completed);
   const showSnackbar = useSnackbar();
 
-  const toggelCheckBox = () => {
-    axios
-      .put(`/api/employeeTasks/${data.id}`, {
-        completed: !completed,
-        dueDate: data.dueDate,
-        responsibleId: data.responsibleId,
-      })
-      .then(() => {
-        showSnackbar('Oppgave fullført', 'success');
-        setCompleted(!completed);
-      })
-      .catch((error) => {
-        showSnackbar(error.response.data?.message, 'error');
-      });
-  };
-
   return (
     <>
       <div className={classes.centeringRow}>
-        <IconButton onClick={toggelCheckBox} size='small'>
+        <IconButton onClick={() => toggleCheckBox(data, completed, setCompleted, showSnackbar)} size='small'>
           {completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
         </IconButton>
         <Typo className={completed ? classes.completedTask : undefined}>{data.task.title}</Typo>
