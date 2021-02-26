@@ -37,6 +37,6 @@ export const toggleCheckBox = (
       setCompleted(!completed);
     })
     .catch((error) => {
-      showSnackbar(error.response.data?.message, 'error');
+      showSnackbar(error.response.data?.message || 'Noe gikk galt', 'error');
     });
 };

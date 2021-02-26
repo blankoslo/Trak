@@ -6,9 +6,9 @@ import TextField from 'components/form/TextField';
 import ToggleButtonGroup from 'components/form/ToggleButtonGroup';
 import Modal from 'components/Modal';
 import Typo from 'components/Typo';
+import { useData } from 'context/Data';
 import useProgressbar from 'context/Progressbar';
 import useSnackbar from 'context/Snackbar';
-import { useTaskModal } from 'context/TaskModal';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -48,7 +48,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
   const showProgressbar = useProgressbar();
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const { professions, tags, employees } = useTaskModal();
+  const { professions, tags, employees } = useData();
   const [task, setTask] = useState<ITask | undefined>(undefined);
   const { register, handleSubmit, errors, control, reset } = useForm({
     reValidateMode: 'onChange',

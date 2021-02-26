@@ -7,14 +7,16 @@ type EmployeeSelectorProps = {
   control: Control;
   name: string;
   label: string;
+  required?: boolean;
 };
 
-const EmployeeSelector = ({ employees, control, name, label }: EmployeeSelectorProps) => {
+const EmployeeSelector = ({ employees, control, name, label, required = false }: EmployeeSelectorProps) => {
   return (
     <Controller
       control={control}
       name={name}
-      render={({ onChange, value }) => <EmployeeSelectorComponent employees={employees} label={label} setValue={onChange} value={value} />}
+      render={({ onChange, value }) => <EmployeeSelectorComponent employees={employees} label={label} required={required} setValue={onChange} value={value} />}
+      rules={{ required: required }}
     />
   );
 };
@@ -24,12 +26,14 @@ type EmployeeSelectorComponentProps = {
   setValue: (IEmployee) => void;
   label: string;
   value: IEmployee;
+  required: boolean;
 };
 
 const EmployeeSelectorComponent = ({
   employees,
   setValue,
   label,
+  required,
   value = {
     firstName: '',
     lastName: '',
@@ -49,7 +53,7 @@ const EmployeeSelectorComponent = ({
       onChange={(_, employee) => setValue(employee)}
       options={employees}
       popupIcon={<></>}
-      renderInput={(params) => <TextField {...params} InputLabelProps={{ shrink: true }} label={label} variant='standard' />}
+      renderInput={(params) => <TextField {...params} InputLabelProps={{ shrink: true }} fullWidth label={label} required={required} variant='standard' />}
       value={value}
     />
   );

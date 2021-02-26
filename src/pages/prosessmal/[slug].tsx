@@ -3,7 +3,7 @@ import AddButton from 'components/AddButton';
 import Typo from 'components/Typo';
 import Phase from 'components/views/prosessmal/Phase';
 import PhaseModal from 'components/views/prosessmal/PhaseModal';
-import { TaskModalProvider } from 'context/TaskModal';
+import { DataProvider } from 'context/Data';
 import prisma from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
@@ -83,11 +83,11 @@ const ProcessTemplate = ({ processTemplate }: InferGetServerSidePropsType<typeof
           </Typo>
           <Typo className={classes.template_title}>{processTemplate?.title}</Typo>
         </div>
-        <TaskModalProvider>
+        <DataProvider>
           {processTemplate?.phases.map((phase: IPhase) => (
             <Phase key={phase.id} phase={phase} processTemplate={processTemplate} />
           ))}
-        </TaskModalProvider>
+        </DataProvider>
         <AddButton onClick={() => setModalIsOpen(true)} text='Legg til fase' />
         {modalIsOpen && <PhaseModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} processTemplate={processTemplate} />}
       </div>

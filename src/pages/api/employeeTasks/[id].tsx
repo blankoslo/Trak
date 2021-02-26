@@ -104,7 +104,11 @@ const PUT = async (req, res, id) => {
       data: {
         completed: completed,
         dueDate: dueDate,
-        responsibleId: responsibleId,
+        responsible: {
+          connect: {
+            id: responsibleId,
+          },
+        },
       },
     });
     res.status(200).json(updatedEmployeeTask);
