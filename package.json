@@ -21,9 +21,13 @@
     "lint": "eslint --fix --max-warnings=0 .",
     "format": "prettier --write --check --config ./.prettierrc './src/**/*.{js,jsx,ts,tsx,css,md,json}'",
     "fastformat": "pretty-quick --staged './**/*.{js,jsx,ts,tsx,css,md,json}'",
-    "db": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
+    "create": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
     "precommit": "yarn fastformat && yarn lint",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "yarn build",
+    "loaddata": "npx fixtures ./src/fixtures",
+    "remove" : "docker rm -f -v trak",
+    "push" : "npx prisma db push --preview-feature",
+    "fresh": "yarn remove && yarn create && sleep 1 && yarn push && yarn loaddata"
   },
   "husky": {
     "hooks": {
@@ -47,6 +51,7 @@
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
     "eslint-plugin-json": "^2.1.2",
+    "faker": "^5.4.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "next": "10.0.6",
@@ -58,6 +63,7 @@
     "swr": "^0.4.2"
   },
   "devDependencies": {
+    "@getbigger-io/prisma-fixtures-cli": "^1.0.9",
     "@types/node": "^14.14.22",
     "@types/react": "^17.0.1",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
