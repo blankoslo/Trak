@@ -43,7 +43,7 @@ const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) 
       () => ({
         responsible: employeeTask?.responsible,
       }),
-      [employeeTask, employeeTask.responsible],
+      [employeeTask, employeeTask?.responsible],
     ),
   });
 
@@ -51,9 +51,9 @@ const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) 
     reset({
       responsible: employeeTask?.responsible,
     });
-  }, [employeeTask, employeeTask.responsible]);
+  }, [employeeTask, employeeTask?.responsible]);
 
-  useMemo(() => employeeTask, [employeeTask, employeeTask.responsible]);
+  useMemo(() => employeeTask, [employeeTask, employeeTask?.responsible]);
 
   const onSubmit = handleSubmit((formData) => {
     axios
