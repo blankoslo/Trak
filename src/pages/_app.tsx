@@ -1,4 +1,4 @@
-import ContextProvider from 'pages/ContextProvider';
+import ContextProvider from 'ContextProvider';
 import { useEffect } from 'react';
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
