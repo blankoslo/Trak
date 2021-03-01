@@ -3,9 +3,11 @@ import { CheckBox, CheckBoxOutlineBlank, Info } from '@material-ui/icons';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import Typo from 'components/Typo';
+import useSnackbar from 'context/Snackbar';
 import { useState } from 'react';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
+import { toggleCheckBox } from 'utils/utils';
 
 const useStyles = makeStyles({
   avatar: {
@@ -26,16 +28,18 @@ const useStyles = makeStyles({
 const TaskRow = ({ data }: { data: IEmployeeTask }) => {
   const classes = useStyles();
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  const [completed, setCompleted] = useState<boolean>(data.completed);
+  const showSnackbar = useSnackbar();
 
   return (
     <>
       <div className={classes.centeringRow}>
-        <IconButton onClick={() => undefined} size='small'>
-          {data.completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
+        <IconButton onClick={() => toggleCheckBox(data, completed, setCompleted, showSnackbar)} size='small'>
+          {completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
         </IconButton>
-        <Typo className={data.completed ? classes.completedTask : undefined}>{data.task.title}</Typo>
+        <Typo className={completed ? classes.completedTask : undefined}>{data.task.title}</Typo>
         <IconButton onClick={() => setModalIsOpen(true)} size='small'>
-          <Info color={data.completed ? 'inherit' : 'primary'} />
+          <Info color={completed ? 'inherit' : 'primary'} />
         </IconButton>
         {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={data.id} modalIsOpen={modalIsOpen} />}
       </div>
