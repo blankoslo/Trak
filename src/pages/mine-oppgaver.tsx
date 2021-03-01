@@ -154,7 +154,7 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
           <Typo className={classes.title} variant='h1'>
             Mine oppgaver
           </Typo>
-          <Typo className={classes.template_title}>{completed ? 'Fullførte' : 'Aktive'} oppgaver</Typo>
+          <Typo className={classes.template_title}>{completed.toString() === 'true' ? 'Fullførte' : 'Aktive'} oppgaver</Typo>
         </div>
         <SearchFilter />
         <div>

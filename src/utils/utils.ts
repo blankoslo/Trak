@@ -33,10 +33,10 @@ export const toggleCheckBox = (
       responsibleId: employeeTask.responsibleId,
     })
     .then(() => {
-      showSnackbar(`Oppgave ${completed ? 'ikke' : ''} fullført`, 'success');
+      showSnackbar(`Oppgave markert som ${completed ? 'ikke' : ''} fullført`, 'success');
       setCompleted(!completed);
     })
     .catch((error) => {
-      showSnackbar(error.response.data?.message || 'Noe gikk galt', 'error');
+      showSnackbar(error.response.data?.message, 'error');
     });
 };
