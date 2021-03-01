@@ -1,3 +1,5 @@
+import 'moment/locale/nb';
+
 import { makeStyles } from '@material-ui/core';
 import SearchFilter from 'components/SearchFilter';
 import Typo from 'components/Typo';
@@ -29,6 +31,8 @@ const useStyles = makeStyles({
 });
 
 const LOGGED_IN_USER = 1;
+moment.locale('nb');
+
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { fullført: completed } = query;
 

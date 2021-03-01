@@ -1,9 +1,14 @@
-import { Box, Button, Chip, makeStyles, Skeleton } from '@material-ui/core';
+import { Box, Button, Chip, IconButton, makeStyles, Skeleton } from '@material-ui/core';
+import { Edit } from '@material-ui/icons';
 import axios from 'axios';
+import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';
 import Typo from 'components/Typo';
+import { DataProvider, useData } from 'context/Data';
 import useSnackbar from 'context/Snackbar';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
 
@@ -20,12 +25,82 @@ const useStyles = makeStyles({
     columnGap: theme.spacing(2),
   },
   centeringRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: theme.spacing(2),
+    display: 'grid',
+    gridTemplateColumns: '4fr 1fr 1fr',
   },
 });
+
+const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
+  const [responsibleSelector, setResponsibleSelector] = useState<boolean>(false);
+  const { employees } = useData();
+  const classes = useStyles();
+  const showSnackbar = useSnackbar();
+  const router = useRouter();
+
+  const { control, reset, handleSubmit } = useForm({
+    reValidateMode: 'onChange',
+    defaultValues: useMemo(
+      () => ({
+        responsible: employeeTask?.responsible,
+      }),
+      [employeeTask, employeeTask?.responsible],
+    ),
+  });
+
+  useEffect(() => {
+    reset({
+      responsible: employeeTask?.responsible,
+    });
+  }, [employeeTask, employeeTask?.responsible]);
+
+  useMemo(() => employeeTask, [employeeTask, employeeTask?.responsible]);
+
+  const onSubmit = handleSubmit((formData) => {
+    axios
+      .put(`/api/employeeTasks/${employeeTask.id}`, {
+        completed: employeeTask.completed,
+        dueDate: employeeTask.dueDate,
+        responsibleId: formData.responsible?.id,
+      })
+      .then(() => {
+        setResponsibleSelector(false);
+        employeeTask.responsible = formData.responsible;
+        router.replace(router.asPath).finally(() => {
+          showSnackbar('Ansvarlig byttet', 'success');
+        });
+      })
+      .catch((error) => {
+        showSnackbar(error.response.data?.message || 'Noe gikk galt', 'error');
+      });
+  });
+
+  return (
+    <Typo variant='body1'>
+      {employeeTask ? (
+        responsibleSelector ? (
+          <form className={classes.centeringRow}>
+            <EmployeeSelector control={control} employees={employees} label='Oppgaveansvarlig' name='responsible' required />
+            <Button onClick={onSubmit} type='button'>
+              Lagre
+            </Button>
+            <Button onClick={() => setResponsibleSelector(false)} type='button'>
+              Avbryt
+            </Button>
+          </form>
+        ) : (
+          <>
+            {`${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}`}
+            <IconButton onClick={() => setResponsibleSelector(true)} size='small'>
+              <Edit />
+            </IconButton>
+          </>
+        )
+      ) : (
+        <Skeleton width={theme.spacing(32)} />
+      )}
+    </Typo>
+  );
+};
 
 type InfoModalProps = {
   employee_task_id: string;
@@ -45,7 +120,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
         setEmployeeTask(res.data);
       })
       .catch((error) => {
-        showSnackbar(error.response.data?.message, 'error');
+        showSnackbar(error.response.data?.message || 'Noe gikk galt', 'error');
       });
   }, [employee_task_id]);
 
@@ -65,9 +140,9 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           <Typo variant='body1'>
             <b>Ansvarlig:</b>
           </Typo>
-          <Typo variant='body1'>
-            {employeeTask ? `${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}` : <Skeleton width={theme.spacing(32)} />}
-          </Typo>
+          <DataProvider>
+            <ResponsibleSelector employeeTask={employeeTask} />
+          </DataProvider>
           <Typo variant='body1'>
             <b>Gjelder:</b>
           </Typo>
