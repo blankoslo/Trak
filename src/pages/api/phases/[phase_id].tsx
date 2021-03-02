@@ -21,6 +21,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   } else {
     res.status(405);
   }
+  prisma.$disconnect();
 }
 
 const GET = async (res, phase_id) => {
@@ -34,6 +35,9 @@ const GET = async (res, phase_id) => {
         title: true,
       },
     });
+    if (!phase) {
+      throw new Error();
+    }
     res.status(200).json(phase);
   } catch (err) {
     if (err) {

@@ -19,6 +19,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   } else {
     res.status(405);
   }
+  prisma.$disconnect();
 }
 
 const GET = async (res, id) => {
@@ -74,6 +75,9 @@ const GET = async (res, id) => {
         },
       },
     });
+    if (!employeeTask) {
+      throw new Error();
+    }
     res.status(200).json(employeeTask);
   } catch (err) {
     if (err) {
