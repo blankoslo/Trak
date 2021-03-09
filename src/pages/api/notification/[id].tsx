@@ -4,19 +4,22 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    const employees = await prisma.employee.findMany({
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        imageUrl: true,
-        slack: true,
+  const {
+    body: { data },
+    query: { id },
+  } = req;
+  if (req.method === 'PUT') {
+    const notification = await prisma.notification.update({
+      where: {
+        id: id.toString(),
+      },
+      data: {
+        read: data.read,
       },
     });
-    res.json(employees);
+
+    res.status(HttpStatusCode.OK).json(notification);
   } else {
     res.status(HttpStatusCode.METHOD_NOT_ALLOWED);
   }
-  prisma.$disconnect();
 }

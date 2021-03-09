@@ -12,7 +12,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
-
 const useStyles = makeStyles({
   chip: {
     marginRight: theme.spacing(1),
@@ -57,22 +56,36 @@ const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) 
   useMemo(() => employeeTask, [employeeTask, employeeTask?.responsible]);
 
   const onSubmit = handleSubmit((formData) => {
-    axios
-      .put(`/api/employeeTasks/${employeeTask.id}`, {
-        completed: employeeTask.completed,
-        dueDate: employeeTask.dueDate,
-        responsibleId: formData.responsible?.id,
-      })
-      .then(() => {
-        setResponsibleSelector(false);
-        employeeTask.responsible = formData.responsible;
-        router.replace(router.asPath).finally(() => {
-          showSnackbar('Ansvarlig byttet', 'success');
+    if (formData.responsible?.id !== employeeTask.responsible.id) {
+      axios
+        .all([
+          axios.put(`/api/employeeTasks/${employeeTask.id}`, {
+            completed: employeeTask.completed,
+            dueDate: employeeTask.dueDate,
+            responsibleId: formData.responsible?.id,
+          }),
+          axios.post('/api/notification', {
+            description: `Du har blitt delegert arbeidsoppgaven "${employeeTask.task.title}" av ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`,
+            employeeId: formData.responsible?.id,
+            ...(formData.responsible.slack && {
+              slackData: {
+                channel: formData.responsible.slack,
+                text: `Du har blitt delegert arbeidsoppgaven ${employeeTask.task.title} av ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`,
+              },
+            }),
+          }),
+        ])
+        .then(() => {
+          setResponsibleSelector(false);
+          employeeTask.responsible = formData.responsible;
+          router.replace(router.asPath).finally(() => {
+            showSnackbar('Ansvarlig byttet', 'success');
+          });
+        })
+        .catch((error) => {
+          showSnackbar(error.response.data?.message || 'Noe gikk galt', 'error');
         });
-      })
-      .catch((error) => {
-        showSnackbar(error.response.data?.message || 'Noe gikk galt', 'error');
-      });
+    }
   });
 
   return (
