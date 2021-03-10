@@ -4,7 +4,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { addDays } from 'utils/utils';
 
 const prisma = new PrismaClient();
+const CRON_SECRET = process.env.CRON_SECRET;
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  if (req.headers.CRON_SECRET !== CRON_SECRET) {
+    res.status(HttpStatusCode.UNAUTHORIZED).end();
+  }
   if (req.method === 'GET') {
     const phases = await prisma.phase.findMany({
       select: {
@@ -120,7 +124,6 @@ const createEmployeeTasks = async (employee, phase) => {
       return {
         employeeId: employee.id,
         responsibleId: task.responsibleId || employee.hrManagerId,
-        year: phase.dueDate.year,
         dueDate: phase.dueDate,
         taskId: task.id,
       };
