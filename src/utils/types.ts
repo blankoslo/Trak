@@ -11,6 +11,7 @@ export type IEmployee = {
   slack?: string;
   profession: IProfession;
   hrManager: IEmployee;
+  hrManagerId?: number;
   employees: IEmployee[];
   employeeTask: IEmployeeTask[];
   notifications?: INotification[];
@@ -44,6 +45,9 @@ export type IPhase = {
   processTemplateId: string;
   processTemplate?: IProcessTemplate;
   tasks?: ITask[];
+  dueDate?: Date;
+  dueDateDayOffset?: number;
+  cronDate?: Date;
 };
 
 export type IProcessTemplate = {
@@ -76,4 +80,5 @@ export type ITask = {
   tags?: ITag[];
   employeeTask: IEmployeeTask[];
   responsible?: IEmployee;
+  responsibleId?: number;
 };

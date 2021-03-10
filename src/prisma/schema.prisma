@@ -58,9 +58,11 @@ model Phase {
   processTemplateId String
   createdAt         DateTime        @default(now())
   order             Int             @default(1)
+  dueDateDayOffset  Int?
+  cronDate          DateTime?
+  dueDate           DateTime?
   processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
   tasks             Task[]
-
 }
 
 model ProcessTemplate {
