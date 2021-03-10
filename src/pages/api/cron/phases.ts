@@ -4,8 +4,18 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { addDays } from 'utils/utils';
 
 const prisma = new PrismaClient();
-const CRON_SECRET = process.env.CRON_SECRET;
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  const CRON_SECRET = process.env.CRON_SECRET;
+  // eslint-disable-next-line
+  console.log('####');
+  // eslint-disable-next-line
+  console.log(req.headers.CRON_SECRET);
+  // eslint-disable-next-line
+  console.log(CRON_SECRET);
+  // eslint-disable-next-line
+  console.log(req.headers.CRON_SECRET !== CRON_SECRET);
+  // eslint-disable-next-line
+  console.log('####');
   if (req.headers.CRON_SECRET !== CRON_SECRET) {
     res.status(HttpStatusCode.UNAUTHORIZED).end();
   }
