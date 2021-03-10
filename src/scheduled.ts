@@ -4,8 +4,13 @@ const axios = require('axios');
 const CRON_SECRET = process.env.CRON_SECRET;
 const BASE_URI = 'api/cron/';
 
+// eslint-disable-next-line
+console.log(process.env);
+// eslint-disable-next-line
+console.log(process.env.CRON_SECRET);
+
 axios
-  .get(`http://localhost:3000/${BASE_URI}phases`, {
+  .get(`https://trak-trak-trak.herokuapp.com/${BASE_URI}phases`, {
     headers: {
       CRON_SECRET: CRON_SECRET ?? 'secret',
     },
