@@ -15,7 +15,7 @@ type TimeSectionProps = {
 const useStyles = makeStyles({
   grid: {
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr 1fr',
+    gridTemplateColumns: '2fr 1fr 1fr 1fr',
     alignItems: 'end',
     marginRight: '30px',
     marginBottom: theme.spacing(1),
@@ -32,7 +32,7 @@ const useStyles = makeStyles({
 
 const TimeSection = ({ section, first }: TimeSectionProps) => {
   const classes = useStyles();
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(section.defaultOpen);
   if (!section) {
     return <></>;
   }
@@ -40,9 +40,9 @@ const TimeSection = ({ section, first }: TimeSectionProps) => {
     <div className={classes.grid}>
       <div className={classes.centeringRow}>
         <Typo>
-          <b>{section.title}</b>
+          <b style={section.error && { color: theme.palette.error.main }}>{section.title}</b>
           <span className={classes.disabled}>
-            {section.title && ' - '}
+            {section.title && section.date && ' - '}
             {section.date}
           </span>
         </Typo>
@@ -51,10 +51,13 @@ const TimeSection = ({ section, first }: TimeSectionProps) => {
         </IconButton>
       </div>
       <Typo color='disabled' variant='body2'>
-        {first && 'Prosess'}
+        {first && 'Gjelder'}
       </Typo>
       <Typo color='disabled' variant='body2'>
-        {first && 'Gjelder'}
+        {first && 'Forfallsdato'}
+      </Typo>
+      <Typo color='disabled' variant='body2'>
+        {first && 'Prosess'}
       </Typo>
       {open && section.data.map((data) => <TaskRow data={data} key={data.id} />)}
       <Divider style={{ gridColumn: 'span 3' }} />
