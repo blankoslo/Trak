@@ -1,4 +1,5 @@
 import ContextProvider from 'ContextProvider';
+import Error from 'next/error';
 import { useEffect } from 'react';
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -7,6 +8,9 @@ function MyApp({ Component, pageProps }) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
   }, []);
+  if (pageProps.error) {
+    return <Error statusCode={pageProps.error.statusCode} title={pageProps.error.message} />;
+  }
   return (
     <ContextProvider>
       <Component {...pageProps} />

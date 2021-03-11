@@ -1,5 +1,5 @@
 import { Avatar, Badge, Box, Button, CircularProgress, Divider, Drawer, IconButton, List, ListItem, ListItemText } from '@material-ui/core';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
@@ -175,24 +175,31 @@ const LoggedInUserCard = ({ firstName, lastName, image, displayNotifications, se
       {displayNotifications && (
         <>
           <Box alignItems='center' className={classes.gutterBottom} display='flex'>
-            <IconButton disabled onClick={() => null}>
-              <SettingsIcon className={classes.marginRight} />
-              <Typo variant='body2'>Innstillinger</Typo>
-            </IconButton>
+            <Button startIcon={<SettingsIcon />}>Innstillinger</Button>
           </Box>
-          <Box maxHeight='60vh' mx={'-' + theme.spacing(2)} style={{ overflowX: 'hidden', overflowY: 'auto' }}>
-            <ScrollableFeed className={classes.showScrollBarOnHover}>
-              {notifications.map((notification: INotification) => {
-                return <Notification key={notification.id} notification={notification} notifications={notifications} setNotifications={setNotifications} />;
-              })}
-            </ScrollableFeed>
-          </Box>
-          <Button color='primary' onClick={() => setOffset(offset + LIMIT)} variant='text'>
-            Last inn flere
-          </Button>
+
+          {notifications.length === 0 ? (
+            <Typo variant='body2'>Ingen varsler</Typo>
+          ) : (
+            <>
+              <Box maxHeight='60vh' mx={'-' + theme.spacing(2)} style={{ overflowX: 'hidden', overflowY: 'auto' }}>
+                <ScrollableFeed className={classes.showScrollBarOnHover}>
+                  {notifications.map((notification: INotification) => {
+                    return <Notification key={notification.id} notification={notification} notifications={notifications} setNotifications={setNotifications} />;
+                  })}
+                </ScrollableFeed>
+              </Box>
+              {notifications.length % LIMIT === 0 && (
+                <Button color='primary' onClick={() => setOffset(offset + LIMIT)} variant='text'>
+                  Last inn flere
+                </Button>
+              )}
+            </>
+          )}
+
           <Box alignItems='flex-end' display='flex' flexDirection='column-reverse'>
             <IconButton onClick={() => setDisplayNotifications(!displayNotifications)}>
-              <ArrowUpwardIcon />
+              <ExpandLessIcon />
             </IconButton>
           </Box>
         </>

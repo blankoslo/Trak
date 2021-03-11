@@ -35,7 +35,7 @@ const LOGGED_IN_USER = 1;
 moment.locale('nb');
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const { fullført: completed } = query;
+  const { fullfort: completed } = query;
   const isCompleted = completed.toString() === 'true';
   const myTasksQuery = await prisma.employeeTask.findMany({
     where: {
@@ -104,7 +104,7 @@ export type TimeSectionType = {
 const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const classes = useStyles();
   const router = useRouter();
-  const { fullført: completed } = router.query;
+  const { fullfort: completed } = router.query;
 
   const splitIntoTimeSections = () => {
     const todaysDate = moment().startOf('day').toDate();
