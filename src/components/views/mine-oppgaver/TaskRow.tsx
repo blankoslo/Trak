@@ -24,6 +24,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    width: '35rem',
   },
   avatarOnClick: {
     display: 'flex',
@@ -51,7 +52,9 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
         <IconButton onClick={() => toggleCheckBox(data, completed, setCompleted, showSnackbar)} size='small'>
           {completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
         </IconButton>
-        <Typo className={completed ? classes.completedTask : undefined}>{data.task.title}</Typo>
+        <Typo className={completed ? classes.completedTask : undefined} noWrap>
+          {data.task.title}
+        </Typo>
         <IconButton onClick={() => setModalIsOpen(true)} size='small'>
           <Info color={completed ? 'inherit' : 'primary'} />
         </IconButton>
