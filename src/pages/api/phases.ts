@@ -12,6 +12,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       data: {
         title: data.title,
         processTemplateId: processTemplateId,
+        dueDateDayOffset: data.dueDateDayOffset,
+        dueDate: data.dueDate,
+        cronDate: data.cronDate,
       },
     });
     res.status(HttpStatusCode.CREATED).json(newPhase);

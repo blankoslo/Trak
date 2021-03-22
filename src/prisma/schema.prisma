@@ -26,8 +26,8 @@ model Employee {
   employees               Employee[]     @relation("EmployeeToEmployee")
   employeeTask            EmployeeTask[] @relation("tasks")
   responsibleEmployeeTask EmployeeTask[] @relation("responsible_employee_tasks")
-  responsibleTask         Task[]         @relation("responsible_tasks")
   notifications           Notification[] @relation("employee")
+  responsibleTask         Task[]         @relation("responsible_tasks")
 }
 
 model EmployeeTask {
@@ -56,7 +56,6 @@ model Phase {
   title             String
   processTemplateId String
   createdAt         DateTime        @default(now())
-  order             Int             @default(1)
   dueDateDayOffset  Int?
   cronDate          DateTime?
   dueDate           DateTime?

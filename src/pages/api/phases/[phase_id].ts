@@ -34,6 +34,9 @@ const GET = async (res, phase_id) => {
       select: {
         id: true,
         title: true,
+        dueDateDayOffset: true,
+        dueDate: true,
+        cronDate: true,
       },
     });
     if (!phase) {
@@ -60,6 +63,9 @@ const PUT = async (req, res, phase_id) => {
       },
       data: {
         title: data.title,
+        dueDateDayOffset: data.dueDateDayOffset,
+        dueDate: data.dueDate,
+        cronDate: data.cronDate,
       },
     });
     res.status(HttpStatusCode.OK).json(updatedPhase);
