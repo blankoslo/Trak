@@ -9,9 +9,10 @@ import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import { IEmployeeTask } from 'utils/types';
-import { splitIntoTimeSections } from 'utils/utils';
+import { searchTask, splitIntoTimeSections } from 'utils/utils';
 
 const useStyles = makeStyles({
   root: {
@@ -107,6 +108,16 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
   const { fullfort: completed } = router.query;
 
   const timeSections: TimeSectionType[] = splitIntoTimeSections(myTasks);
+  useEffect(() => {
+    setSearchResults([]);
+  }, [router.query]);
+
+  const [searchResults, setSearchResults] = useState([]);
+
+  const search = (text: string) => {
+    const result = searchTask(text, timeSections);
+    setSearchResults(result);
+  };
 
   return (
     <>
@@ -120,12 +131,14 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
           </Typo>
           <Typo className={classes.template_title}>{completed.toString() === 'true' ? 'Fullførte' : 'Aktive'} oppgaver</Typo>
         </div>
-        <SearchFilter />
+        <SearchFilter search={search} />
         <div>
-          {timeSections.length === 0 ? (
+          {!timeSections.length ? (
             <Typo>Ingen oppgaver</Typo>
           ) : (
-            timeSections.map((section: TimeSectionType, index: number) => <TimeSection first={index === 0} key={index} section={section} />)
+            (searchResults.length ? searchResults : timeSections).map((section: TimeSectionType, index: number) => {
+              return <TimeSection first={index === 0} key={index} section={section} />;
+            })
           )}
         </div>
       </div>
