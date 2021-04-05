@@ -1,6 +1,5 @@
 import { Avatar, Badge, Box, Button, CircularProgress, Divider, Drawer, IconButton, List, ListItem, ListItemText } from '@material-ui/core';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 import classnames from 'classnames';
@@ -10,6 +9,7 @@ import moment from 'moment';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { signOut } from 'next-auth/client';
 import { Dispatch, useEffect, useState } from 'react';
 import ScrollableFeed from 'react-scrollable-feed';
 import theme from 'theme';
@@ -172,8 +172,9 @@ const LoggedInUserCard = ({ firstName, lastName, image, displayNotifications, se
 
       {displayNotifications && (
         <>
-          <Box alignItems='center' className={classes.gutterBottom} display='flex'>
-            <Button startIcon={<SettingsIcon />}>Innstillinger</Button>
+          <Box alignItems='center' className={classes.gutterBottom} display='flex' flexDirection='column'>
+            <Button>Innstillinger</Button>
+            <Button onClick={signOut}>Logg ut</Button>
           </Box>
 
           {notifications.length === 0 ? (
@@ -207,23 +208,25 @@ const Sidebar = () => {
   const classes = useStyles();
 
   const [displayNotifications, setDisplayNotifications] = useState(false);
-  if (!user) {
-    return <Typo>Loading...</Typo>;
-  }
+
   return (
     <Drawer anchor='left' className={classes.drawer} classes={{ paper: classnames(classes.drawerPaper, classes.removeScrollbar) }} variant='permanent'>
       <Box className={classes.removeScrollbar} display='flex' flexDirection='column' padding={theme.spacing(2)}>
         <Box className={classes.gutterBottom}>
-          <Image height={34} src={'/trak_logo.png'} width={120} />
+          <Image height={34} src={'/trak_logo.svg'} width={120} />
         </Box>
-        <LoggedInUserCard
-          displayNotifications={displayNotifications}
-          firstName={user.firstName}
-          image={user.imageUrl}
-          lastName={user.lastName}
-          setDisplayNotifications={setDisplayNotifications}
-          userId={user.id}
-        />
+        {!user ? (
+          <CircularProgress />
+        ) : (
+          <LoggedInUserCard
+            displayNotifications={displayNotifications}
+            firstName={user.firstName}
+            image={user.imageUrl}
+            lastName={user.lastName}
+            setDisplayNotifications={setDisplayNotifications}
+            userId={user.id}
+          />
+        )}
         <Divider />
         {!displayNotifications && (
           <List className={classes.listRoot} component='nav'>
