@@ -1,9 +1,9 @@
-import { Box, Button, Fade, makeStyles, TextField } from '@material-ui/core';
+import { Badge, Button, Fade, IconButton, InputAdornment, makeStyles, Popover, TextField } from '@material-ui/core';
 import { Search, Tune } from '@material-ui/icons';
+import ClearIcon from '@material-ui/icons/Clear';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import theme from 'theme';
-
 const useStyles = makeStyles({
   centeringRow: {
     display: 'flex',
@@ -14,14 +14,17 @@ const useStyles = makeStyles({
   textField: {
     height: theme.spacing(4),
   },
+  gutterBottom: {
+    marginBottom: theme.spacing(2),
+  },
 });
 
 type SearchFilterProps = {
-  //eslint-disable-next-line
-  search: (element: any) => void;
+  filterComponent: React.ReactNode;
+  search: (element: string) => void;
+  activeFilters: boolean;
 };
-
-const SearchFilter = ({ search }: SearchFilterProps) => {
+const SearchFilter = ({ filterComponent, search, activeFilters }: SearchFilterProps) => {
   const classes = useStyles();
   const router = useRouter();
 
@@ -30,17 +33,48 @@ const SearchFilter = ({ search }: SearchFilterProps) => {
   }, [router.query]);
 
   const [displaySearch, setDisplaySearch] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [searchValue, setSearchValue] = useState('');
 
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    search(searchValue);
+  }, [searchValue]);
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'filter' : undefined;
   return (
-    <Box className={classes.centeringRow} justifyContent='flex-end'>
+    <div className={classes.centeringRow}>
       {displaySearch ? (
         <Fade in timeout={100}>
           <TextField
-            InputProps={{ className: classes.textField }}
+            InputProps={{
+              className: classes.textField,
+              ...(searchValue.length && {
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      onClick={() => {
+                        setSearchValue('');
+                      }}>
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }),
+            }}
             autoFocus
             onBlur={(e) => !e.target.value && setDisplaySearch(false)}
-            onChange={(e) => search(e.target.value)}
+            onChange={(e) => setSearchValue(e.target.value)}
             size='small'
+            value={searchValue}
           />
         </Fade>
       ) : (
@@ -48,11 +82,33 @@ const SearchFilter = ({ search }: SearchFilterProps) => {
           Søk
         </Button>
       )}
-
-      <Button aria-label='Filter' color='primary' startIcon={<Tune />}>
+      <Button
+        aria-label='Filter'
+        color='primary'
+        onClick={handleClick}
+        startIcon={
+          <Badge color='secondary' invisible={!activeFilters} variant='dot'>
+            <Tune />
+          </Badge>
+        }>
         Filter
       </Button>
-    </Box>
+      <Popover
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        id={id}
+        onClose={handleClose}
+        open={open}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}>
+        {filterComponent}
+      </Popover>
+    </div>
   );
 };
 

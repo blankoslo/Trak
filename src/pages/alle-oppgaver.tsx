@@ -3,16 +3,18 @@ import 'moment/locale/nb';
 import { makeStyles } from '@material-ui/core';
 import SearchFilter from 'components/SearchFilter';
 import Typo from 'components/Typo';
+import Filter from 'components/views/mine-oppgaver/Filter';
 import TimeSection from 'components/views/mine-oppgaver/TimeSection';
 import prisma from 'lib/prisma';
 import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
-import { IEmployeeTask } from 'utils/types';
-import { searchTask, splitIntoTimeSections } from 'utils/utils';
+import theme from 'theme';
+import { IEmployeeTask, ITag } from 'utils/types';
+import { filterAndSearchTasks, splitIntoTimeSections } from 'utils/utils';
 
 const useStyles = makeStyles({
   root: {
@@ -27,6 +29,9 @@ const useStyles = makeStyles({
   },
   template_title: {
     marginLeft: '3px',
+  },
+  gutterBottom: {
+    marginBottom: theme.spacing(2),
   },
 });
 
@@ -69,6 +74,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
         select: {
           id: true,
           title: true,
+          tags: true,
           phase: {
             select: {
               processTemplate: {
@@ -104,12 +110,14 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
 
   const timeSections: TimeSectionType[] = splitIntoTimeSections(myTasks);
 
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchString, setSearchString] = useState('');
 
-  const search = (text: string) => {
-    const result = searchTask(text, timeSections);
-    setSearchResults(result);
-  };
+  const [choosenProcessTemplates, setChoosenProcessTemplates] = useState<string[]>([]);
+  const [choosenTags, setChoosenTags] = useState<ITag[]>([]);
+
+  const filterResult = useMemo(() => {
+    return filterAndSearchTasks(searchString, { tags: choosenTags, processTemplates: choosenProcessTemplates }, timeSections, true);
+  }, [searchString, choosenTags, choosenProcessTemplates]);
 
   return (
     <>
@@ -123,12 +131,23 @@ const MyTasks = ({ myTasks }: InferGetServerSidePropsType<typeof getServerSidePr
           </Typo>
           <Typo className={classes.template_title}>{completed.toString() === 'true' ? 'Fullførte' : 'Aktive'} oppgaver</Typo>
         </div>
-        <SearchFilter search={search} />
+        <SearchFilter
+          activeFilters={Boolean(choosenTags.length || choosenProcessTemplates.length)}
+          filterComponent={
+            <Filter
+              choosenProcessTemplates={choosenProcessTemplates}
+              choosenTags={choosenTags}
+              setChoosenProcessTemplates={setChoosenProcessTemplates}
+              setChoosenTags={setChoosenTags}
+            />
+          }
+          search={setSearchString}
+        />
         <div>
           {!timeSections.length ? (
             <Typo>Ingen oppgaver</Typo>
           ) : (
-            (searchResults.length ? searchResults : timeSections).map((section: TimeSectionType, index: number) => {
+            (filterResult.length ? filterResult : timeSections).map((section: TimeSectionType, index: number) => {
               return <TimeSection first={index === 0} key={index} section={section} />;
             })
           )}
