@@ -22,7 +22,9 @@ const withAuth = (handler) => {
         }
       }
       // eslint-disable-next-line no-empty
-    } catch {}
+    } catch (err) {
+      return res.json(err?.message);
+    }
     return res.status(HttpStatusCode.UNAUTHORIZED).end();
   };
 };
