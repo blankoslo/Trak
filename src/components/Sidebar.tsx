@@ -1,4 +1,18 @@
-import { Avatar, Badge, Box, Button, CircularProgress, Divider, Drawer, IconButton, List, ListItem, ListItemText } from '@material-ui/core';
+import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Drawer as MuiDrawer,
+  Hidden,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+} from '@material-ui/core';
+import { Menu } from '@material-ui/icons';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
@@ -14,7 +28,7 @@ import { Dispatch, useEffect, useState } from 'react';
 import ScrollableFeed from 'react-scrollable-feed';
 import theme from 'theme';
 import urls, { link, section } from 'URLS';
-import { INotification } from 'utils/types';
+import { IEmployee, INotification } from 'utils/types';
 const SIDEBAR_WIDTH = 190;
 
 const useStyles = makeStyles({
@@ -66,8 +80,13 @@ const useStyles = makeStyles({
       overflowY: 'auto',
     },
   },
+  collapsNavbar: {
+    backgroundColor: theme.palette.secondary.light,
+    height: '100vh',
+    cursor: 'pointer',
+  },
 });
-const LinkGroup = ({ title, links, divider }: section) => {
+const LinkGroup = ({ title, links, divider, setDrawer }: section & { setDrawer: (boolean) => void }) => {
   const router = useRouter();
   const classes = useStyles();
   return (
@@ -76,8 +95,8 @@ const LinkGroup = ({ title, links, divider }: section) => {
       <List component='div' disablePadding>
         {links.map((url: link) => {
           return (
-            <Link href={url.link} key={url.title}>
-              <ListItem button className={classes.nested}>
+            <Link href={url.link} key={url.title} passHref>
+              <ListItem button className={classes.nested} component='a' onClick={() => setDrawer(false)}>
                 <ListItemText
                   aria-label={url.aria_label}
                   classes={{ secondary: router.asPath === url.link ? classes.linkActive : classes.link }}
@@ -209,15 +228,25 @@ const LoggedInUserCard = ({ firstName, lastName, image, displayNotifications, se
   );
 };
 
-const Sidebar = () => {
-  const { user } = useUser();
-
+type DrawerType = {
+  drawer: boolean;
+  setDrawer: (boolean) => void;
+  displayNotifications: boolean;
+  setDisplayNotifications: (boolean) => void;
+  variant: 'permanent' | 'persistent' | 'temporary';
+  user: IEmployee;
+};
+const Drawer = ({ drawer, setDrawer, displayNotifications, setDisplayNotifications, variant, user }: DrawerType) => {
   const classes = useStyles();
 
-  const [displayNotifications, setDisplayNotifications] = useState(false);
-
   return (
-    <Drawer anchor='left' className={classes.drawer} classes={{ paper: classnames(classes.drawerPaper, classes.removeScrollbar) }} variant='permanent'>
+    <MuiDrawer
+      anchor='left'
+      className={classes.drawer}
+      classes={{ paper: classnames(classes.drawerPaper, classes.removeScrollbar) }}
+      onClose={() => setDrawer(false)}
+      open={drawer}
+      variant={variant}>
       <Box className={classes.removeScrollbar} display='flex' flexDirection='column' padding={theme.spacing(2)}>
         <Box className={classes.gutterBottom}>
           <Image height={34} src={'/trak_logo.svg'} width={120} />
@@ -238,12 +267,49 @@ const Sidebar = () => {
         {!displayNotifications && (
           <List className={classes.listRoot} component='nav'>
             {urls.map((url) => {
-              return <LinkGroup divider={url.divider} key={url.title} links={url.links} title={url.title} />;
+              return <LinkGroup divider={url.divider} key={url.title} links={url.links} setDrawer={setDrawer} title={url.title} />;
             })}
           </List>
         )}
       </Box>
-    </Drawer>
+    </MuiDrawer>
+  );
+};
+
+const Sidebar = () => {
+  const classes = useStyles();
+  const [drawer, setDrawer] = useState<boolean>(false);
+  const [displayNotifications, setDisplayNotifications] = useState<boolean>(false);
+  const { user } = useUser();
+
+  return (
+    <>
+      <Hidden mdUp>
+        <div className={classes.collapsNavbar} onClick={() => setDrawer(true)}>
+          <IconButton style={{ width: '50px', height: '50px' }}>
+            <Menu />
+          </IconButton>
+        </div>
+        <Drawer
+          displayNotifications={displayNotifications}
+          drawer={drawer}
+          setDisplayNotifications={setDisplayNotifications}
+          setDrawer={setDrawer}
+          user={user}
+          variant={'temporary'}
+        />
+      </Hidden>
+      <Hidden mdDown>
+        <Drawer
+          displayNotifications={displayNotifications}
+          drawer={true}
+          setDisplayNotifications={setDisplayNotifications}
+          setDrawer={() => undefined}
+          user={user}
+          variant={'permanent'}
+        />
+      </Hidden>
+    </>
   );
 };
 
