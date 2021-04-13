@@ -1,5 +1,5 @@
-import { ButtonBase, Hidden, IconButton, makeStyles } from '@material-ui/core';
-import { CheckBox, CheckBoxOutlineBlank } from '@material-ui/icons';
+import { ButtonBase, Hidden, IconButton, makeStyles, Tooltip } from '@material-ui/core';
+import { CheckBox, CheckBoxOutlineBlank, Launch, Mail } from '@material-ui/icons';
 import classnames from 'classnames';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
@@ -11,6 +11,7 @@ import { useState } from 'react';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
+import validator from 'validator';
 
 const useStyles = makeStyles({
   avatar: {
@@ -65,6 +66,13 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
             {data.task.title}
           </Typo>
         </ButtonBase>
+        {data.task.link && (
+          <Tooltip title={data.task.link}>
+            <a href={`${validator.isEmail(data.task.link) ? 'mailto:' : ''}${data.task.link}`} rel='noopener noreferrer' target='_blank'>
+              <IconButton size='small'>{validator.isEmail(data.task.link) ? <Mail /> : <Launch />}</IconButton>
+            </a>
+          </Tooltip>
+        )}
         {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={data.id} modalIsOpen={modalIsOpen} />}
       </div>
       <div

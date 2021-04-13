@@ -10,10 +10,11 @@ import useProgressbar from 'context/Progressbar';
 import useSnackbar from 'context/Snackbar';
 import { useRouter } from 'next/router';
 import { EmployeeContext } from 'pages/ansatt/[id]';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { ITask } from 'utils/types';
 import { axiosBuilder } from 'utils/utils';
+import validator from 'validator';
 
 const useStyles = makeStyles((theme) => ({
   grid: {
@@ -46,13 +47,15 @@ const TaskModal = ({ modalIsOpen, closeModal, phaseId, dueDate }: TaskModalProps
   const showSnackbar = useSnackbar();
   const showProgressbar = useProgressbar();
   const { tags, employees } = useData();
-  const { register, handleSubmit, errors, control } = useForm({
-    defaultValues: {
-      title: '',
-      description: '',
-      tags: [],
-      responsible: null,
-    },
+  const defaultValues = {
+    title: '',
+    link: '',
+    description: '',
+    tags: [],
+    responsible: null,
+  };
+  const { register, handleSubmit, errors, control, clearErrors, reset } = useForm({
+    defaultValues: defaultValues,
   });
   const { employee } = useContext(EmployeeContext);
   const classes = useStyles();
@@ -75,6 +78,13 @@ const TaskModal = ({ modalIsOpen, closeModal, phaseId, dueDate }: TaskModalProps
         showSnackbar(err?.message, 'error');
       });
   });
+
+  useEffect(() => {
+    return () => {
+      clearErrors();
+      reset(defaultValues);
+    };
+  }, []);
 
   return (
     <Modal buttonGroup={buttonGroup} header={'Lag oppgave'} onClose={closeModal} onSubmit={onSubmit} open={modalIsOpen}>
@@ -111,6 +121,24 @@ const TaskModal = ({ modalIsOpen, closeModal, phaseId, dueDate }: TaskModalProps
           name='description'
           register={register}
           rows={4}
+        />
+        <TextField
+          errors={errors}
+          label={
+            <>
+              Link{' '}
+              <Tooltip title={`Link til nettsted/e-post for å få rask tilgang fra oppgaveoversikten`}>
+                <HelpIcon fontSize='small' />
+              </Tooltip>
+            </>
+          }
+          name='link'
+          register={register}
+          rules={{
+            validate: {
+              isLinkOrEmail: (tekst) => validator.isEmail(tekst) || validator.isURL(tekst) || 'Linken må være en gyldig URL eller E-post',
+            },
+          }}
         />
         <TagSelector control={control} label='Tags' name='tags' options={tags} />
         <EmployeeSelector control={control} employees={employees} label='Oppgaveansvarlig' name='responsible' />

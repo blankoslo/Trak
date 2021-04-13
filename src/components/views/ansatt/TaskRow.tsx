@@ -1,15 +1,16 @@
-import { Box, ButtonBase, Hidden, IconButton } from '@material-ui/core';
-import { CheckBox as CheckBoxIcon, CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon } from '@material-ui/icons';
+import { Box, ButtonBase, Hidden, IconButton, Tooltip } from '@material-ui/core';
+import { CheckBox as CheckBoxIcon, CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, Launch, Mail } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import Typo from 'components/Typo';
 import useSnackbar from 'context/Snackbar';
 import { EmployeeContext } from 'pages/ansatt/[id]';
-import { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
+import validator from 'validator';
 
 const useStyles = makeStyles({
   avatar: {
@@ -52,7 +53,13 @@ const TaskRow = ({ employeeTask }: TaskRowProps) => {
             {employeeTask.task.title}
           </Typo>
         </ButtonBase>
-
+        {employeeTask.task.link && (
+          <Tooltip title={employeeTask.task.link}>
+            <a href={`${validator.isEmail(employeeTask.task.link) ? 'mailto:' : ''}${employeeTask.task.link}`} rel='noopener noreferrer' target='_blank'>
+              <IconButton size='small'>{validator.isEmail(employeeTask.task.link) ? <Mail /> : <Launch />}</IconButton>
+            </a>
+          </Tooltip>
+        )}
         {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={employeeTask.id} modalIsOpen={modalIsOpen} />}
       </Box>
       <Hidden smDown>

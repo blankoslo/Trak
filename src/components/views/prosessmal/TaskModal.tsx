@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IEmployee, IPhase, ITag, ITask } from 'utils/types';
 import { axiosBuilder } from 'utils/utils';
+import validator from 'validator';
 
 type TaskModalProps = {
   phase: IPhase;
@@ -57,6 +58,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
       () => ({
         title: task?.title,
         description: task?.description,
+        link: task?.link,
         professions: task?.professions,
         tags: task?.tags,
         responsible: task?.responsible,
@@ -77,6 +79,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     reset({
       title: task?.title,
       description: task?.description,
+      link: task?.link,
       professions: task?.professions,
       tags: task?.tags,
       responsible: task?.responsible,
@@ -174,6 +177,24 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           name='description'
           register={register}
           rows={4}
+        />
+        <TextField
+          errors={errors}
+          label={
+            <>
+              Link{' '}
+              <Tooltip title={`Link til nettsted/e-post for å få rask tilgang fra oppgaveoversikten`}>
+                <HelpIcon fontSize='small' />
+              </Tooltip>
+            </>
+          }
+          name='link'
+          register={register}
+          rules={{
+            validate: {
+              isLinkOrEmail: (tekst) => validator.isEmail(tekst) || validator.isURL(tekst) || 'Linken må være en gyldig URL eller E-post',
+            },
+          }}
         />
         <ToggleButtonGroup control={control} name={'professions'} professions={professions} />
         <TagSelector control={control} label='Tags' name='tags' options={tags} />
