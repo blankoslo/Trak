@@ -11,6 +11,7 @@ export type IEmployee = {
   profession: IProfession;
   hrManager: IEmployee;
   hrManagerId?: number;
+  activeYear: Date;
   employees: IEmployee[];
   employeeSettings: IEmployeeSettings;
   employeeTask: IEmployeeTask[];
@@ -60,7 +61,6 @@ export type IPhase = {
   tasks?: ITask[];
   dueDate?: Date;
   dueDateDayOffset?: number;
-  cronDate?: Date;
 };
 
 export type IProcessTemplate = {
