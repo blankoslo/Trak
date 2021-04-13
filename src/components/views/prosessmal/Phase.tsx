@@ -1,11 +1,10 @@
 import { IconButton, makeStyles } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import Typo from 'components/Typo';
+import PhaseModal from 'components/views/prosessmal/PhaseModal';
 import PhaseTable from 'components/views/prosessmal/PhaseTable';
 import { useState } from 'react';
 import { IPhase, IProcessTemplate } from 'utils/types';
-
-import PhaseModal from './PhaseModal';
 
 type PhaseProps = {
   phase: IPhase;

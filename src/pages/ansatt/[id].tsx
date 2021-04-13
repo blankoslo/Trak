@@ -3,53 +3,74 @@ import { makeStyles } from '@material-ui/styles';
 import Typo from 'components/Typo';
 import Phase from 'components/views/ansatt/Phase';
 import prisma from 'lib/prisma';
-import _ from 'lodash';
+import { flattenDeep, uniq, uniqBy } from 'lodash';
+import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { createContext, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import theme from 'theme';
-import { ITask } from 'utils/types';
+import { IEmployeeTask, ITask, Process } from 'utils/types';
 
 export const EmployeeContext = createContext(undefined);
 
 const useStyles = makeStyles({
-  root: {
-    marginLeft: '30px',
-    marginTop: '60px',
-    marginRight: '30px',
-  },
   spaceRight: {
     marginRight: theme.spacing(4),
   },
+  header: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    flexDirection: 'row',
+    [theme.breakpoints.down('md')]: {
+      alignItems: 'flex-start',
+      flexDirection: 'column',
+    },
+  },
+  buttonGroup: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+    },
+  },
 });
-
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const { id, år: year, prosess: process } = query;
+  const { id, år: year = null, prosess: process } = query;
   const parsedId = typeof id === 'string' && parseInt(id);
-  if (!id || !process || !year) {
+  if ((process === Process.LOPENDE && !year) || !id || !process) {
     return {
       notFound: true,
     };
   }
+
   const employeeQuery = await prisma.employee.findUnique({
     where: {
       id: parsedId,
     },
+
     select: {
       id: true,
       firstName: true,
       lastName: true,
+      profession: true,
       hrManager: {
         select: {
+          id: true,
           firstName: true,
           lastName: true,
         },
       },
       employeeTask: {
         where: {
-          year: new Date(year.toString()),
+          ...(process === Process.LOPENDE && {
+            dueDate: {
+              gte: moment(year.toString()).startOf('year').toDate(),
+              lte: moment(year.toString()).endOf('year').toDate(),
+            },
+          }),
           task: {
             phase: {
               processTemplate: {
@@ -59,8 +80,9 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           },
         },
         select: {
+          dueDate: true,
+          id: true,
           completed: true,
-          year: true,
           responsible: {
             select: {
               firstName: true,
@@ -71,11 +93,15 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           },
           task: {
             select: {
+              id: true,
               title: true,
               tags: true,
+              global: true,
+              link: true,
               description: true,
               phase: {
                 select: {
+                  id: true,
                   title: true,
                   processTemplate: {
                     select: {
@@ -83,13 +109,14 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
                       slug: true,
                     },
                   },
+                  dueDate: true,
                 },
               },
             },
           },
         },
         orderBy: {
-          year: 'asc',
+          dueDate: 'asc',
         },
       },
     },
@@ -103,12 +130,14 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
         select: {
           tasks: {
             select: {
+              id: true,
               employeeTask: {
                 where: {
                   employeeId: parsedId,
                 },
                 select: {
-                  year: true,
+                  id: true,
+                  dueDate: true,
                 },
               },
             },
@@ -122,31 +151,34 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       notFound: true,
     };
   }
+
   const employee = JSON.parse(safeJsonStringify(employeeQuery));
   const processes = JSON.parse(safeJsonStringify(processesQuery));
-  const phases = _.uniq(
+  const phases = uniqBy(
     employee.employeeTask.map((element) => {
-      return element.task.phase.title;
+      return { id: element.task.phase.id, title: element.task.phase.title };
     }),
+    'title',
   );
-
-  const phasesWithTasks = phases.map((unique: string) => {
-    const tasks = employee.employeeTask.filter((task) => task.task.phase.title === unique);
-    const finishedTasks = employee.employeeTask.filter((task) => task.completed);
+  // eslint-disable-next-line
+  const phasesWithTasks = phases.map((unique: any) => {
+    const tasks = employee.employeeTask.filter((task: IEmployeeTask) => task.task.phase.title === unique.title);
+    const finishedTasks = tasks.filter((task: IEmployeeTask) => task.completed);
     return {
-      title: unique,
+      id: unique.id,
+      title: unique.title,
       tasks: tasks,
       totalTasks: tasks.length,
       finishedTasks: finishedTasks.length,
     };
   });
-
   const allTasks = processes.map((process) => {
     const years = process.phases.map((phase) => {
       return phase.tasks.map((task: ITask) => {
-        return task.employeeTask.filter((employeeTask) => Boolean(employeeTask.year));
+        return task.employeeTask.map((employeeTask) => new Date(employeeTask.dueDate).getFullYear());
       });
     });
+
     const filteredYears = years.map((year) => {
       return year.filter((element) => {
         return element.length !== 0;
@@ -156,9 +188,9 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   });
 
   const history = allTasks.map((process) => {
-    const years = _.flattenDeep(process.years);
-    const uniqeYears = _.uniqBy(years, 'year');
-    return { title: process.title, slug: process.slug, years: uniqeYears };
+    const years = flattenDeep(process.years);
+    const uniqeYears = uniq(years);
+    return { title: process.title, slug: process.slug, years: process.slug === Process.LOPENDE ? uniqeYears : Array(uniqeYears.length ? 1 : 0) };
   });
 
   return { props: { employee, phasesWithTasks, year, process, history } };
@@ -180,25 +212,22 @@ const Employee = ({ employee, phasesWithTasks, year, process, history }: InferGe
       <Head>
         <title>Ansatt</title>
       </Head>
-      <div className={classes.root}>
-        <Box alignItems='flex-end' display='flex'>
-          <Typo className={classes.spaceRight} variant='h1'>
+      <>
+        <div className={classes.header}>
+          <Typo className={classes.spaceRight} noWrap variant='h1'>
             {employee.firstName} {employee.lastName}
           </Typo>
           {employee.hrManager && (
-            <Typo variant='body1'>
+            <Typo noWrap variant='body1'>
               Ansvarlig: {employee.hrManager.firstName} {employee.hrManager.lastName}
             </Typo>
           )}
-        </Box>
-        <Box display='flex' justifyContent='space-between' mb={theme.spacing(4)}>
-          <Typo variant='body1'>
+        </div>
+        <div className={classes.buttonGroup}>
+          <Typo noWrap variant='body1'>
             {year} {history.find((element) => element.slug === process)?.title}
           </Typo>
           <Box display='flex'>
-            <Button aria-controls='filer' aria-haspopup='true' className={classes.spaceRight} color='primary' onClick={() => null}>
-              Filer
-            </Button>
             <Button
               aria-controls='historikk meny'
               aria-haspopup='true'
@@ -219,26 +248,37 @@ const Employee = ({ employee, phasesWithTasks, year, process, history }: InferGe
               onClose={handleClose}
               open={Boolean(anchorEl)}>
               {history.map((process) => {
-                return process.years.map((yearObject) => {
-                  const year = new Date(yearObject.year).getFullYear();
+                return process.years.map((year) => {
+                  const linkText = `${process.slug === Process.LOPENDE ? year : ''} ${process.title}`;
+                  const link = `/ansatt/${employee.id}?${process.slug === Process.LOPENDE ? `år=${year}&` : ''}prosess=${process.slug}`;
                   return (
-                    <Link href={`/ansatt/${employee.id}?år=${year}&prosess=${process.slug}`} key={`${process.title} ${year}`}>
-                      <MenuItem onClick={handleClose}>
-                        {year} {process.title}
-                      </MenuItem>
-                    </Link>
+                    <MenuItem key={`${process.title} ${year}`} onClick={handleClose}>
+                      <Link href={link}>
+                        <a style={{ textDecoration: 'none', color: theme.palette.text.primary }}>{linkText}</a>
+                      </Link>
+                    </MenuItem>
                   );
                 });
               })}
             </Menu>
           </Box>
-        </Box>
+        </div>
         <EmployeeContext.Provider value={{ employee }}>
-          {phasesWithTasks.map((phase) => {
-            return <Phase key={phase.title} tasks={phase.tasks} tasksFinished={phase.finishedTasks} title={phase.title} totalTasks={phase.totalTasks} />;
+          {phasesWithTasks.map((phase, index) => {
+            return (
+              <Phase
+                employeeTasks={phase.tasks}
+                first={index === 0}
+                key={phase.title}
+                phaseId={phase.id}
+                tasksFinished={phase.finishedTasks}
+                title={phase.title}
+                totalTasks={phase.totalTasks}
+              />
+            );
           })}
         </EmployeeContext.Provider>
-      </div>
+      </>
     </>
   );
 };

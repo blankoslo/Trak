@@ -1,4 +1,5 @@
-import { Button, makeStyles } from '@material-ui/core';
+import { Button, makeStyles, Tooltip } from '@material-ui/core';
+import HelpIcon from '@material-ui/icons/Help';
 import axios from 'axios';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import TagSelector from 'components/form/TagSelector';
@@ -6,14 +7,15 @@ import TextField from 'components/form/TextField';
 import ToggleButtonGroup from 'components/form/ToggleButtonGroup';
 import Modal from 'components/Modal';
 import Typo from 'components/Typo';
+import { useData } from 'context/Data';
 import useProgressbar from 'context/Progressbar';
 import useSnackbar from 'context/Snackbar';
-import { useTaskModal } from 'context/TaskModal';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IEmployee, IPhase, ITag, ITask } from 'utils/types';
 import { axiosBuilder } from 'utils/utils';
+import validator from 'validator';
 
 type TaskModalProps = {
   phase: IPhase;
@@ -48,7 +50,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
   const showProgressbar = useProgressbar();
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const { professions, tags, employees } = useTaskModal();
+  const { professions, tags, employees } = useData();
   const [task, setTask] = useState<ITask | undefined>(undefined);
   const { register, handleSubmit, errors, control, reset } = useForm({
     reValidateMode: 'onChange',
@@ -56,6 +58,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
       () => ({
         title: task?.title,
         description: task?.description,
+        link: task?.link,
         professions: task?.professions,
         tags: task?.tags,
         responsible: task?.responsible,
@@ -76,6 +79,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     reset({
       title: task?.title,
       description: task?.description,
+      link: task?.link,
       professions: task?.professions,
       tags: task?.tags,
       responsible: task?.responsible,
@@ -151,7 +155,47 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
             required: 'Oppgavetittel er påkrevd',
           }}
         />
-        <TextField errors={errors} label='Oppgavebeskrivelse' multiline name='description' register={register} rows={4} />
+        <TextField
+          errors={errors}
+          label={
+            <>
+              Oppgavebeskrivelse{' '}
+              <Tooltip
+                title={
+                  <>
+                    Dette feltet støtter{' '}
+                    <a href='https://www.markdownguide.org/cheat-sheet/' rel='noreferrer noopener' target='_blank'>
+                      markdown
+                    </a>
+                  </>
+                }>
+                <HelpIcon fontSize='small' />
+              </Tooltip>
+            </>
+          }
+          multiline
+          name='description'
+          register={register}
+          rows={4}
+        />
+        <TextField
+          errors={errors}
+          label={
+            <>
+              Link{' '}
+              <Tooltip title={`Link til nettsted/e-post for å få rask tilgang fra oppgaveoversikten`}>
+                <HelpIcon fontSize='small' />
+              </Tooltip>
+            </>
+          }
+          name='link'
+          register={register}
+          rules={{
+            validate: {
+              isLinkOrEmail: (tekst) => validator.isEmail(tekst) || validator.isURL(tekst) || 'Linken må være en gyldig URL eller E-post',
+            },
+          }}
+        />
         <ToggleButtonGroup control={control} name={'professions'} professions={professions} />
         <TagSelector control={control} label='Tags' name='tags' options={tags} />
         <EmployeeSelector control={control} employees={employees} label='Oppgaveansvarlig' name='responsible' />

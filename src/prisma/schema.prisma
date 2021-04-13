@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["createMany"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -9,10 +8,9 @@ datasource db {
 }
 
 model Employee {
-  id                      Int            @id @default(autoincrement())
+  id                      Int               @id @default(autoincrement())
   title                   String?
-  email                   String         @unique
-  slack                   String?        @unique
+  email                   String            @unique
   professionId            String
   firstName               String
   lastName                String
@@ -21,24 +19,51 @@ model Employee {
   terminationDate         DateTime?
   imageUrl                String?
   hrManagerId             Int?
-  hrManager               Employee?      @relation("EmployeeToEmployee", fields: [hrManagerId], references: [id])
-  profession              Profession     @relation(fields: [professionId], references: [id])
-  employees               Employee[]     @relation("EmployeeToEmployee")
-  employeeTask            EmployeeTask[] @relation("tasks")
-  responsibleEmployeeTask EmployeeTask[] @relation("responsible_employee_tasks")
-  responsibleTask         Task[]         @relation("responsible_tasks")
+  activeYear              DateTime          @default(now()) @db.Date
+  hrManager               Employee?         @relation("EmployeeToEmployee", fields: [hrManagerId], references: [id])
+  profession              Profession        @relation(fields: [professionId], references: [id])
+  employees               Employee[]        @relation("EmployeeToEmployee")
+  employeeSettings        EmployeeSettings? @relation("settings")
+  employeeTask            EmployeeTask[]    @relation("tasks")
+  responsibleEmployeeTask EmployeeTask[]    @relation("responsible_employee_tasks")
+  notifications           Notification[]    @relation("employee")
+  responsibleTask         Task[]            @relation("responsible_tasks")
+}
+
+enum NotificationType {
+  DELEGATE
+  DEADLINE
+  WEEK_BEFORE_DEADLINE
+  TERMINATION
+  HIRED
+}
+
+model EmployeeSettings {
+  employeeId           Int                @id
+  employee             Employee           @relation("settings", fields: [employeeId], references: [id])
+  slack                Boolean            @default(true)
+  notificationSettings NotificationType[]
 }
 
 model EmployeeTask {
-  id            String    @id @default(uuid())
-  taskId        String?
-  completed     Boolean   @default(false)
-  employeeId    Int?
-  responsibleId Int?
-  year          DateTime
-  employee      Employee? @relation("tasks", fields: [employeeId], references: [id])
-  responsible   Employee? @relation("responsible_employee_tasks", fields: [responsibleId], references: [id])
-  task          Task?     @relation(fields: [taskId], references: [id])
+  id            String   @id @default(uuid())
+  taskId        String
+  completed     Boolean  @default(false)
+  employeeId    Int
+  responsibleId Int
+  dueDate       DateTime
+  employee      Employee @relation("tasks", fields: [employeeId], references: [id])
+  responsible   Employee @relation("responsible_employee_tasks", fields: [responsibleId], references: [id])
+  task          Task     @relation(fields: [taskId], references: [id])
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  employeeId  Int
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  description String
+  employee    Employee @relation("employee", fields: [employeeId], references: [id])
 }
 
 model Phase {
@@ -46,8 +71,11 @@ model Phase {
   title             String
   processTemplateId String
   createdAt         DateTime        @default(now())
+  dueDateDayOffset  Int?
+  dueDate           DateTime?
   processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
   tasks             Task[]
+  active            Boolean         @default(true)
 }
 
 model ProcessTemplate {
@@ -74,13 +102,15 @@ model Task {
   id            String         @id @default(uuid())
   title         String
   description   String?
+  link          String?
   global        Boolean        @default(true)
-  phaseId       String
+  phaseId       String?
   responsibleId Int?
   createdAt     DateTime       @default(now())
-  phase         Phase          @relation(fields: [phaseId], references: [id])
+  phase         Phase?         @relation(fields: [phaseId], references: [id])
   responsible   Employee?      @relation("responsible_tasks", fields: [responsibleId], references: [id])
   employeeTask  EmployeeTask[]
   professions   Profession[]
   tags          Tag[]
+  active        Boolean        @default(true)
 }

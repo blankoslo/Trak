@@ -1,4 +1,4 @@
-import { Box, ButtonBase, makeStyles, Table, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { Box, ButtonBase, Hidden, makeStyles, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from '@material-ui/icons';
 import classNames from 'classnames';
 import Typo from 'components/Typo';
@@ -43,14 +43,22 @@ const PhaseCard = ({ title, amount, employees, slug }: PhaseCardProps) => {
             <TableHead>
               <TableRow>
                 <TableCell style={{ width: '37.5rem' }}>Navn</TableCell>
-                <TableCell style={{ width: '18.75rem' }}>Oppgaver gjennomført</TableCell>
-                <TableCell style={{ width: '18.75rem' }}>Stilling</TableCell>
-                <TableCell style={{ width: '18.75rem' }}>Ansvarlig</TableCell>
+                <Hidden mdDown>
+                  <TableCell style={{ width: '18.75rem' }}>Oppgaver gjennomført</TableCell>
+                </Hidden>
+                <Hidden lgDown>
+                  <TableCell style={{ width: '18.75rem' }}>Stilling</TableCell>
+                </Hidden>
+                <Hidden smDown>
+                  <TableCell style={{ width: '18.75rem' }}>Ansvarlig</TableCell>
+                </Hidden>
               </TableRow>
             </TableHead>
-            {employees.map((employee) => {
-              return <UserRow employee={employee} key={employee.id} slug={slug} />;
-            })}
+            <TableBody>
+              {employees.map((employee) => {
+                return <UserRow employee={employee} key={employee.id} slug={slug} />;
+              })}
+            </TableBody>
           </Table>
         ) : (
           <Typo variant='body2'>Ingen ansatte i denne fasen</Typo>

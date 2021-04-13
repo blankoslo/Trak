@@ -1,12 +1,16 @@
-import { Box, IconButton } from '@material-ui/core';
-import { CheckBox as CheckBoxIcon, CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, Info as InfoIcon } from '@material-ui/icons';
+import { Box, ButtonBase, Hidden, IconButton, Tooltip } from '@material-ui/core';
+import { CheckBox as CheckBoxIcon, CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, Launch, Mail } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
-import AvatarComponent from 'components/AvatarComponent';
+import Avatar from 'components/Avatar';
+import InfoModal from 'components/InfoModal';
 import Typo from 'components/Typo';
-import InfoModal from 'components/views/ansatt/InfoModal';
-import { useState } from 'react';
+import useSnackbar from 'context/Snackbar';
+import { EmployeeContext } from 'pages/ansatt/[id]';
+import React, { useContext, useMemo, useState } from 'react';
 import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
+import { toggleCheckBox } from 'utils/utils';
+import validator from 'validator';
 
 const useStyles = makeStyles({
   avatar: {
@@ -17,41 +21,62 @@ const useStyles = makeStyles({
   completedTask: {
     textDecoration: 'line-through',
   },
+  textButton: {
+    '&:hover': {
+      background: theme.palette.text.secondary,
+      borderRadius: theme.spacing(0.5),
+    },
+  },
 });
 
 type TaskRowProps = {
-  task: IEmployeeTask;
+  employeeTask: IEmployeeTask;
 };
 
-const TaskRow = ({ task }: TaskRowProps) => {
+const TaskRow = ({ employeeTask }: TaskRowProps) => {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const classes = useStyles();
+  const { employee } = useContext(EmployeeContext);
+  const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
+  const showSnackbar = useSnackbar();
+
+  useMemo(() => setCompleted(employeeTask.completed), [employeeTask, employeeTask.completed]);
 
   return (
     <Box display='flex'>
-      <Box alignItems='center' display='flex' flexGrow={2}>
-        {task.completed ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
-        <Typo className={task.completed && classes.completedTask} color={!task.completed && 'disabled'} variant='body1'>
-          {task.task.title}
-        </Typo>
-        <IconButton onClick={() => setModalIsOpen(true)} size='small'>
-          <InfoIcon color={task.completed ? 'inherit' : 'primary'} />
+      <Box alignItems='center' display='flex' flex={2}>
+        <IconButton onClick={() => toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar)} size='small'>
+          {completed ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
         </IconButton>
-        <InfoModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} task={task} />
-      </Box>
-      {task.responsible && (
-        <Box alignItems='center' display='flex' flexDirection='row' flexGrow={1}>
-          <AvatarComponent
-            className={classes.avatar}
-            firstName={task.responsible.firstName}
-            image={task.responsible.imageUrl}
-            lastName={task.responsible.lastName}
-          />
-          <Typo variant='body1'>
-            {task.responsible.firstName} {task.responsible.lastName}
+        <ButtonBase className={classes.textButton} onClick={() => setModalIsOpen(true)}>
+          <Typo className={completed ? classes.completedTask : null} color={!completed && 'disabled'} noWrap style={{ maxWidth: '80vw' }} variant='body1'>
+            {employeeTask.task.title}
           </Typo>
-        </Box>
-      )}
+        </ButtonBase>
+        {employeeTask.task.link && (
+          <Tooltip title={employeeTask.task.link}>
+            <a href={`${validator.isEmail(employeeTask.task.link) ? 'mailto:' : ''}${employeeTask.task.link}`} rel='noopener noreferrer' target='_blank'>
+              <IconButton size='small'>{validator.isEmail(employeeTask.task.link) ? <Mail /> : <Launch />}</IconButton>
+            </a>
+          </Tooltip>
+        )}
+        {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={employeeTask.id} modalIsOpen={modalIsOpen} />}
+      </Box>
+      <Hidden smDown>
+        {employeeTask.responsible.id !== employee.hrManager.id && (
+          <Box alignItems='center' display='flex' flex={1} flexDirection='row'>
+            <Avatar
+              className={classes.avatar}
+              firstName={employeeTask.responsible.firstName}
+              image={employeeTask.responsible.imageUrl}
+              lastName={employeeTask.responsible.lastName}
+            />
+            <Typo variant='body1'>
+              {employeeTask.responsible.firstName} {employeeTask.responsible.lastName}
+            </Typo>
+          </Box>
+        )}
+      </Hidden>
     </Box>
   );
 };

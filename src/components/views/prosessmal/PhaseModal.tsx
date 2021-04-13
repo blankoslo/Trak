@@ -1,14 +1,17 @@
-import { Button, makeStyles } from '@material-ui/core';
+import { Box, Button, makeStyles, Tooltip } from '@material-ui/core';
+import HelpIcon from '@material-ui/icons/Help';
 import axios from 'axios';
+import BeforeToogle from 'components/form/BeforeToggle';
 import TextField from 'components/form/TextField';
 import Modal from 'components/Modal';
 import Typo from 'components/Typo';
 import useProgressbar from 'context/Progressbar';
 import useSnackbar from 'context/Snackbar';
+import moment from 'moment';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { IPhase, IProcessTemplate } from 'utils/types';
+import { IProcessTemplate, Offset, Process } from 'utils/types';
 import { axiosBuilder } from 'utils/utils';
 
 type PhaseModalProps = {
@@ -20,6 +23,9 @@ type PhaseModalProps = {
 
 type PhaseData = {
   title: string;
+  offset: Offset;
+  dueDateDayOffset: number;
+  dueDate: string;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -40,12 +46,15 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
   const showProgressbar = useProgressbar();
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const [phase, setPhase] = useState<IPhase | undefined>(undefined);
-  const { register, handleSubmit, errors, reset } = useForm({
+  const [phase, setPhase] = useState<PhaseData | undefined>(undefined);
+  const { register, handleSubmit, control, errors, reset } = useForm({
     reValidateMode: 'onChange',
     defaultValues: useMemo(
       () => ({
         title: phase?.title,
+        dueDateDayOffset: phase?.dueDateDayOffset,
+        offset: phase?.offset,
+        dueDate: phase?.dueDate,
       }),
       [phase],
     ),
@@ -54,7 +63,12 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
   useEffect(() => {
     if (phase_id) {
       axios.get(`/api/phases/${phase_id}`).then((res) => {
-        setPhase(res.data);
+        setPhase({
+          ...res.data,
+          dueDate: moment(res.data.dueDate).format('yyyy-MM-DD'),
+          offset: res.data.dueDateDayOffset <= 0 ? Offset.Before : Offset.After,
+          dueDateDayOffset: Math.abs(res.data.dueDateDayOffset),
+        });
       });
     }
   }, [phase_id]);
@@ -62,6 +76,9 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
   useEffect(() => {
     reset({
       title: phase?.title,
+      dueDateDayOffset: phase?.dueDateDayOffset,
+      offset: phase?.offset,
+      dueDate: phase?.dueDate,
     });
   }, [phase]);
 
@@ -71,16 +88,19 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
 
   const onSubmit = handleSubmit((formData: PhaseData) => {
     const data = {
-      data: formData,
+      data: {
+        ...formData,
+        dueDate: new Date(formData.dueDate),
+        dueDateDayOffset: formData.offset === Offset.Before ? -Math.abs(formData.dueDateDayOffset) : Math.abs(formData.dueDateDayOffset),
+      },
       processTemplateId: processTemplate.id,
     };
     if (phase_id) {
-      axiosPhaseModal(axios.put(`/api/phases/${phase_id}`, data), 'Fase opprettet');
+      axiosPhaseModal(axios.put(`/api/phases/${phase_id}`, data), 'Fasen ble oppdatert');
     } else {
-      axiosPhaseModal(axios.post('/api/phases', data), 'Fase oppdatert');
+      axiosPhaseModal(axios.post('/api/phases', data), 'Fasen ble opprettet');
     }
   });
-
   const buttonGroup = confirmDelete
     ? [
         <Typo key={'text'}>Er du sikker?</Typo>,
@@ -109,7 +129,6 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
           {phase_id ? 'Oppdater' : 'Opprett'}
         </Button>,
       ];
-
   return (
     <Modal
       buttonGroup={buttonGroup}
@@ -133,6 +152,60 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
             required: 'Prosesstittel er påkrevd',
           }}
         />
+        {(processTemplate.slug === Process.ONBOARDING || processTemplate.slug === Process.OFFBOARDING) && (
+          <div>
+            <Box display='flex'>
+              <TextField
+                errors={errors}
+                inputProps={{ min: 0 }}
+                label={
+                  <>
+                    Forfaller{' '}
+                    <Tooltip
+                      title={`Når oppgavene i fasen skal forfalle basert på ${
+                        processTemplate.slug === Process.ONBOARDING ? `ansettelsdato` : `termineringsdato`
+                      } `}>
+                      <HelpIcon fontSize='small' />
+                    </Tooltip>
+                  </>
+                }
+                name='dueDateDayOffset'
+                placeholder='Antall dager'
+                register={register}
+                required
+                rules={{
+                  min: {
+                    value: 0,
+                    message: 'Må være større eller lik 0',
+                  },
+                }}
+                type='number'
+              />
+              <BeforeToogle control={control} name='offset' />
+              <Typo variant='body1'>{processTemplate.slug === Process.ONBOARDING ? 'ansettelsesdato' : 'termineringsdato'}</Typo>
+            </Box>
+          </div>
+        )}
+        {processTemplate.slug === Process.LOPENDE && (
+          <>
+            <TextField
+              defaultValue={moment().format('yyyy-MM-DD')}
+              errors={errors}
+              inputProps={{ min: `${new Date().getFullYear()}-01-01`, max: `${new Date().getFullYear()}-12-31` }}
+              label={
+                <>
+                  Forfallsdato{' '}
+                  <Tooltip title='Forfallsdato for alle tilhørende oppgaver'>
+                    <HelpIcon />
+                  </Tooltip>
+                </>
+              }
+              name={'dueDate'}
+              register={register}
+              type='date'
+            />
+          </>
+        )}
       </div>
     </Modal>
   );
