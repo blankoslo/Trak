@@ -1,13 +1,22 @@
-import { PrismaClient } from '@prisma/client';
 import HttpStatusCode from 'http-status-typed';
+import prisma from 'lib/prisma';
 import { createMocks } from 'node-mocks-http';
 import tasksAPI from 'pages/api/tasks';
 import singleTaskAPI from 'pages/api/tasks/[task_id]';
 
+import { phaseFactory } from './factories/phase.factory';
 import { randomString } from './utils/utils';
 
-const prisma = new PrismaClient();
 describe('/api/tasks', () => {
+  beforeAll(async () => {
+    await phaseFactory();
+  });
+
+  afterAll((done) => {
+    prisma.$disconnect();
+    done();
+  });
+
   let task;
   test('create new task', async () => {
     const phases = await prisma.phase.findMany();
