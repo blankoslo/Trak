@@ -210,7 +210,7 @@ const LoggedInUserCard = ({ user, displayNotifications, setDisplayNotifications 
           )}
 
           <Box alignItems='flex-end' display='flex' flexDirection='column-reverse'>
-            <IconButton onClick={() => setDisplayNotifications(false)}>
+            <IconButton aria-label='Lukk boks' onClick={() => setDisplayNotifications(false)}>
               <ExpandLessIcon />
             </IconButton>
           </Box>
@@ -241,7 +241,7 @@ const Drawer = ({ drawer, setDrawer, displayNotifications, setDisplayNotificatio
       variant={variant}>
       <Box className={classes.removeScrollbar} display='flex' flexDirection='column' padding={theme.spacing(2)}>
         <Box className={classes.gutterBottom}>
-          <Image height={34} src={'/trak_logo.svg'} width={120} />
+          <Image alt='TRAK sin logo' height={34} src={'/trak_logo.svg'} width={120} />
         </Box>
         <LoggedInUserCard displayNotifications={displayNotifications} setDisplayNotifications={setDisplayNotifications} user={user} />
 

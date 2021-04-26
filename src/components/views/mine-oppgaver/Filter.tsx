@@ -58,7 +58,10 @@ const Filter = ({ choosenTags, setChoosenTags, choosenProcessTemplates, setChoos
           setChoosenTags(value);
         }}
         options={tags}
-        renderInput={(params) => <TextField {...params} size='small' />}
+        renderInput={(params) => {
+          const paramsWithAriaLabel = { ...params, inputProps: { ...params.inputProps, 'aria-label': 'Tags' } };
+          return <TextField {...paramsWithAriaLabel} size='small' />;
+        }}
         value={choosenTags}
       />
       <Typo gutterBottom variant='h2'>
