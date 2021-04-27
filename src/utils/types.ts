@@ -3,15 +3,15 @@
  * @property {number} id
  * @property {string} firstName
  * @property {string} lastName
- * @property {string=} title
+ * @property {string?} title
  * @property {string} email
  * @property {Date} birthDate
- * @property {Date=} dateOfEmployment
- * @property {Date=} terminationDate
- * @property {string=} imageUrl
+ * @property {Date?} dateOfEmployment
+ * @property {Date?} terminationDate
+ * @property {string?} imageUrl
  * @property {IProfession} profession
  * @property {IEmployee} hrManager
- * @property {number=} hrManagerId
+ * @property {number?} hrManagerId
  * @property {numberDate} activeYear
  * @property {IEmployee[]} employees
  * @property {IEmployeeSettings} employeeSettings
@@ -29,6 +29,7 @@ export type IEmployee = {
   terminationDate?: Date;
   imageUrl?: string;
   profession: IProfession;
+  professionId?: string;
   hrManager: IEmployee;
   hrManagerId?: number;
   employees: IEmployee[];
@@ -38,13 +39,13 @@ export type IEmployee = {
 };
 /**
  * @typedef {object} IEmployeeSettings
- * @property {number=} employeeId
- * @property {string=} slack
+ * @property {number?} employeeId
+ * @property {string?} slack
  * @property {('DELEGATE' | 'DEADLINE' | 'WEEK_BEFORE_DEADLINE' | 'TERMINATION' | 'HIRED')[]} notificationSettings
  */
 export type IEmployeeSettings = {
   employeeId?: number;
-  slack?: string;
+  slack?: boolean;
   notificationSettings: ('DELEGATE' | 'DEADLINE' | 'WEEK_BEFORE_DEADLINE' | 'TERMINATION' | 'HIRED')[];
 };
 /** @enum {string} */
@@ -68,12 +69,12 @@ export enum NotificationTypeEnum {
  * @typedef {object} IEmployeeTask
  * @property {string} id
  * @property {boolean} completed
- * @property {ITask=} task
- * @property {string=} taskId
- * @property {IEmployee=} employee
- * @property {number=} employeeId
- * @property {IEmployee=} responsible
- * @property {number=} responsibleId
+ * @property {ITask?} task
+ * @property {string?} taskId
+ * @property {IEmployee?} employee
+ * @property {number?} employeeId
+ * @property {IEmployee?} responsible
+ * @property {number?} responsibleId
  * @property {Date} dueDate
  */
 export type IEmployeeTask = {
@@ -111,10 +112,10 @@ export type INotification = {
  * @typedef {object} IPhase
  * @property {string} id
  * @property {string} title
- * @property {IProcessTemplate=} processTemplate
- * @property {ITask[]=} tasks
- * @property {Date=} dueDate
- * @property {number=} dueDateDayOffset
+ * @property {IProcessTemplate?} processTemplate
+ * @property {ITask[]?} tasks
+ * @property {Date?} dueDate
+ * @property {number?} dueDateDayOffset
  */
 export type IPhase = {
   id: string;
@@ -130,7 +131,7 @@ export type IPhase = {
  * @property {string} id
  * @property {string} title
  * @property {string} slug
- * @property {IPhase[]=} phases
+ * @property {IPhase[]?} phases
  */
 export type IProcessTemplate = {
   id: string;
@@ -142,7 +143,7 @@ export type IProcessTemplate = {
  * @typedef {object} IProfession
  * @property {string} id
  * @property {string} title
- * @property {ITask[]=} tasks
+ * @property {ITask[]?} tasks
  */
 export type IProfession = {
   id: string;
@@ -153,7 +154,7 @@ export type IProfession = {
  * @typedef {object} ITag
  * @property {string} id
  * @property {string} title
- * @property {ITask[]=} tasks
+ * @property {ITask[]?} tasks
  */
 export type ITag = {
   id: string;
@@ -165,15 +166,15 @@ export type ITag = {
  * @property {string} id
  * @property {string} title
  * @property {string} description
- * @property {string=} link
+ * @property {string?} link
  * @property {boolean} global
  * @property {string} phaseId
  * @property {IPhase} phase
- * @property {IProfession[]=} professions
- * @property {ITag[]=} tags
+ * @property {IProfession[]?} professions
+ * @property {ITag[]?} tags
  * @property {IEmployeeTask[]} employeeTask
- * @property {IEmployee=} responsible
- * @property {number=} responsibleId
+ * @property {IEmployee?} responsible
+ * @property {number?} responsibleId
  */
 export type ITask = {
   id: string;
