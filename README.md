@@ -53,14 +53,14 @@ GOOGLE_SECRET=SUPER_SECRET_SECRET
 yarn createdb
 ```
 
-Migrering av database:
+Oppsett av database:
 
 ```
 npx prisma generate
 yarn push
 ```
 
-(Optional) Legg inn fixtures:
+(Optional) Legg inn test data:
 
 ```
 yarn loaddata
