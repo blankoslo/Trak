@@ -6,6 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
 import { Process } from 'utils/types';
 import { addDays, slackMessager } from 'utils/utils';
+let LAST_RUN = undefined;
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const CRON_SECRET = process.env.CRON_SECRET;
   if (req.headers.cron_secret !== CRON_SECRET) {
@@ -14,6 +15,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     // eslint-disable-next-line no-console
     console.log('Running CRON/PHASES POST');
+    if (LAST_RUN === new Date()) {
+      return;
+    }
+    LAST_RUN = new Date();
     const phases = await prisma.phase.findMany({
       where: {
         active: true,
@@ -117,7 +122,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     });
 
     employeeTaskCreator(phases, employees);
-    createNotification(responsibleEmployees);
+    await createNotification(responsibleEmployees);
 
     res.status(HttpStatusCode.OK).end();
   } else {
@@ -188,7 +193,7 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
  * @param {IPhase[]} phases
  * @param {IEmployee} employee
  */
-const onboardingEmployeeTaskCreator = (phases: IPhase[], employee: IEmployee) => {
+const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee) => {
   phases.forEach((phase) => {
     if (phase.processTemplate.slug === Process.ONBOARDING) {
       phase.dueDate = addDays(employee.dateOfEmployment, phase.dueDateDayOffset);
@@ -198,14 +203,14 @@ const onboardingEmployeeTaskCreator = (phases: IPhase[], employee: IEmployee) =>
   const employeeWantsNewEmployeeNotificiation = employee.hrManager.employeeSettings?.notificationSettings?.includes('HIRED');
   if (employeeWantsNewEmployeeNotificiation) {
     const notificationText = `${employee.firstName} ${employee.lastName} har nettopp startet, og har fått opprettet nye oppgaver i onboarding`;
-    notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+    await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
   }
 };
 /**
  * @param  {IPhase[]} phases
  * @param  {IEmployee} employee
  */
-const offboardingEmployeeTaskCreator = (phases: IPhase[], employee: IEmployee) => {
+const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee) => {
   phases.forEach((phase) => {
     if (phase.processTemplate.slug === Process.OFFBOARDING) {
       phase.dueDate = addDays(employee.terminationDate, phase.dueDateDayOffset);
@@ -215,7 +220,7 @@ const offboardingEmployeeTaskCreator = (phases: IPhase[], employee: IEmployee) =
   const employeeWantsEmployeeQuittingNotification = employee.hrManager.employeeSettings?.notificationSettings?.includes('TERMINATION');
   if (employeeWantsEmployeeQuittingNotification) {
     const notificationText = `${employee.firstName} ${employee.lastName} skal slutte, og har fått opprettet nye oppgaver i offboarding`;
-    notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+    await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
   }
 };
 /**
@@ -247,7 +252,7 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
 /**
  * @param  {(IEmployee&{responsibleEmployeeTask:IEmployeeTask})[]} responsibleEmployees
  */
-const createNotification = (responsibleEmployees: (IEmployee & { responsibleEmployeeTask: IEmployeeTask })[]) => {
+const createNotification = async (responsibleEmployees: (IEmployee & { responsibleEmployeeTask: IEmployeeTask })[]) => {
   // eslint-disable-next-line no-console
   console.log('Creating notification');
   // eslint-disable-next-line no-console
@@ -267,7 +272,7 @@ const createNotification = (responsibleEmployees: (IEmployee & { responsibleEmpl
       const dates = Object.keys(groupBy(employee.responsibleEmployeeTask, 'dueDate'));
       // eslint-disable-next-line no-console
       console.log(dates);
-      dates.forEach((d) => {
+      dates.forEach(async (d) => {
         const date = moment(d);
         let notificationText = undefined;
         if (employeeWantsPhaseEndsTodayNotification && moment(today).isSame(date, 'day')) {
@@ -278,7 +283,7 @@ const createNotification = (responsibleEmployees: (IEmployee & { responsibleEmpl
         if (notificationText) {
           // eslint-disable-next-line no-console
           console.log(`Sending notification message: ${notificationText}`);
-          notificationSender(employee.id, notificationText, employee.employeeSettings.slack && employee.email);
+          await notificationSender(employee.id, notificationText, employee.employeeSettings.slack && employee.email);
         }
       });
     });
@@ -300,6 +305,6 @@ const notificationSender = async (employeeId: number, description: string, email
     },
   });
   if (email) {
-    slackMessager(email, description);
+    await slackMessager(email, description);
   }
 };
