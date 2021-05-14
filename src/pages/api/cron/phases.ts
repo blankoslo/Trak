@@ -12,6 +12,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     res.status(HttpStatusCode.UNAUTHORIZED).end();
   }
   if (req.method === 'POST') {
+    // eslint-disable-next-line no-console
+    console.log('Running CRON/PHASES POST');
     const phases = await prisma.phase.findMany({
       where: {
         active: true,
@@ -246,6 +248,12 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
  * @param  {(IEmployee&{responsibleEmployeeTask:IEmployeeTask})[]} responsibleEmployees
  */
 const createNotification = (responsibleEmployees: (IEmployee & { responsibleEmployeeTask: IEmployeeTask })[]) => {
+  // eslint-disable-next-line no-console
+  console.log('Creating notification');
+  // eslint-disable-next-line no-console
+  console.log('Responsible employees:');
+  // eslint-disable-next-line no-console
+  console.log(responsibleEmployees);
   try {
     const today = new Date();
     const nextWeek = new Date().setDate(today.getDate() + 7);
@@ -257,6 +265,8 @@ const createNotification = (responsibleEmployees: (IEmployee & { responsibleEmpl
         return;
       }
       const dates = Object.keys(groupBy(employee.responsibleEmployeeTask, 'dueDate'));
+      // eslint-disable-next-line no-console
+      console.log(dates);
       dates.forEach((d) => {
         const date = moment(d);
         let notificationText = undefined;
@@ -266,6 +276,8 @@ const createNotification = (responsibleEmployees: (IEmployee & { responsibleEmpl
           notificationText = `Du har oppgaver som utgår om en uke`;
         }
         if (notificationText) {
+          // eslint-disable-next-line no-console
+          console.log(`Sending notification message: ${notificationText}`);
           notificationSender(employee.id, notificationText, employee.employeeSettings.slack && employee.email);
         }
       });
