@@ -1,17 +1,22 @@
 // https://github.com/prisma/prisma/issues/1983
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient as BlankClient } from 'prisma/generated/blank';
+import { PrismaClient as TrakClient } from 'prisma/generated/trak';
 
-let prisma;
+export let blankClient;
+export let trakClient;
 
 if (process.env.NODE_ENV === `production`) {
-  prisma = new PrismaClient();
+  blankClient = new BlankClient();
+  trakClient = new TrakClient();
 } else {
-  if (!global['prisma']) {
-    global['prisma'] = new PrismaClient();
+  if (!global['blank']) {
+    global['blank'] = new BlankClient();
+  }
+  if (!global['trak']) {
+    global['trak'] = new TrakClient();
   }
 
-  prisma = global['prisma'];
+  blankClient = global['blank'];
+  trakClient = global['trak'];
 }
-
-export default prisma;
