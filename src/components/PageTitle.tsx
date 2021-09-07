@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import classNames from 'classnames';
 import Typo from 'components/Typo';
 import theme from 'theme';

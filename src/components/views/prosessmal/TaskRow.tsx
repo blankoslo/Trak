@@ -1,5 +1,6 @@
-import { IconButton, makeStyles, TableCell, TableRow } from '@material-ui/core';
+import { IconButton, TableCell, TableRow } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/styles';
 import Avatar from 'components/Avatar';
 import TaskModal from 'components/views/prosessmal/TaskModal';
 import markdownToTxt from 'markdown-to-txt';

@@ -1,4 +1,5 @@
-import { Button, Checkbox as MuiCheckbox, FormControlLabel, FormGroup, makeStyles } from '@material-ui/core';
+import { Button, Checkbox as MuiCheckbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 import Typo from 'components/Typo';
 import useSnackbar from 'context/Snackbar';

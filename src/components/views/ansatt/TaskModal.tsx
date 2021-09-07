@@ -1,5 +1,6 @@
-import { Button, makeStyles, Tooltip } from '@material-ui/core';
+import { Button, Tooltip } from '@material-ui/core';
 import HelpIcon from '@material-ui/icons/Help';
+import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import TagSelector from 'components/form/TagSelector';

@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import { blankClient } from 'lib/prisma';
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
 import { NotificationTypeEnum } from 'utils/types';
@@ -21,13 +21,13 @@ export default NextAuth({
     //eslint-disabe-next-line
     async signIn(_, __, profile) {
       try {
-        const user = await prisma.employee.findUnique({
+        const user = await blankClient.employee.findUnique({
           where: {
             email: profile.email,
           },
         });
         if (user && profile.verified_email) {
-          await prisma.employeeSettings.upsert({
+          await blankClient.employeeSettings.upsert({
             where: {
               employeeId: user.id,
             },
@@ -51,7 +51,7 @@ export default NextAuth({
     },
     async session(session, user) {
       try {
-        const user_id = await prisma.employee.findUnique({
+        const user_id = await blankClient.employee.findUnique({
           where: {
             email: user.email,
           },
