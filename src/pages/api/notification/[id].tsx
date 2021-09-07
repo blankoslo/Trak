@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
@@ -11,7 +11,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
    * @param {string} id
    */
   if (req.method === 'PUT') {
-    const notification = await prisma.notification.update({
+    const notification = await trakClient.notification.update({
       where: {
         id: id.toString(),
       },

@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import { toInteger } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -18,7 +18,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
   if (user.id.toString() !== id.toString()) {
     res.status(HttpStatusCode.FORBIDDEN).send({ message: 'Kan kun hente egne notifikasjoner' });
   } else if (req.method === 'GET') {
-    const notification = await prisma.notification.findMany({
+    const notification = await trakClient.notification.findMany({
       where: {
         employeeId: toInteger(id),
         read: false,

@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import { toInteger } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -29,7 +29,7 @@ const PUT = async (req, res, id) => {
     body: { slack, notificationSettings },
   } = req;
   try {
-    const employeeSettings = await prisma.employeeSettings.update({
+    const employeeSettings = await trakClient.employeeSettings.update({
       where: {
         employeeId: toInteger(id),
       },

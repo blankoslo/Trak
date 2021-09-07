@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,7 +18,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     const {
       body: { data, phaseId, global },
     } = req;
-    const newTask = await prisma.task.create({
+    const newTask = await trakClient.task.create({
       data: {
         title: data.title,
         description: data.description,

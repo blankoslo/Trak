@@ -1,4 +1,4 @@
-import { IconButton, TableCell, TableRow } from '@material-ui/core';
+import { IconButton, TableCell, TableRow, Theme } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import Avatar from 'components/Avatar';
@@ -17,7 +17,7 @@ export type TaskProps = {
   phase: IPhase;
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   table: {
     minWidth: 650,
   },

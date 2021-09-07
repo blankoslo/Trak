@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { IProcessTemplate } from 'utils/types';
@@ -11,7 +11,7 @@ import { IProcessTemplate } from 'utils/types';
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const processTemplates = await prisma.processTemplate.findMany({
+    const processTemplates = await trakClient.processTemplate.findMany({
       select: {
         id: true,
         slug: true,

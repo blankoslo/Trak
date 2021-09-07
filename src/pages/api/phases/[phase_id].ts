@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -31,7 +31,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
  */
 const GET = async (res, phase_id) => {
   try {
-    const phase = await prisma.phase.findUnique({
+    const phase = await trakClient.phase.findUnique({
       where: {
         id: phase_id.toString(),
       },
@@ -65,7 +65,7 @@ const PUT = async (req, res, phase_id) => {
     body: { data },
   } = req;
   try {
-    const updatedPhase = await prisma.phase.update({
+    const updatedPhase = await trakClient.phase.update({
       where: {
         id: phase_id.toString(),
       },
@@ -90,7 +90,7 @@ const PUT = async (req, res, phase_id) => {
  */
 const DELETE = async (res, phase_id) => {
   try {
-    await prisma.task.updateMany({
+    await trakClient.task.updateMany({
       where: {
         phaseId: phase_id.toString(),
       },
@@ -98,7 +98,7 @@ const DELETE = async (res, phase_id) => {
         active: false,
       },
     });
-    const deletedPhase = await prisma.phase.update({ where: { id: phase_id.toString() }, data: { active: false } });
+    const deletedPhase = await trakClient.phase.update({ where: { id: phase_id.toString() }, data: { active: false } });
     res.status(HttpStatusCode.OK).json(deletedPhase);
   } catch (err) {
     if (err) {

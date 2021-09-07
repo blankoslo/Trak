@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'next-auth/jwt';
 const secret = process.env.JWT_SECRET;
@@ -12,7 +12,7 @@ const withAuth = (handler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       if (process.env.NODE_ENV === 'test') {
-        const user = await prisma.employee.findFirst({
+        const user = await trakClient.employee.findFirst({
           select: {
             id: true,
             email: true,
@@ -23,7 +23,7 @@ const withAuth = (handler) => {
       const token = await jwt.getToken({ req, secret });
 
       if (token) {
-        const user = await prisma.employee.findUnique({
+        const user = await trakClient.employee.findUnique({
           where: {
             email: token.email,
           },

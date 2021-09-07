@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Actions, IEmployeeTask } from 'utils/types';
@@ -20,7 +20,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const {
       body: { data },
     } = req;
-    const newEmployeeTask = await prisma.employeeTask.create({
+    const newEmployeeTask = await trakClient.employeeTask.create({
       data: {
         task: {
           connect: {
@@ -47,7 +47,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const {
           body: { dueDate, employeeTasksId },
         } = req;
-        await prisma.employeeTask.updateMany({
+        await trakClient.employeeTask.updateMany({
           where: {
             id: {
               in: employeeTasksId,
