@@ -21,6 +21,10 @@ jobs:
         uses: borales/actions-yarn@v2.3.0
         with:
           cmd: install
+      - name: Generating prisma files
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: generate
       - name: Building Next
         uses: borales/actions-yarn@v2.3.0
         with:
