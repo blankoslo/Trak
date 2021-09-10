@@ -4,21 +4,21 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const blankEmployees = await blankClient.employees.findMany({
-      select: {
-        id: true,
-        first_name: true,
-        last_name: true,
-        phone: true,
-        email: true,
-        birth_date: true,
-        date_of_employment: true,
-        image_url: true,
-        role: true,
-        termination_date: true,
-      },
-    });
     try {
+      const blankEmployees = await blankClient.employees.findMany({
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          phone: true,
+          email: true,
+          birth_date: true,
+          date_of_employment: true,
+          image_url: true,
+          role: true,
+          termination_date: true,
+        },
+      });
       trakClient.$transaction(
         blankEmployees.map((employee) => {
           return trakClient.employee.create({
@@ -31,7 +31,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
               dateOfEmployment: employee.date_of_employment,
               terminationDate: employee.termination_date,
               imageUrl: employee.image_url,
-              Profession: {
+              profession: {
                 connectOrCreate: {
                   where: {
                     title: employee.role,
@@ -49,5 +49,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     } catch (err) {
       res.status(HttpStatusCode.BAD_REQUEST).json({ message: err });
     }
-  }
+  } else if(req.method === 'POST')
+  res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
 }

@@ -11,6 +11,15 @@ import theme from 'theme';
 import { IPhase } from 'utils/types';
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  await trakClient.processTemplate.createMany({
+    data: [
+      { title: 'Onboarding', slug: 'onboarding' },
+      { title: 'Offboarding', slug: 'offboarding' },
+      { title: 'Løpende', slug: 'lopende' },
+    ],
+    skipDuplicates: true,
+  });
+
   const processTemplate = await trakClient.processTemplate.findUnique({
     where: {
       slug: params.slug.toString(),
