@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,7 +30,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
  */
 const GET = async (res, id) => {
   try {
-    const employeeTask = await prisma.employeeTask.findUnique({
+    const employeeTask = await trakClient.employeeTask.findUnique({
       where: {
         id: id.toString(),
       },
@@ -115,13 +115,13 @@ const PUT = async (req, res, id, user) => {
     body: { completed, dueDate, responsibleId },
   }: employeeTaskUpdateData = req;
   try {
-    const employeeTask = await prisma.employeeTask.findUnique({
+    const employeeTask = await trakClient.employeeTask.findUnique({
       where: {
         id: id.toString(),
       },
     });
 
-    const updatedEmployeeTask = await prisma.employeeTask.update({
+    const updatedEmployeeTask = await trakClient.employeeTask.update({
       where: {
         id: id.toString(),
       },

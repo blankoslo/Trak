@@ -1,4 +1,5 @@
-import { makeStyles, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableHead, TableRow, Theme } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import AddButton from 'components/AddButton';
 import TaskRow from 'components/views/prosessmal//TaskRow';
 import TaskModal from 'components/views/prosessmal/TaskModal';
@@ -13,7 +14,7 @@ export type PhaseTableProps = {
   phase: IPhase;
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   table: {
     minWidth: 650,
   },

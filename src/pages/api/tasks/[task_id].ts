@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,7 +33,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
  */
 const GET = async (res, task_id) => {
   try {
-    const task = await prisma.task.findUnique({
+    const task = await trakClient.task.findUnique({
       where: {
         id: task_id.toString(),
       },
@@ -92,7 +92,7 @@ const PUT = async (req, res, task_id) => {
     body: { data, phaseId, global },
   } = req;
   try {
-    const getTask = await prisma.task.findUnique({
+    const getTask = await trakClient.task.findUnique({
       where: {
         id: task_id.toString(),
       },
@@ -100,7 +100,7 @@ const PUT = async (req, res, task_id) => {
         responsibleId: true,
       },
     });
-    const updatedTask = await prisma.task.update({
+    const updatedTask = await trakClient.task.update({
       where: {
         id: task_id.toString(),
       },
@@ -159,7 +159,7 @@ const PUT = async (req, res, task_id) => {
  */
 const DELETE = async (res, task_id) => {
   try {
-    const deletedTask = await prisma.task.update({ where: { id: task_id.toString() }, data: { active: false } });
+    const deletedTask = await trakClient.task.update({ where: { id: task_id.toString() }, data: { active: false } });
     res.status(HttpStatusCode.OK).json(deletedTask);
   } catch (err) {
     if (err) {

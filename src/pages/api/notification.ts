@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { INotification } from 'utils/types';
@@ -18,7 +18,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       body: { description, employeeId, email },
     } = req;
     try {
-      const newNotification = await prisma.notification.create({
+      const newNotification = await trakClient.notification.create({
         data: {
           employeeId: employeeId,
           description: description,

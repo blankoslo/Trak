@@ -1,6 +1,7 @@
-import { Badge, Button, Fade, IconButton, InputAdornment, makeStyles, Popover, TextField } from '@material-ui/core';
+import { Badge, Button, Fade, IconButton, InputAdornment, Popover, TextField } from '@material-ui/core';
 import { Search, Tune } from '@material-ui/icons';
 import ClearIcon from '@material-ui/icons/Clear';
+import { makeStyles } from '@material-ui/styles';
 import CenteringRow from 'components/CenteringRow';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';

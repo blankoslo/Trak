@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -12,7 +12,7 @@ import { IEmployee } from 'utils/types';
 
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const employees = await prisma.employee.findMany({
+    const employees = await trakClient.employee.findMany({
       select: {
         id: true,
         firstName: true,

@@ -3,7 +3,7 @@ import PageTitle from 'components/PageTitle';
 import Phase from 'components/views/prosessmal/Phase';
 import PhaseModal from 'components/views/prosessmal/PhaseModal';
 import { DataProvider } from 'context/Data';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import theme from 'theme';
 import { IPhase } from 'utils/types';
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const processTemplate = await prisma.processTemplate.findUnique({
+  const processTemplate = await trakClient.processTemplate.findUnique({
     where: {
       slug: params.slug.toString(),
     },

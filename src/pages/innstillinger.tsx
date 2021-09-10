@@ -1,9 +1,10 @@
-import { Button, Checkbox as MuiCheckbox, FormControlLabel, FormGroup, makeStyles } from '@material-ui/core';
+import { Button, Checkbox as MuiCheckbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 import Typo from 'components/Typo';
 import useSnackbar from 'context/Snackbar';
 import { useUser } from 'context/User';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { getSession } from 'next-auth/client';
@@ -31,7 +32,7 @@ const useStyles = makeStyles({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
   try {
-    const mySettings = await prisma.employeeSettings.findUnique({
+    const mySettings = await trakClient.employeeSettings.findUnique({
       where: {
         employeeId: session?.user?.id,
       },

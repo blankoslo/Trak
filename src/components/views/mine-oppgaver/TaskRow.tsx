@@ -1,5 +1,6 @@
-import { ButtonBase, Checkbox, Hidden, IconButton, makeStyles, Tooltip } from '@material-ui/core';
+import { ButtonBase, Checkbox, Hidden, IconButton, Tooltip } from '@material-ui/core';
 import { Launch, Mail } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/styles';
 import classNames from 'classnames';
 import Avatar from 'components/Avatar';
 import CenteringRow from 'components/CenteringRow';

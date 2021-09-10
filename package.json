@@ -18,20 +18,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p $PORT",
-    "test": "yarn deletedb && yarn createdb && sleep 1 && yarn push && jest --coverage",
-    "test-github": "jest --coverage --forceExit",
-    "docs": "npx typedoc",
     "lint": "eslint --fix --max-warnings=0 .",
     "format": "prettier --write --check --config ./.prettierrc './src/**/*.{js,jsx,ts,tsx,css,md,json}'",
     "fastformat": "pretty-quick --staged './**/*.{js,jsx,ts,tsx,css,md,json}'",
-    "createdb": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
     "precommit": "yarn fastformat && yarn lint",
     "heroku-postbuild": "yarn build",
-    "loaddata": "npx fixtures ./src/fixtures",
-    "deletedb": "docker rm -f -v trak",
-    "push": "npx prisma db push --preview-feature",
-    "generate": "npx prisma generate",
-    "fresh": "yarn deletedb && yarn createdb && sleep 1 && yarn push && yarn generate && yarn loaddata"
+    "createdb": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
+    "generate": "npx prisma generate --schema src/prisma/blank.prisma && npx prisma generate --schema src/prisma/trak.prisma"
   },
   "husky": {
     "hooks": {
@@ -46,10 +39,10 @@
   "dependencies": {
     "@emotion/react": "^11.1.4",
     "@emotion/styled": "^11.0.0",
-    "@material-ui/core": "^5.0.0-alpha.24",
-    "@material-ui/icons": "^5.0.0-alpha.24",
-    "@material-ui/styles": "^5.0.0-alpha.24",
-    "@prisma/client": "^2.21.2",
+    "@material-ui/core": "^5.0.0-beta.5",
+    "@material-ui/icons": "^5.0.0-beta.5",
+    "@material-ui/styles": "^5.0.0-beta.5",
+    "@prisma/client": "2.21.2",
     "@types/lodash": "^4.14.168",
     "@types/material-ui": "^0.21.8",
     "axios": "^0.21.1",
@@ -105,12 +98,12 @@
     "pg-mem": "^1.8.1",
     "prettier": "^2.2.1",
     "pretty-quick": "^3.1.0",
-    "prisma": "^2.21.2",
+    "prisma": "2.21.2",
     "ts-jest": "^26.5.2",
     "typedoc": "^0.20.36",
     "typescript": "^4.2.4"
   },
   "prisma": {
-    "schema": "src/prisma/schema.prisma"
+    "schema": "src/prisma/trak.prisma"
   }
 }

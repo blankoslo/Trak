@@ -3,7 +3,7 @@ import HistoryIcon from '@material-ui/icons/History';
 import { makeStyles } from '@material-ui/styles';
 import Typo from 'components/Typo';
 import Phase from 'components/views/ansatt/Phase';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import { flattenDeep, uniq, uniqBy } from 'lodash';
 import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     };
   }
 
-  const employeeQuery = await prisma.employee.findUnique({
+  const employeeQuery = await trakClient.employee.findUnique({
     where: {
       id: parsedId,
     },
@@ -123,7 +123,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
   });
 
-  const processesQuery = await prisma.processTemplate.findMany({
+  const processesQuery = await trakClient.processTemplate.findMany({
     select: {
       title: true,
       slug: true,

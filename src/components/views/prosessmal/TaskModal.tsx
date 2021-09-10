@@ -1,5 +1,6 @@
-import { Button, makeStyles, Tooltip } from '@material-ui/core';
+import { Button, Theme, Tooltip } from '@material-ui/core';
 import HelpIcon from '@material-ui/icons/Help';
+import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import TagSelector from 'components/form/TagSelector';
@@ -47,7 +48,7 @@ export type TaskData = {
   tags?: ITag[];
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   grid: {
     display: 'grid',
     gridTemplateRows: 'auto',

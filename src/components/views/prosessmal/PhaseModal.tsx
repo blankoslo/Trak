@@ -1,5 +1,6 @@
-import { Box, Button, InputLabel, makeStyles, MenuItem, Select, Tooltip } from '@material-ui/core';
+import { Box, Button, InputLabel, MenuItem, Select, Theme, Tooltip } from '@material-ui/core';
 import HelpIcon from '@material-ui/icons/Help';
+import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 import capitalize from 'capitalize-first-letter';
 import BeforeToogle from 'components/form/BeforeToggle';
@@ -48,7 +49,7 @@ export type PhaseData = {
   month: number;
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   grid: {
     display: 'grid',
     gridTemplateRows: 'auto',

@@ -3,7 +3,7 @@ import PageTitle from 'components/PageTitle';
 import SearchFilter from 'components/SearchFilter';
 import Filter from 'components/views/mine-ansatte/Filter';
 import PhaseCard from 'components/views/mine-ansatte/PhaseCard';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
@@ -16,7 +16,7 @@ import { filterAndSearchEmployees } from 'utils/utils';
 
 const TODAY = moment();
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const phases = prisma.processTemplate.findMany({
+  const phases = trakClient.processTemplate.findMany({
     where: {
       slug: params.slug.toString(),
     },
@@ -71,7 +71,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     },
   });
 
-  const employees = prisma.employee.findMany({
+  const employees = trakClient.employee.findMany({
     select: {
       id: true,
       firstName: true,

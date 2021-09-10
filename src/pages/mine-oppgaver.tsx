@@ -5,7 +5,7 @@ import SearchFilter from 'components/SearchFilter';
 import Typo from 'components/Typo';
 import Filter from 'components/views/mine-oppgaver/Filter';
 import TimeSection from 'components/views/mine-oppgaver/TimeSection';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
   const { fullfort: completed } = context.query;
   const isCompleted = completed.toString() === 'true';
-  const myTasksQuery = await prisma.employeeTask.findMany({
+  const myTasksQuery = await trakClient.employeeTask.findMany({
     where: {
       responsible: {
         email: session?.user?.email,

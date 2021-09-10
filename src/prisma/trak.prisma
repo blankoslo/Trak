@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/trak"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TRAK_DB_URL")
+}
+
+model Employee {
+  id                                                Int               @id @default(autoincrement())
+  title                                             String?
+  email                                             String            @unique
+  professionId                                      String
+  firstName                                         String
+  lastName                                          String
+  birthDate                                         DateTime
+  dateOfEmployment                                  DateTime?
+  terminationDate                                   DateTime?
+  imageUrl                                          String?
+  hrManagerId                                       Int?
+  Employee                                          Employee?         @relation("EmployeeToEmployee_hrManagerId", fields: [hrManagerId], references: [id])
+  Profession                                        Profession        @relation(fields: [professionId], references: [id])
+  other_Employee                                    Employee[]        @relation("EmployeeToEmployee_hrManagerId")
+  EmployeeSettings                                  EmployeeSettings?
+  EmployeeTask_EmployeeToEmployeeTask_completedById EmployeeTask[]    @relation("EmployeeToEmployeeTask_completedById")
+  EmployeeTask_EmployeeToEmployeeTask_employeeId    EmployeeTask[]    @relation("EmployeeToEmployeeTask_employeeId")
+  EmployeeTask_EmployeeToEmployeeTask_responsibleId EmployeeTask[]    @relation("EmployeeToEmployeeTask_responsibleId")
+  Notification                                      Notification[]
+  Task                                              Task[]
+}
+
+model EmployeeSettings {
+  employeeId           Int                @id
+  slack                Boolean            @default(true)
+  notificationSettings NotificationType[]
+  Employee             Employee           @relation(fields: [employeeId], references: [id])
+}
+
+model EmployeeTask {
+  id                                            String    @id
+  taskId                                        String
+  completed                                     Boolean   @default(false)
+  employeeId                                    Int
+  responsibleId                                 Int
+  dueDate                                       DateTime
+  completedDate                                 DateTime?
+  completedById                                 Int?
+  Employee_EmployeeToEmployeeTask_completedById Employee? @relation("EmployeeToEmployeeTask_completedById", fields: [completedById], references: [id])
+  Employee_EmployeeToEmployeeTask_employeeId    Employee  @relation("EmployeeToEmployeeTask_employeeId", fields: [employeeId], references: [id])
+  Employee_EmployeeToEmployeeTask_responsibleId Employee  @relation("EmployeeToEmployeeTask_responsibleId", fields: [responsibleId], references: [id])
+  Task                                          Task      @relation(fields: [taskId], references: [id])
+}
+
+model Notification {
+  id          String   @id
+  employeeId  Int
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  description String
+  Employee    Employee @relation(fields: [employeeId], references: [id])
+}
+
+model Phase {
+  id                String          @id
+  title             String
+  processTemplateId String
+  createdAt         DateTime        @default(now())
+  dueDateDayOffset  Int?
+  dueDate           DateTime?
+  active            Boolean         @default(true)
+  ProcessTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
+  Task              Task[]
+}
+
+model ProcessTemplate {
+  id    String  @id
+  title String
+  slug  String  @unique
+  Phase Phase[]
+}
+
+model Profession {
+  id       String     @id
+  title    String     @unique
+  Employee Employee[]
+  Task     Task[]
+}
+
+model Tag {
+  id    String @id
+  title String @unique
+  Task  Task[]
+}
+
+model Task {
+  id            String         @id
+  title         String
+  description   String?
+  link          String?
+  global        Boolean        @default(true)
+  phaseId       String?
+  responsibleId Int?
+  createdAt     DateTime       @default(now())
+  active        Boolean        @default(true)
+  Phase         Phase?         @relation(fields: [phaseId], references: [id])
+  Employee      Employee?      @relation(fields: [responsibleId], references: [id])
+  EmployeeTask  EmployeeTask[]
+  Profession    Profession[]
+  Tag           Tag[]
+}
+
+enum NotificationType {
+  DELEGATE
+  DEADLINE
+  WEEK_BEFORE_DEADLINE
+  TERMINATION
+  HIRED
+}

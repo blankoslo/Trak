@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -12,7 +12,7 @@ import { IProfession } from 'utils/types';
 
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const professions = await prisma.profession.findMany({
+    const professions = await trakClient.profession.findMany({
       select: {
         title: true,
         id: true,

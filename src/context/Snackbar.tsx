@@ -1,4 +1,5 @@
-import { Alert, makeStyles, Snackbar, Theme } from '@material-ui/core';
+import { Alert, Snackbar, Theme } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({

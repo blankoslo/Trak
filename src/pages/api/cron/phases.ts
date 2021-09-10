@@ -1,5 +1,5 @@
 import HttpStatusCode from 'http-status-typed';
-import prisma from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
 import { groupBy } from 'lodash';
 import moment, { Moment } from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -17,7 +17,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return;
     }
     LAST_RUN = new Date();
-    const phases = await prisma.phase.findMany({
+    const phases = await trakClient.phase.findMany({
       where: {
         active: true,
       },
@@ -51,7 +51,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         },
       },
     });
-    const employees = await prisma.employee.findMany({
+    const employees = await trakClient.employee.findMany({
       select: {
         id: true,
         firstName: true,
@@ -91,7 +91,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         },
       },
     });
-    const responsibleEmployees = await prisma.employee.findMany({
+    const responsibleEmployees = await trakClient.employee.findMany({
       where: {
         responsibleEmployeeTask: {
           some: {
@@ -245,7 +245,7 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
       };
     }
   });
-  await prisma.employeeTask.createMany({ data: data, skipDuplicates: true });
+  await trakClient.employeeTask.createMany({ data: data, skipDuplicates: true });
 };
 /**
  * @param  {(IEmployee&{responsibleEmployeeTask:IEmployeeTask})[]} responsibleEmployees
@@ -286,7 +286,7 @@ const createNotification = async (responsibleEmployees: (IEmployee & { responsib
  * @param  {string?} email
  */
 const notificationSender = async (employeeId: number, description: string, email: string = undefined) => {
-  await prisma.notification.create({
+  await trakClient.notification.create({
     data: {
       employeeId: employeeId,
       description: description,
