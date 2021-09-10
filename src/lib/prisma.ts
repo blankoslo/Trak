@@ -1,10 +1,11 @@
 // https://github.com/prisma/prisma/issues/1983
 
+import { Prisma } from 'prisma';
 import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 import { PrismaClient as TrakClient } from 'prisma/generated/trak';
 
-export let blankClient;
-export let trakClient;
+export let blankClient: BlankClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation>;
+export let trakClient: TrakClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation>;
 
 if (process.env.NODE_ENV === `production`) {
   blankClient = new BlankClient();

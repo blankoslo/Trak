@@ -9,10 +9,10 @@ datasource db {
 }
 
 model Employee {
-  id                                                Int               @id @default(autoincrement())
+  id                                                Int               @id
   title                                             String?
   email                                             String            @unique
-  professionId                                      String
+  professionId                                      Int
   firstName                                         String
   lastName                                          String
   birthDate                                         DateTime
@@ -82,7 +82,7 @@ model ProcessTemplate {
 }
 
 model Profession {
-  id       String     @id
+  id       Int        @id @default(autoincrement())
   title    String     @unique
   Employee Employee[]
   Task     Task[]
