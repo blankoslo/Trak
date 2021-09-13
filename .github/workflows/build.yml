@@ -7,7 +7,8 @@ on:
 jobs:
   build:
     env:
-      DATABASE_URL: ${{secrets.DATABASE_URL}}
+      TRAK_DB_URL: ${{secrets.TRAK_DB_URL}}
+      BLANK_DB_URL: ${{secrets.BLANK_DB_URL}}
     name: Build
     runs-on: ubuntu-latest
 
