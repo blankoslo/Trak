@@ -22,7 +22,7 @@
     "format": "prettier --write --check --config ./.prettierrc './src/**/*.{js,jsx,ts,tsx,css,md,json}'",
     "fastformat": "pretty-quick --staged './**/*.{js,jsx,ts,tsx,css,md,json}'",
     "precommit": "yarn fastformat && yarn lint",
-    "heroku-postbuild": "yarn build",
+    "heroku-postbuild": "yarn generate && yarn build",
     "fresh": "docker rm -f -v trak && yarn createdb && npx prisma db push --schema src/prisma/trak.prisma --preview-feature",
     "createdb": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
     "generate": "npx prisma generate --schema src/prisma/blank.prisma && npx prisma generate --schema src/prisma/trak.prisma"
