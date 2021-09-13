@@ -133,7 +133,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
  * @param {IPhase[]} phases
  * @param {IEmployee[]} employees
  */
-const employeeTaskCreator = (phases: IPhase[], employees: IEmployee[]) => {
+/* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
+const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any) => {
   const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
   const today = moment();
   employees.forEach((employee) => {
@@ -250,7 +251,8 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
 /**
  * @param  {(IEmployee&{responsibleEmployeeTask:IEmployeeTask})[]} responsibleEmployees
  */
-const createNotification = async (responsibleEmployees: (IEmployee & { responsibleEmployeeTask: IEmployeeTask })[]) => {
+/* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
+const createNotification = async (responsibleEmployees: any | (IEmployee & { responsibleEmployeeTask: IEmployeeTask })[]) => {
   try {
     const today = new Date();
     const nextWeek = new Date().setDate(today.getDate() + 7);

@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const mySettings = await trakClient.employeeSettings.findUnique({
       where: {
-        employeeId: session?.user?.id,
+        employeeId: parseInt(session?.user?.id),
       },
     });
     return { props: { mySettings } };
