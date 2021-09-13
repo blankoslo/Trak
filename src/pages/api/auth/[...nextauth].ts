@@ -59,7 +59,7 @@ export default NextAuth({
             id: true,
           },
         });
-        session.user.id = user_id.id;
+        session.user.id = user_id.id.toString();
         // eslint-disable-next-line no-empty
       } catch (err) {}
       return session;
