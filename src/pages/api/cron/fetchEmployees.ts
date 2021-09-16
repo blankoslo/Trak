@@ -1,7 +1,7 @@
 import HttpStatusCode from 'http-status-typed';
 import { blankClient, trakClient } from 'lib/prisma';
+import { remove } from 'lodash';
 import { NextApiRequest, NextApiResponse } from 'next';
-
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
@@ -19,8 +19,32 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           termination_date: true,
         },
       });
-      trakClient.$transaction(
-        blankEmployees.map((employee) => {
+      const MAGNE = await remove(blankEmployees, (employee) => employee.id === 2)[0];
+
+      trakClient.$transaction([
+        trakClient.employee.create({
+          data: {
+            id: MAGNE.id,
+            firstName: MAGNE.first_name,
+            lastName: MAGNE.last_name,
+            email: MAGNE.email,
+            birthDate: MAGNE.birth_date,
+            dateOfEmployment: MAGNE.date_of_employment,
+            terminationDate: MAGNE.termination_date,
+            imageUrl: MAGNE.image_url,
+            profession: {
+              connectOrCreate: {
+                where: {
+                  title: MAGNE.role,
+                },
+                create: {
+                  title: MAGNE.role,
+                },
+              },
+            },
+          },
+        }),
+        ...blankEmployees.map((employee) => {
           return trakClient.employee.create({
             data: {
               id: employee.id,
@@ -31,6 +55,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
               dateOfEmployment: employee.date_of_employment,
               terminationDate: employee.termination_date,
               imageUrl: employee.image_url,
+              hrManager: {
+                connect: {
+                  id: MAGNE.id,
+                },
+              },
               profession: {
                 connectOrCreate: {
                   where: {
@@ -44,7 +73,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             },
           });
         }),
-      );
+      ]);
       res.status(HttpStatusCode.OK).end();
     } catch (err) {
       res.status(HttpStatusCode.BAD_REQUEST).json({ message: err });
