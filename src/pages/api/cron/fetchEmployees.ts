@@ -49,6 +49,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     } catch (err) {
       res.status(HttpStatusCode.BAD_REQUEST).json({ message: err });
     }
-  } else if(req.method === 'POST')
-  res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
+  } else {
+    res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
+  }
 }

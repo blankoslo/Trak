@@ -121,4 +121,10 @@ module.exports = {
       },
     ],
   },
+  ignorePatterns: ['src/prisma/generated/*'],
+  overrides: [
+    {
+      files: ['src/**/*.{js,jsx,ts,tsx}'],
+    },
+  ],
 };
