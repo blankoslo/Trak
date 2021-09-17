@@ -11,7 +11,7 @@ const secret = process.env.JWT_SECRET;
 const withAuth = (handler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      //eslint-disable-next-line
+      // eslint-disable-next-line
       console.log('###AUTH###');
       const token = await jwt.getToken({ req, secret });
       // eslint-disable-next-line
