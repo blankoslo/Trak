@@ -19,61 +19,56 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           termination_date: true,
         },
       });
+
       const MAGNE = await remove(blankEmployees, (employee) => employee.id === 2)[0];
 
-      trakClient.$transaction([
-        trakClient.employee.create({
-          data: {
-            id: MAGNE.id,
-            firstName: MAGNE.first_name,
-            lastName: MAGNE.last_name,
-            email: MAGNE.email,
-            birthDate: MAGNE.birth_date,
-            dateOfEmployment: MAGNE.date_of_employment,
-            terminationDate: MAGNE.termination_date,
-            imageUrl: MAGNE.image_url,
-            profession: {
-              connectOrCreate: {
-                where: {
-                  title: MAGNE.role,
-                },
-                create: {
-                  title: MAGNE.role,
-                },
+      await trakClient.employee.create({
+        data: {
+          id: MAGNE.id,
+          firstName: MAGNE.first_name,
+          lastName: MAGNE.last_name,
+          email: MAGNE.email,
+          birthDate: MAGNE.birth_date,
+          dateOfEmployment: MAGNE.date_of_employment,
+          terminationDate: MAGNE.termination_date,
+          imageUrl: MAGNE.image_url,
+          profession: {
+            connectOrCreate: {
+              where: {
+                title: MAGNE.role,
+              },
+              create: {
+                title: MAGNE.role,
               },
             },
           },
-        }),
-        ...blankEmployees.map((employee) => {
-          return trakClient.employee.create({
-            data: {
-              id: employee.id,
-              firstName: employee.first_name,
-              lastName: employee.last_name,
-              email: employee.email,
-              birthDate: employee.birth_date,
-              dateOfEmployment: employee.date_of_employment,
-              terminationDate: employee.termination_date,
-              imageUrl: employee.image_url,
-              hrManager: {
-                connect: {
-                  id: MAGNE.id,
-                },
-              },
-              profession: {
-                connectOrCreate: {
-                  where: {
-                    title: employee.role,
-                  },
-                  create: {
-                    title: employee.role,
+          employees: {
+            create: blankEmployees.map((employee) => {
+              return {
+                id: employee.id,
+                firstName: employee.first_name,
+                lastName: employee.last_name,
+                email: employee.email,
+                birthDate: employee.birth_date,
+                dateOfEmployment: employee.date_of_employment,
+                terminationDate: employee.termination_date,
+                imageUrl: employee.image_url,
+                profession: {
+                  connectOrCreate: {
+                    where: {
+                      title: employee.role,
+                    },
+                    create: {
+                      title: employee.role,
+                    },
                   },
                 },
-              },
-            },
-          });
-        }),
-      ]);
+              };
+            }),
+          },
+        },
+      });
+
       res.status(HttpStatusCode.OK).end();
     } catch (err) {
       res.status(HttpStatusCode.BAD_REQUEST).json({ message: err });
