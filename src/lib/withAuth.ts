@@ -11,16 +11,11 @@ const secret = process.env.JWT_SECRET;
 const withAuth = (handler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      if (process.env.NODE_ENV === 'test') {
-        const user = await trakClient.employee.findFirst({
-          select: {
-            id: true,
-            email: true,
-          },
-        });
-        return handler(req, res, user);
-      }
+      //eslint-disable-next-line
+      console.log('###AUTH###');
       const token = await jwt.getToken({ req, secret });
+      // eslint-disable-next-line
+      console.log(token);
 
       if (token) {
         const user = await trakClient.employee.findUnique({
@@ -32,12 +27,16 @@ const withAuth = (handler) => {
             email: true,
           },
         });
+        // eslint-disable-next-line
+        console.log(user);
         if (user) {
           return handler(req, res, user);
         }
       }
       // eslint-disable-next-line no-empty
     } catch (err) {
+      // eslint-disable-next-line
+      console.log(err);
       return res.json(err?.message);
     }
     return res.status(HttpStatusCode.UNAUTHORIZED).end();
