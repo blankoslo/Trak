@@ -134,7 +134,6 @@ export type IPhase = {
  * @property {IPhase[]?} phases
  */
 export type IProcessTemplate = {
-  id: string;
   title: string;
   slug: string;
   phases?: IPhase[];

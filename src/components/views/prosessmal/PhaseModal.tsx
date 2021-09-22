@@ -135,7 +135,7 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
         dueDate: dueDate,
         dueDateDayOffset: formData.offset === Offset.Before ? -Math.abs(formData.dueDateDayOffset) : Math.abs(formData.dueDateDayOffset),
       },
-      processTemplateId: processTemplate.id,
+      processTemplateId: processTemplate.slug,
     };
     if (phase_id) {
       axiosPhaseModal(axios.put(`/api/phases/${phase_id}`, data), 'Fasen ble oppdatert');
