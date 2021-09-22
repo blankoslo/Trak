@@ -76,15 +76,14 @@ model Phase {
   createdAt         DateTime        @default(now())
   dueDateDayOffset  Int?
   dueDate           DateTime?
-  processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
+  processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [slug])
   tasks             Task[]
   active            Boolean         @default(true)
 }
 
 model ProcessTemplate {
-  id     String  @id @default(uuid())
   title  String
-  slug   String  @unique
+  slug   String  @id
   phases Phase[]
 }
 

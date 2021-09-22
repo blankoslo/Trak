@@ -21,7 +21,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       slug: params.slug.toString(),
     },
     select: {
-      id: true,
       slug: true,
       title: true,
       phases: {

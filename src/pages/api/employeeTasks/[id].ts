@@ -73,7 +73,7 @@ const GET = async (res, id) => {
                 title: true,
                 processTemplate: {
                   select: {
-                    id: true,
+                    slug: true,
                     title: true,
                   },
                 },
