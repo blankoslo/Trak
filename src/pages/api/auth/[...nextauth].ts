@@ -45,8 +45,10 @@ export default NextAuth({
           });
           return true;
         }
-        // eslint-disable-next-line no-empty
-      } catch (err) {}
+      } catch (err) {
+        // eslint-disable-next-line
+        console.log(err);
+      }
       return false;
     },
     async session(session, user) {
@@ -60,8 +62,10 @@ export default NextAuth({
           },
         });
         session.user.id = user_id.id.toString();
-        // eslint-disable-next-line no-empty
-      } catch (err) {}
+      } catch (err) {
+        // eslint-disable-next-line
+        console.log(err);
+      }
       return session;
     },
   },
