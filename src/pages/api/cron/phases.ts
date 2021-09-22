@@ -3,6 +3,7 @@ import { trakClient } from 'lib/prisma';
 import { groupBy } from 'lodash';
 import moment, { Moment } from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { syncTrakDatabase } from 'utils/cron';
 import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
 import { Process } from 'utils/types';
 import { addDays, slackMessager } from 'utils/utils';
@@ -17,6 +18,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return;
     }
     LAST_RUN = new Date();
+
+    await syncTrakDatabase();
+
     const phases = await trakClient.phase.findMany({
       where: {
         active: true,
@@ -128,11 +132,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-/**
- *
- * @param {IPhase[]} phases
- * @param {IEmployee[]} employees
- */
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
 const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any) => {
   const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
@@ -152,11 +151,7 @@ const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | an
     }
   });
 };
-/**
- * @param  {IEmployee} employee
- * @param  {IPhase[]} lopendePhases
- * @param  {Moment} today
- */
+
 const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[], today: Moment) => {
   const comingPhases = lopendePhases.filter((phase) => {
     const dueDate = moment(phase.dueDate).subtract(1, 'week');
@@ -188,10 +183,7 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
     createEmployeeTasks(employee, nextPhase);
   }
 };
-/**
- * @param {IPhase[]} phases
- * @param {IEmployee} employee
- */
+
 const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee) => {
   phases.forEach((phase) => {
     if (phase.processTemplate.slug === Process.ONBOARDING) {
@@ -205,10 +197,7 @@ const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmploy
     await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
   }
 };
-/**
- * @param  {IPhase[]} phases
- * @param  {IEmployee} employee
- */
+
 const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee) => {
   phases.forEach((phase) => {
     if (phase.processTemplate.slug === Process.OFFBOARDING) {
@@ -222,16 +211,10 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
     await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
   }
 };
-/**
- * @param  {IEmployee} employee
- * @param  {string} processTitle
- */
+
 const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
   employee.employeeTask.some((employeeTask) => employeeTask.task.phase.processTemplate.slug === processTitle);
-/**
- * @param  {IEmployee} employee
- * @param  {IPhase} phase
- */
+
 const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
   const data = phase?.tasks.map((task) => {
     if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
@@ -248,9 +231,7 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
   });
   await trakClient.employeeTask.createMany({ data: data, skipDuplicates: true });
 };
-/**
- * @param  {(IEmployee&{responsibleEmployeeTask:IEmployeeTask})[]} responsibleEmployees
- */
+
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
 const createNotification = async (responsibleEmployees: any | (IEmployee & { responsibleEmployeeTask: IEmployeeTask })[]) => {
   try {
@@ -282,11 +263,7 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
     console.error(err.message);
   }
 };
-/**
- * @param  {number} employeeId
- * @param  {string} description
- * @param  {string?} email
- */
+
 const notificationSender = async (employeeId: number, description: string, email: string = undefined) => {
   await trakClient.notification.create({
     data: {
