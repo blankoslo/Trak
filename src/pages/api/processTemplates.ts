@@ -13,7 +13,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     const processTemplates = await trakClient.processTemplate.findMany({
       select: {
-        id: true,
         slug: true,
         title: true,
       },

@@ -83,7 +83,7 @@ const Filter = ({ choosenTags, setChoosenTags, choosenProcessTemplates, setChoos
       <ToggleButtonGroup className={classNames(classes.gutterBottom, classes.wrap)} onChange={handleFormat} value={choosenProcessTemplates}>
         {processTemplates?.map((processTemplate: IProcessTemplate) => {
           return (
-            <ToggleButton className={classes.selectedButton} key={processTemplate.id} value={processTemplate.title}>
+            <ToggleButton className={classes.selectedButton} key={processTemplate.slug} value={processTemplate.title}>
               {processTemplate.title}
             </ToggleButton>
           );
