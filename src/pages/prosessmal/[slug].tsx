@@ -42,6 +42,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
         select: {
           id: true,
           title: true,
+          processTemplateId: true,
           tasks: {
             orderBy: {
               createdAt: 'asc',
