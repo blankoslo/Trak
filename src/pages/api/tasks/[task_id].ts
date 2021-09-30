@@ -43,6 +43,8 @@ const GET = async (res, task_id) => {
         description: true,
         phaseId: true,
         link: true,
+        dueDate: true,
+        dueDateDayOffset: true,
         tags: {
           select: {
             id: true,
@@ -109,6 +111,8 @@ const PUT = async (req, res, task_id) => {
         description: data.description,
         link: data.link,
         global: global,
+        dueDate: data.dueDate,
+        dueDateDayOffset: data.dueDateDayOffset,
         phase: {
           connect: {
             id: phaseId,

@@ -62,6 +62,7 @@ export const SelectComponent = ({ setValue, value }: ToggleComponentProps) => {
         className={classes.select}
         inputProps={{ name: 'before-toogle', id: 'select-before', 'aria-label': 'Før/etter' }}
         onChange={() => setValue(value === Offset.Before ? Offset.After : Offset.Before)}
+        style={{ height: '36px' }}
         value={value}>
         <MenuItem value={Offset.Before}>før</MenuItem>
         <MenuItem value={Offset.After}>etter</MenuItem>

@@ -105,8 +105,8 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
           dueDate: moment(res.data.dueDate).format('yyyy-MM-DD'),
           offset: res.data.dueDateDayOffset <= 0 ? Offset.Before : Offset.After,
           dueDateDayOffset: Math.abs(res.data.dueDateDayOffset),
-          day: dueDate.getDate(),
-          month: dueDate.getMonth(),
+          day: dueDate?.getDate(),
+          month: dueDate?.getMonth(),
         });
       });
     }

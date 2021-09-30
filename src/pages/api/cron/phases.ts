@@ -45,6 +45,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           },
           select: {
             id: true,
+            dueDate: true,
+            dueDateDayOffset: true,
             responsibleId: true,
             professions: {
               select: {
@@ -218,13 +220,24 @@ const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
 const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
   const data = phase?.tasks.map((task) => {
     if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
+      let taskDueDate = null;
+      if (task.dueDate) {
+        taskDueDate = task.dueDate;
+      } else if (task.dueDateDayOffset) {
+        if (phase.processTemplateId === Process.OFFBOARDING) {
+          taskDueDate = addDays(employee.terminationDate, task.dueDateDayOffset);
+        } else if (phase.processTemplateId === Process.ONBOARDING) {
+          taskDueDate = addDays(employee.dateOfEmployment, task.dueDateDayOffset);
+        }
+      }
+
       if (!task.responsibleId && !employee.hrManagerId) {
         return;
       }
       return {
         employeeId: employee.id,
         responsibleId: task.responsibleId || employee.hrManagerId,
-        dueDate: phase.dueDate,
+        dueDate: taskDueDate || phase.dueDate,
         taskId: task.id,
       };
     }
