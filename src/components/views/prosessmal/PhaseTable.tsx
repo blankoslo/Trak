@@ -57,6 +57,9 @@ const PhaseTable = ({ phase }: PhaseTableProps) => {
             Beskrivelse
           </TableCell>
           <TableCell className={classes.headerCell} size='small'>
+            Rolle
+          </TableCell>
+          <TableCell className={classes.headerCell} size='small'>
             Ansvarlig
           </TableCell>
           <TableCell className={classes.headerCell} component='td' size='small'></TableCell>
