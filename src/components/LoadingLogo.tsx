@@ -1,5 +1,5 @@
-import { Box } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Box } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Typo from 'components/Typo';
 import Image from 'next/image';
 import theme from 'theme';

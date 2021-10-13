@@ -1,6 +1,6 @@
-import { Box, ButtonBase, Checkbox, Hidden, IconButton, Tooltip } from '@material-ui/core';
-import { Launch, Mail } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import { Launch, Mail } from '@mui/icons-material/';
+import { Box, ButtonBase, Checkbox, Hidden, IconButton, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import Typo from 'components/Typo';

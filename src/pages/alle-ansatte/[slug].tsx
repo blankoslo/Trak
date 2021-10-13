@@ -1,4 +1,4 @@
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import PageTitle from 'components/PageTitle';
 import SearchFilter from 'components/SearchFilter';
 import Filter from 'components/views/mine-ansatte/Filter';

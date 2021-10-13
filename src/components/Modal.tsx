@@ -1,5 +1,5 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Typo from 'components/Typo';
 
 const useStyles = makeStyles({

@@ -1,5 +1,5 @@
-import { Box, Button, ToggleButton, ToggleButtonGroup } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Box, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import Typo from 'components/Typo';
 import { useData } from 'context/Data';

@@ -1,5 +1,5 @@
-import { Box, Paper } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Box, Paper } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Image from 'next/image';
 import { signIn } from 'next-auth/client';
 import GoogleButton from 'react-google-button';

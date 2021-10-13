@@ -1,6 +1,6 @@
-import { Box, Button, Menu, MenuItem } from '@material-ui/core';
-import HistoryIcon from '@material-ui/icons/History';
-import { makeStyles } from '@material-ui/styles';
+import HistoryIcon from '@mui/icons-material/History';
+import { Box, Button, Menu, MenuItem } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Typo from 'components/Typo';
 import Phase from 'components/views/ansatt/Phase';
 import { trakClient } from 'lib/prisma';

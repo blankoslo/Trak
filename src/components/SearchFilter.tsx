@@ -1,7 +1,8 @@
-import { Badge, Button, Fade, IconButton, InputAdornment, Popover, TextField } from '@material-ui/core';
-import { Search, Tune } from '@material-ui/icons';
-import ClearIcon from '@material-ui/icons/Clear';
-import { makeStyles } from '@material-ui/styles';
+import ClearIcon from '@mui/icons-material/Clear';
+import Search from '@mui/icons-material/Search';
+import Tune from '@mui/icons-material/Tune';
+import { Badge, Button, Fade, IconButton, InputAdornment, Popover, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import CenteringRow from 'components/CenteringRow';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';

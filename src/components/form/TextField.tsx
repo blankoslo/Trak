@@ -1,4 +1,4 @@
-import MuiTextField, { StandardTextFieldProps as MUITextFieldProps } from '@material-ui/core/TextField';
+import MuiTextField, { StandardTextFieldProps as MUITextFieldProps } from '@mui/material/TextField';
 import { RegisterOptions, UseFormMethods } from 'react-hook-form';
 
 /**
