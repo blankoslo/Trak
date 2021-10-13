@@ -1,6 +1,7 @@
-import { Divider, Hidden, IconButton } from '@material-ui/core';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Divider, Hidden, IconButton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import CenteringRow from 'components/CenteringRow';
 import Typo from 'components/Typo';
 import TaskRow from 'components/views/mine-oppgaver/TaskRow';

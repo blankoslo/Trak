@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider } from '@material-ui/core';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import Layout from 'components/Layout';
 import { DataProvider } from 'context/Data';
 import { ProgressbarProvider } from 'context/Progressbar';

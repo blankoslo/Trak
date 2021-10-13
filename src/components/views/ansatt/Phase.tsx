@@ -1,6 +1,6 @@
-import { Box, Button, Divider, Hidden } from '@material-ui/core';
-import AlarmIcon from '@material-ui/icons/Alarm';
-import { makeStyles } from '@material-ui/styles';
+import AlarmIcon from '@mui/icons-material/Alarm';
+import { Box, Button, Divider, Hidden } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import AddButton from 'components/AddButton';
 import Typo from 'components/Typo';
 import ChangeDueDateModal from 'components/views/ansatt/ChangeDueDateModal';

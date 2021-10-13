@@ -1,6 +1,6 @@
-import { Box, ButtonBase, Hidden, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
-import { ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import { ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material/';
+import { Box, ButtonBase, Hidden, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import CenteringRow from 'components/CenteringRow';
 import Typo from 'components/Typo';
 import UserRow from 'components/views/mine-ansatte/UserRow';

@@ -1,6 +1,6 @@
-import { Box, Button, InputLabel, MenuItem, Select, Theme, Tooltip } from '@material-ui/core';
-import HelpIcon from '@material-ui/icons/Help';
-import { makeStyles } from '@material-ui/styles';
+import HelpIcon from '@mui/icons-material/Help';
+import { Box, Button, InputLabel, MenuItem, Select, Theme, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import capitalize from 'capitalize-first-letter';
 import BeforeToogle from 'components/form/BeforeToggle';

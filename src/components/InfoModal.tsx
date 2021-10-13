@@ -1,6 +1,6 @@
-import { Box, Button, Chip, IconButton, Skeleton } from '@material-ui/core';
-import { Edit } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import Edit from '@mui/icons-material/Edit';
+import { Box, Button, Chip, IconButton, Skeleton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';

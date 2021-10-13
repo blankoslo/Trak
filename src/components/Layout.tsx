@@ -1,5 +1,5 @@
-import { Box } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Box } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import LogIn from 'components/LogIn';
 import Sidebar from 'components/Sidebar';
 import { useRouter } from 'next/router';

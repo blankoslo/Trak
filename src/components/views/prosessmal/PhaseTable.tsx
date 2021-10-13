@@ -1,5 +1,5 @@
-import { Table, TableBody, TableCell, TableHead, TableRow, Theme } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Table, TableBody, TableCell, TableHead, TableRow, Theme } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import AddButton from 'components/AddButton';
 import TaskRow from 'components/views/prosessmal//TaskRow';
 import TaskModal from 'components/views/prosessmal/TaskModal';

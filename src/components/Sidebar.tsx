@@ -1,7 +1,7 @@
-import { Badge, Box, Button, Divider, Drawer as MuiDrawer, Hidden, IconButton, List, ListItem, ListItemText, Skeleton } from '@material-ui/core';
-import { Menu } from '@material-ui/icons';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import { makeStyles } from '@material-ui/styles';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import Menu from '@mui/icons-material/Menu';
+import { Badge, Box, Button, Divider, Drawer as MuiDrawer, Hidden, IconButton, List, ListItem, ListItemText, Skeleton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import classnames from 'classnames';
 import Avatar from 'components/Avatar';

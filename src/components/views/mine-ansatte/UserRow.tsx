@@ -1,5 +1,5 @@
-import { Box, ButtonBase, Hidden, TableCell, TableRow } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Box, ButtonBase, Hidden, TableCell, TableRow } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Avatar from 'components/Avatar';
 import Typo from 'components/Typo';
 import { useRouter } from 'next/router';

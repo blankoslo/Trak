@@ -1,5 +1,5 @@
-import { CircularProgress, Snackbar, Theme } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { CircularProgress, Snackbar, Theme } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
