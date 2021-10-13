@@ -188,6 +188,8 @@ export type ITask = {
   employeeTask: IEmployeeTask[];
   responsible?: IEmployee;
   responsibleId?: number;
+  dueDateDayOffset?: number;
+  dueDate?: Date;
 };
 
 /** @enum {string} */
