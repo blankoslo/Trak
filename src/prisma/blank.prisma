@@ -8,9 +8,8 @@ datasource db {
   url      = env("BLANK_DB_URL")
 }
 
-
 model employee_role {
-  id          String             @id @default(dbgenerated())
+  id          String             @id @default(dbgenerated("uuid_generate_v4()"))
   employee_id Int
   role_type   employee_role_type
   created     DateTime?          @default(now()) @db.Date
@@ -18,28 +17,29 @@ model employee_role {
 }
 
 model employees {
-  id                                                  Int                  @id @default(autoincrement())
-  first_name                                          String
-  last_name                                           String
-  title                                               String?
-  phone                                               String
-  email                                               String               @unique
-  gender                                              gender
-  birth_date                                          DateTime             @db.Date
-  date_of_employment                                  DateTime?            @db.Date
-  termination_date                                    DateTime?            @db.Date
-  emergency_contact_name                              String?
-  emergency_contact_phone                             String?
-  emergency_contact_relation                          String?
-  address                                             String?
-  postal_code                                         String?
-  city                                                String?
-  image_url                                           String?
-  has_permanent_position                              Boolean?             @default(true)
-  emoji                                               String?              @db.VarChar(10)
-  role                                                String?
-  bio                                                 String?
-  employee_role                                       employee_role[]
+  id                         Int             @id @default(autoincrement())
+  first_name                 String
+  last_name                  String
+  title                      String?
+  phone                      String
+  email                      String          @unique
+  gender                     gender
+  birth_date                 DateTime        @db.Date
+  date_of_employment         DateTime?       @db.Date
+  termination_date           DateTime?       @db.Date
+  emergency_contact_name     String?
+  emergency_contact_phone    String?
+  emergency_contact_relation String?
+  address                    String?
+  postal_code                String?
+  city                       String?
+  image_url                  String?
+  has_permanent_position     Boolean?        @default(true)
+  emoji                      String?         @db.VarChar(10)
+  role                       String?
+  bio                        String?
+  hr_manager                 Int?
+  employee_role              employee_role[]
 }
 
 enum employee_role_type {
