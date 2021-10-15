@@ -12,37 +12,10 @@ export const syncTrakDatabase = async () => {
       date_of_employment: true,
       image_url: true,
       role: true,
+      hr_manager: true,
       termination_date: true,
     },
   });
-
-  const MAGNE = await blankEmployees.find((x) => x.id === 2);
-  const magne_connect_or_create = {
-    where: {
-      id: MAGNE.id,
-    },
-    create: {
-      id: MAGNE.id,
-      firstName: MAGNE.first_name,
-      lastName: MAGNE.last_name,
-      email: MAGNE.email,
-      birthDate: MAGNE.birth_date,
-      dateOfEmployment: MAGNE.date_of_employment,
-      terminationDate: MAGNE.termination_date,
-      imageUrl: MAGNE.image_url,
-      profession: {
-        connectOrCreate: {
-          where: {
-            title: MAGNE.role,
-          },
-          create: {
-            title: MAGNE.role,
-          },
-        },
-      },
-    },
-  };
-
   await trakClient.$transaction(
     blankEmployees.map((employee) => {
       const data = {
@@ -53,9 +26,13 @@ export const syncTrakDatabase = async () => {
         dateOfEmployment: employee.date_of_employment,
         terminationDate: employee.termination_date,
         imageUrl: employee.image_url,
-        hrManager: {
-          connectOrCreate: magne_connect_or_create,
-        },
+        ...(employee.hr_manager && {
+          hrManager: {
+            connect: {
+              id: employee.hr_manager,
+            },
+          },
+        }),
         profession: {
           connectOrCreate: {
             where: {
