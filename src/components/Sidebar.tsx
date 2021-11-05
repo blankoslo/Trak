@@ -27,7 +27,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   drawerPaper: {
     width: SIDEBAR_WIDTH,
-    backgroundColor: theme.palette.background.paper,
   },
   gutterBottom: {
     marginBottom: theme.spacing(2),
