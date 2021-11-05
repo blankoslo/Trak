@@ -1,10 +1,9 @@
-import { Box } from '@mui/material';
+import { Box, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Typo from 'components/Typo';
 import Image from 'next/image';
-import theme from 'theme';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     transform: 'translate(-50%,-50%)',
     left: '50%',
@@ -28,7 +27,7 @@ const useStyles = makeStyles({
       transform: 'scale(0.9)',
     },
   },
-});
+}));
 
 /**
  * Loading page to be used once fetching data

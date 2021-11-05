@@ -1,5 +1,5 @@
 import { Launch, Mail } from '@mui/icons-material/';
-import { Box, ButtonBase, Checkbox, Hidden, IconButton, Tooltip } from '@mui/material';
+import { Box, ButtonBase, Checkbox, Hidden, IconButton, Theme, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
@@ -7,12 +7,11 @@ import Typo from 'components/Typo';
 import useSnackbar from 'context/Snackbar';
 import { EmployeeContext } from 'pages/ansatt/[id]';
 import React, { useContext, useMemo, useState } from 'react';
-import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
 import validator from 'validator';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
     width: theme.spacing(3),
     height: theme.spacing(3),
@@ -36,7 +35,7 @@ const useStyles = makeStyles({
       borderRadius: theme.spacing(0.5),
     },
   },
-});
+}));
 
 /**
  * @typedef {object} TaskRowProps

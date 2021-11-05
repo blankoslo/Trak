@@ -4,13 +4,14 @@ import useSWR, { responseInterface } from 'swr';
 import { IEmployee, IProcessTemplate, IProfession, ITag } from 'utils/types';
 import { fetcher } from 'utils/utils';
 
-const DataContext = createContext(undefined);
+const DataContext = createContext('light');
 /**
  * hook to get the DataContext
  * @returns DataContext
  */
 function useData() {
-  const context = useContext(DataContext);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const context: any = useContext(DataContext);
   if (!context) {
     throw new Error(`useData must be used within a DataProvider`);
   }

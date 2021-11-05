@@ -11,7 +11,6 @@ import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/client';
 import { useEffect, useMemo, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
-import theme from 'theme';
 import { IEmployee, IEmployeeTask, IPhase, IProcessTemplate, Process } from 'utils/types';
 import { filterAndSearchEmployees } from 'utils/utils';
 
@@ -227,7 +226,7 @@ const MyEmployees = ({ myEmployees, allPhases }: InferGetServerSidePropsType<typ
       />
       {(filterResult.length ? filterResult : phases).map((phase) => {
         return (
-          <Box key={phase.id} mb={theme.spacing(2)}>
+          <Box key={phase.id} mb={2}>
             <PhaseCard amount={phase.employees.length} employees={phase.employees} id={phase.id} slug={processTemplate.slug} title={phase.title} />
           </Box>
         );

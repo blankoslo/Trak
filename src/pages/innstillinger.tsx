@@ -10,10 +10,9 @@ import Head from 'next/head';
 import { getSession } from 'next-auth/client';
 import { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import theme from 'theme';
 import { NotificationType } from 'utils/types';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(() => ({
   root: {
     marginLeft: '30px',
     marginTop: '60px',
@@ -27,7 +26,7 @@ const useStyles = makeStyles({
   grid: {
     display: 'grid',
   },
-});
+}));
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
@@ -85,7 +84,6 @@ const Settings = ({ mySettings }: InferGetServerSidePropsType<typeof getServerSi
         showSnackbar(error.response?.data?.message, 'error');
       });
   });
-
   return (
     <>
       <Head>
@@ -100,7 +98,7 @@ const Settings = ({ mySettings }: InferGetServerSidePropsType<typeof getServerSi
         <form noValidate onSubmit={onSubmit}>
           <div>
             <Checkbox control={control} key={'slack'} label='Jeg ønsker varslinger på Slack' name={'slack'} />
-            <div style={{ padding: `${theme.spacing(4)} 0` }}>
+            <div style={{ padding: `32 0` }}>
               <Typo variant='h2'>Send notifikasjon når:</Typo>
               <FormGroup>
                 {Object.keys(NotificationType).map((key) => {

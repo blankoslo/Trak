@@ -1,14 +1,13 @@
-import { Box } from '@mui/material';
+import { Box, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import LogIn from 'components/LogIn';
 import Sidebar from 'components/Sidebar';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/client';
 import { useEffect } from 'react';
-import theme from 'theme';
 import urls from 'URLS';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   center: {
     position: 'absolute',
     top: '50%',
@@ -24,7 +23,7 @@ const useStyles = makeStyles({
       marginLeft: '10px',
     },
   },
-});
+}));
 
 /**
  * @typedef {object} LayoutProps

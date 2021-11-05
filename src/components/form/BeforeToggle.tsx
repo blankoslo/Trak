@@ -1,14 +1,13 @@
-import { InputLabel, MenuItem, Select } from '@mui/material';
+import { InputLabel, MenuItem, Select, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Control, Controller } from 'react-hook-form';
-import theme from 'theme';
 import { Offset } from 'utils/types';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   select: {
     marginRight: theme.spacing(1),
   },
-});
+}));
 
 /**
  * @typedef {object} BeforeToogleProps

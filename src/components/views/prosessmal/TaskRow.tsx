@@ -76,7 +76,7 @@ const TaskRow = ({ task, phase }: TaskProps) => {
           onClick={() => {
             setModalIsOpen(true);
           }}>
-          <Edit />
+          <Edit color='primary' />
         </IconButton>
         {modalIsOpen && <TaskModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} phase={phase} task_id={task.id} />}
       </TableCell>

@@ -1,5 +1,5 @@
 import { Launch, Mail } from '@mui/icons-material';
-import { ButtonBase, Checkbox, Hidden, IconButton, Tooltip } from '@mui/material';
+import { ButtonBase, Checkbox, Hidden, IconButton, Theme, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import Avatar from 'components/Avatar';
@@ -10,12 +10,11 @@ import useSnackbar from 'context/Snackbar';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import theme from 'theme';
 import { IEmployeeTask, Process } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
 import validator from 'validator';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
     width: theme.spacing(3),
     height: theme.spacing(3),
@@ -49,7 +48,7 @@ const useStyles = makeStyles({
       borderRadius: theme.spacing(0.5),
     },
   },
-});
+}));
 
 /**
  * Display a specific task
@@ -81,7 +80,7 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
           <Tooltip title={data.task.link}>
             <a href={`${validator.isEmail(data.task.link) ? 'mailto:' : ''}${data.task.link}`} rel='noopener noreferrer' target='_blank'>
               <IconButton disableFocusRipple size='small'>
-                {validator.isEmail(data.task.link) ? <Mail /> : <Launch />}
+                {validator.isEmail(data.task.link) ? <Mail color='primary' /> : <Launch color='primary' />}
               </IconButton>
             </a>
           </Tooltip>

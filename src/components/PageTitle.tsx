@@ -1,7 +1,7 @@
+import { Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import Typo from 'components/Typo';
-import theme from 'theme';
 
 /**
  * @typedef {object} PageTitleProps
@@ -13,14 +13,14 @@ export type PageTitleProps = {
   subtitle?: string;
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   title: {
     lineHeight: 0.7,
   },
   gutterBottom: {
     marginBottom: theme.spacing(2),
   },
-});
+}));
 
 /**
  * Component to be used on every page to make sure all titles are the same

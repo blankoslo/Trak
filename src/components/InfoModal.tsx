@@ -1,5 +1,5 @@
 import Edit from '@mui/icons-material/Edit';
-import { Box, Button, Chip, IconButton, Skeleton } from '@mui/material';
+import { Box, Button, Chip, IconButton, Skeleton, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import EmployeeSelector from 'components/form/EmployeeSelector';
@@ -13,10 +13,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Linkify from 'react-linkify';
 import ReactMarkdown from 'react-markdown';
-import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   chip: {
     marginRight: theme.spacing(1),
   },
@@ -32,7 +31,13 @@ const useStyles = makeStyles({
     display: 'grid',
     gridTemplateColumns: '4fr 1fr 1fr',
   },
-});
+  skeleton: {
+    width: theme.spacing(32),
+  },
+  skeletonHeight: {
+    height: theme.spacing(24),
+  },
+}));
 
 /**
  * Select employee to be responsible
@@ -116,7 +121,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
           </>
         )
       ) : (
-        <Skeleton width={theme.spacing(32)} />
+        <Skeleton className={classes.skeleton} />
       )}
     </Typo>
   );
@@ -177,16 +182,16 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <b>Gjelder:</b>
           </Typo>
           <Typo variant='body1'>
-            {employeeTask ? `${employeeTask?.employee.firstName} ${employeeTask?.employee.lastName}` : <Skeleton width={theme.spacing(32)} />}
+            {employeeTask ? `${employeeTask?.employee.firstName} ${employeeTask?.employee.lastName}` : <Skeleton className={classes.skeleton} />}
           </Typo>
           <Typo variant='body1'>
             <b>Fase:</b>
           </Typo>
-          <Typo variant='body1'>{employeeTask ? `${employeeTask?.task.phase.title}` : <Skeleton width={theme.spacing(32)} />}</Typo>
+          <Typo variant='body1'>{employeeTask ? `${employeeTask?.task.phase.title}` : <Skeleton className={classes.skeleton} />}</Typo>
           <Typo variant='body1'>
             <b>Forfallsdato:</b>
           </Typo>
-          <Typo variant='body1'>{employeeTask ? moment(new Date(employeeTask?.dueDate)).format('DD.MM.YYYY') : <Skeleton width={theme.spacing(32)} />}</Typo>
+          <Typo variant='body1'>{employeeTask ? moment(new Date(employeeTask?.dueDate)).format('DD.MM.YYYY') : <Skeleton className={classes.skeleton} />}</Typo>
           {employeeTask?.completedBy && employeeTask?.completedDate && (
             <>
               <Typo variant='body1'>
@@ -229,7 +234,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
               <ReactMarkdown>{employeeTask?.task.description}</ReactMarkdown>
             </Linkify>
           ) : (
-            <Skeleton height={theme.spacing(24)} />
+            <Skeleton className={classes.skeletonHeight} />
           )}
         </Typo>
       </>

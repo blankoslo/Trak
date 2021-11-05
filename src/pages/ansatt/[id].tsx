@@ -1,5 +1,5 @@
 import HistoryIcon from '@mui/icons-material/History';
-import { Box, Button, Menu, MenuItem } from '@mui/material';
+import { Box, Button, Menu, MenuItem, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Typo from 'components/Typo';
 import Phase from 'components/views/ansatt/Phase';
@@ -11,12 +11,11 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { createContext, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
-import theme from 'theme';
 import { IEmployeeTask, ITask, Process } from 'utils/types';
 
 export const EmployeeContext = createContext(undefined);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   spaceRight: {
     marginRight: theme.spacing(4),
   },
@@ -37,7 +36,10 @@ const useStyles = makeStyles({
       flexDirection: 'column',
     },
   },
-});
+  link: {
+    color: theme.palette.text.primary,
+  },
+}));
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id, år: year = null, prosess: process } = query;
   const parsedId = typeof id === 'string' && parseInt(id);
@@ -256,7 +258,9 @@ const Employee = ({ employee, phasesWithTasks, year, process, history }: InferGe
                   return (
                     <MenuItem key={`${process.title} ${year}`} onClick={handleClose}>
                       <Link href={link}>
-                        <a style={{ textDecoration: 'none', color: theme.palette.text.primary }}>{linkText}</a>
+                        <a className={classes.link} style={{ textDecoration: 'none' }}>
+                          {linkText}
+                        </a>
                       </Link>
                     </MenuItem>
                   );

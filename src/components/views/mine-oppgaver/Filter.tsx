@@ -1,12 +1,11 @@
-import { Autocomplete, Box, Button, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Autocomplete, Box, Button, TextField, Theme, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import Typo from 'components/Typo';
 import { useData } from 'context/Data';
-import theme from 'theme';
 import { IProcessTemplate, ITag } from 'utils/types';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   gutterBottom: {
     marginBottom: theme.spacing(2),
   },
@@ -21,7 +20,7 @@ const useStyles = makeStyles({
   wrap: {
     flexWrap: 'wrap',
   },
-});
+}));
 
 /**
  * @typedef {object} FilterOptions

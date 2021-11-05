@@ -1,12 +1,11 @@
-import { Box, ButtonBase, Hidden, TableCell, TableRow } from '@mui/material';
+import { Box, ButtonBase, Hidden, TableCell, TableRow, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Avatar from 'components/Avatar';
 import Typo from 'components/Typo';
 import { useRouter } from 'next/router';
-import theme from 'theme';
 import { IEmployee, IEmployeeTask, IProfession } from 'utils/types';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   pointer: {
     cursor: 'pointer',
   },
@@ -23,7 +22,7 @@ const useStyles = makeStyles({
     height: '25px',
     marginRight: theme.spacing(1),
   },
-});
+}));
 
 /**
  * @typedef {object} EmployeeRow

@@ -1,13 +1,12 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Divider, Hidden, IconButton } from '@mui/material';
+import { Divider, Hidden, IconButton, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CenteringRow from 'components/CenteringRow';
 import Typo from 'components/Typo';
 import TaskRow from 'components/views/mine-oppgaver/TaskRow';
 import { TimeSectionType } from 'pages/mine-oppgaver';
 import { useState } from 'react';
-import theme from 'theme';
 
 /**
  * @typedef {object} TimeSectionProps
@@ -19,7 +18,7 @@ export type TimeSectionProps = {
   index: number;
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   grid: {
     display: 'grid',
     gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
@@ -44,7 +43,10 @@ const useStyles = makeStyles({
   disabled: {
     color: theme.palette.text.disabled,
   },
-});
+  error: {
+    color: theme.palette.error.main,
+  },
+}));
 
 /**
  * Card to display tasks in a specific time-range
@@ -64,7 +66,7 @@ const TimeSection = ({ section, index }: TimeSectionProps) => {
     <div className={classes.grid}>
       <CenteringRow>
         <Typo>
-          <b style={section.error && { color: theme.palette.error.main }}>{section.title}</b>
+          <b className={section.error && classes.error}>{section.title}</b>
           <span className={classes.disabled}>
             {section.title && section.date && ' - '}
             {section.date}

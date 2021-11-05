@@ -1,20 +1,19 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import Search from '@mui/icons-material/Search';
 import Tune from '@mui/icons-material/Tune';
-import { Badge, Button, Fade, IconButton, InputAdornment, Popover, TextField } from '@mui/material';
+import { Badge, Button, Fade, IconButton, InputAdornment, Popover, TextField, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CenteringRow from 'components/CenteringRow';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import theme from 'theme';
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   textField: {
     height: theme.spacing(4),
   },
   gutterBottom: {
     marginBottom: theme.spacing(2),
   },
-});
+}));
 
 /**
  * @typedef {object} SearchFilterProps

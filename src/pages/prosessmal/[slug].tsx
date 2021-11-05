@@ -7,7 +7,6 @@ import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useState } from 'react';
-import theme from 'theme';
 import { IPhase } from 'utils/types';
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
@@ -89,7 +88,7 @@ const ProcessTemplate = ({ processTemplate }: InferGetServerSidePropsType<typeof
         ))}
       </DataProvider>
       <AddButton onClick={() => setModalIsOpen(true)} text='Legg til fase' />
-      <div style={{ marginBottom: theme.spacing(3) }} />
+      <div style={{ marginBottom: '24px' }} />
       {modalIsOpen && <PhaseModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} processTemplate={processTemplate} />}
     </>
   );
