@@ -18,27 +18,25 @@ function ColorModeProvider(props) {
   const colorModeFromLocalStorage = getItem('colorMode');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+  const setColor = (colorMode: ColorMode) => {
+    setMode(colorMode);
+    setItem('colorMode', colorMode);
+  };
+
   const toogleColorMode = () => {
     if (mode === ColorMode.DARK) {
-      setMode(ColorMode.LIGHT);
-      setItem('colorMode', ColorMode.LIGHT);
+      setColor(ColorMode.LIGHT);
     } else {
-      setMode(ColorMode.DARK);
-      setItem('colorMode', ColorMode.DARK);
+      setColor(ColorMode.DARK);
     }
   };
   const [mode, setMode] = useState(ColorMode.LIGHT);
 
   useEffect(() => {
-    setMode(
-      colorModeFromLocalStorage
-        ? colorModeFromLocalStorage === ColorMode.DARK
-          ? ColorMode.DARK
-          : ColorMode.LIGHT
-        : prefersDarkMode
-        ? ColorMode.DARK
-        : ColorMode.LIGHT,
-    );
+    const userSelectedColorMode = colorModeFromLocalStorage === ColorMode.DARK ? ColorMode.DARK : ColorMode.LIGHT;
+    const systemColorMode = prefersDarkMode ? ColorMode.DARK : ColorMode.LIGHT;
+    const colorMode = colorModeFromLocalStorage ? userSelectedColorMode : systemColorMode;
+    setMode(colorMode);
   }, [prefersDarkMode, colorModeFromLocalStorage]);
 
   return <ColorModeContext.Provider value={{ mode: mode, setMode: setMode, toggleColorMode: toogleColorMode }} {...props} />;

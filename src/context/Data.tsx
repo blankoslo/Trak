@@ -1,10 +1,10 @@
 import { useSession } from 'next-auth/client';
 import { createContext, useContext } from 'react';
 import useSWR, { responseInterface } from 'swr';
-import { IEmployee, IProcessTemplate, IProfession, ITag } from 'utils/types';
+import { ColorMode, IEmployee, IProcessTemplate, IProfession, ITag } from 'utils/types';
 import { fetcher } from 'utils/utils';
 
-const DataContext = createContext('light');
+const DataContext = createContext(ColorMode.LIGHT);
 /**
  * hook to get the DataContext
  * @returns DataContext

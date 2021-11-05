@@ -2,6 +2,21 @@ import { createTheme } from '@mui/material/styles';
 import { ColorMode } from 'utils/types';
 // Create a theme instance.
 
+const typography = {
+  h1: {
+    fontSize: '2.75rem',
+  },
+  h2: {
+    fontSize: '1.75rem',
+  },
+  body1: {
+    fontSize: '1.25rem',
+  },
+  body2: {
+    fontSize: '0.75rem',
+  },
+};
+
 export const getTheme = (mode: string) => {
   let theme;
   switch (mode) {
@@ -32,20 +47,7 @@ export const getTheme = (mode: string) => {
             disabled: '#FFF',
           },
         },
-        typography: {
-          h1: {
-            fontSize: '2.75rem',
-          },
-          h2: {
-            fontSize: '1.75rem',
-          },
-          body1: {
-            fontSize: '1.25rem',
-          },
-          body2: {
-            fontSize: '0.75rem',
-          },
-        },
+        typography: typography,
       });
       break;
     default:
@@ -75,20 +77,7 @@ export const getTheme = (mode: string) => {
             disabled: '#4B4949',
           },
         },
-        typography: {
-          h1: {
-            fontSize: '2.75rem',
-          },
-          h2: {
-            fontSize: '1.75rem',
-          },
-          body1: {
-            fontSize: '1.25rem',
-          },
-          body2: {
-            fontSize: '0.75rem',
-          },
-        },
+        typography: typography,
       });
   }
   theme.components = {

@@ -3,10 +3,11 @@ import { ServerStyleSheets } from '@mui/styles';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
 import { getTheme } from 'theme';
+import { ColorMode } from 'utils/types';
 export default class MyDocument extends Document {
   // TODO:
   // Get this automatically
-  theme: Theme = getTheme('light');
+  theme: Theme = getTheme(ColorMode.DARK);
   render() {
     return (
       <Html lang='en'>

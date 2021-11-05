@@ -40,19 +40,19 @@ const Option = ({ isSelected, name, onClick }: OptionProps) => {
   );
 };
 
-type ToogleProps = {
+type ToggleProps = {
   options: string[];
-  func: () => void;
+  onToggle: () => void;
   defaultChecked?: number;
 };
 
-const Toogle = ({ options, func, defaultChecked = 0 }: ToogleProps) => {
+const Toggle = ({ options, onToggle, defaultChecked = 0 }: ToggleProps) => {
   const classes = useStyles();
   const [selectedOption, setSelectedOption] = useState(defaultChecked);
 
   const toogle = (index: number) => {
     setSelectedOption(index);
-    func();
+    onToggle();
   };
   return (
     <Stack className={classes.root} direction='row'>
@@ -63,4 +63,4 @@ const Toogle = ({ options, func, defaultChecked = 0 }: ToogleProps) => {
   );
 };
 
-export default Toogle;
+export default Toggle;

@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import classnames from 'classnames';
 import Avatar from 'components/Avatar';
-import Toogle from 'components/Toogle';
+import Toggle from 'components/Toggle';
 import Typo from 'components/Typo';
 import { useColorMode } from 'context/ColorMode';
 import { useUser } from 'context/User';
@@ -18,7 +18,7 @@ import { Dispatch, useEffect, useState } from 'react';
 import ScrollableFeed from 'react-scrollable-feed';
 import { getTheme } from 'theme';
 import urls, { link, section } from 'URLS';
-import { IEmployee, INotification } from 'utils/types';
+import { ColorMode, IEmployee, INotification } from 'utils/types';
 const SIDEBAR_WIDTH = 190;
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
@@ -213,7 +213,7 @@ export const LoggedInUserCard = ({ user, displayNotifications, setDisplayNotific
       {displayNotifications && (
         <>
           <Box alignItems='center' className={classes.gutterBottom} display='flex' flexDirection='column'>
-            <Toogle defaultChecked={mode === 'light' ? 0 : 1} func={toggleColorMode} options={['Light ☀️', 'Dark 🌙']} />
+            <Toggle defaultChecked={mode === ColorMode.LIGHT ? 0 : 1} onToggle={toggleColorMode} options={['Light ☀️', 'Dark 🌙']} />
             <Button
               onClick={() => {
                 router.push('/innstillinger');

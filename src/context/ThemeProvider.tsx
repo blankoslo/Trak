@@ -1,8 +1,7 @@
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { useColorMode } from 'context/ColorMode';
 import { createContext, ReactNode } from 'react';
 import { getTheme } from 'theme';
-
-import { useColorMode } from './ColorMode';
 
 const ThemeContext = createContext(undefined);
 
