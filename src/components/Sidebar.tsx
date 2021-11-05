@@ -1,11 +1,13 @@
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Menu from '@mui/icons-material/Menu';
-import { Badge, Box, Button, Divider, Drawer as MuiDrawer, Hidden, IconButton, List, ListItem, ListItemText, Skeleton } from '@mui/material';
+import { Badge, Box, Button, Divider, Drawer as MuiDrawer, Hidden, IconButton, List, ListItem, ListItemText, Skeleton, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import classnames from 'classnames';
 import Avatar from 'components/Avatar';
+import Toggle from 'components/Toggle';
 import Typo from 'components/Typo';
+import { useColorMode } from 'context/ColorMode';
 import { useUser } from 'context/User';
 import moment from 'moment';
 import Image from 'next/image';
@@ -14,19 +16,17 @@ import { useRouter } from 'next/router';
 import { signOut } from 'next-auth/client';
 import { Dispatch, useEffect, useState } from 'react';
 import ScrollableFeed from 'react-scrollable-feed';
-import theme from 'theme';
+import { getTheme } from 'theme';
 import urls, { link, section } from 'URLS';
-import { IEmployee, INotification } from 'utils/types';
+import { ColorMode, IEmployee, INotification } from 'utils/types';
 const SIDEBAR_WIDTH = 190;
-
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
     width: SIDEBAR_WIDTH,
     flexShrink: 0,
   },
   drawerPaper: {
     width: SIDEBAR_WIDTH,
-    backgroundColor: theme.palette.secondary.light,
   },
   gutterBottom: {
     marginBottom: theme.spacing(2),
@@ -69,11 +69,14 @@ const useStyles = makeStyles({
     },
   },
   collapsNavbar: {
-    backgroundColor: theme.palette.secondary.light,
+    backgroundColor: theme.palette.background.paper,
     height: '100vh',
     cursor: 'pointer',
   },
-});
+  userCard: {
+    backgroundColor: theme.palette.background.default,
+  },
+}));
 
 /**
  * Collection of associated links
@@ -124,6 +127,8 @@ export type NotificationProps = {
  * @returns Notification
  */
 export const Notification = ({ notification, setNotifications, notifications }: NotificationProps) => {
+  const { mode } = useColorMode();
+  const theme: Theme = getTheme(mode);
   useEffect(() => {
     if (!notification.read) {
       axios.put(`/api/notification/${notification.id}`);
@@ -175,7 +180,7 @@ export const LoggedInUserCard = ({ user, displayNotifications, setDisplayNotific
   const router = useRouter();
   const name = `${user?.firstName} ${user?.lastName[0]}.`;
   const [notifications, setNotifications] = useState<INotification[]>([]);
-
+  const { mode, toggleColorMode } = useColorMode();
   useEffect(() => {
     if (user) {
       axios.get(`/api/employee/${user.id}/notifications`).then((res) => {
@@ -184,12 +189,7 @@ export const LoggedInUserCard = ({ user, displayNotifications, setDisplayNotific
     }
   }, [user?.id, displayNotifications]);
   return (
-    <Box
-      bgcolor={theme.palette.background.paper}
-      boxShadow={'0px 4px 4px rgba(0,0,0,0.25)'}
-      className={classes.gutterBottom}
-      mx={'-' + theme.spacing(2)}
-      padding={theme.spacing(2)}>
+    <Box boxShadow={'0px 4px 4px rgba(0,0,0,0.25)'} className={classnames(classes.gutterBottom, classes.userCard)} mx={'-16px'} padding={2}>
       <Box
         className={classes.pointerCursor}
         display='flex'
@@ -197,7 +197,7 @@ export const LoggedInUserCard = ({ user, displayNotifications, setDisplayNotific
         onKeyPress={() => setDisplayNotifications(!displayNotifications)}
         role='button'
         tabIndex={0}>
-        <Box flex={3} mb={theme.spacing(1)}>
+        <Box flex={3} mb={1}>
           <Badge badgeContent={notifications.filter((notification) => !notification.read).length} color='error'>
             {user ? (
               <Avatar firstName={user?.firstName} image={user?.imageUrl} lastName={user?.lastName} />
@@ -213,6 +213,7 @@ export const LoggedInUserCard = ({ user, displayNotifications, setDisplayNotific
       {displayNotifications && (
         <>
           <Box alignItems='center' className={classes.gutterBottom} display='flex' flexDirection='column'>
+            <Toggle defaultChecked={mode === ColorMode.LIGHT ? 0 : 1} onToggle={toggleColorMode} options={['Light ☀️', 'Dark 🌙']} />
             <Button
               onClick={() => {
                 router.push('/innstillinger');
@@ -227,7 +228,7 @@ export const LoggedInUserCard = ({ user, displayNotifications, setDisplayNotific
             <Typo variant='body2'>Ingen varsler</Typo>
           ) : (
             <>
-              <Box maxHeight='60vh' mx={'-' + theme.spacing(2)} style={{ overflowX: 'hidden', overflowY: 'auto' }}>
+              <Box maxHeight='60vh' mx={'-16px'} style={{ overflowX: 'hidden', overflowY: 'auto' }}>
                 <ScrollableFeed className={classes.showScrollBarOnHover}>
                   {notifications.map((notification: INotification) => {
                     return <Notification key={notification.id} notification={notification} notifications={notifications} setNotifications={setNotifications} />;
@@ -273,6 +274,10 @@ export type DrawerType = {
  */
 export const Drawer = ({ drawer, setDrawer, displayNotifications, setDisplayNotifications, variant, user }: DrawerType) => {
   const classes = useStyles();
+  //TODO:
+  // Get automatically
+  const { mode } = useColorMode();
+  const theme: Theme = getTheme(mode);
 
   return (
     <MuiDrawer

@@ -222,3 +222,8 @@ export type IPhaseWithEmployees = {
   title: string;
   employees: IEmployeeExtended[];
 };
+
+export enum ColorMode {
+  DARK = 'dark',
+  LIGHT = 'light',
+}

@@ -1,8 +1,13 @@
+import { Theme } from '@mui/material';
 import { ServerStyleSheets } from '@mui/styles';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
-import theme from 'theme';
+import { getTheme } from 'theme';
+import { ColorMode } from 'utils/types';
 export default class MyDocument extends Document {
+  // TODO:
+  // Get this automatically
+  theme: Theme = getTheme(ColorMode.DARK);
   render() {
     return (
       <Html lang='en'>
@@ -10,7 +15,7 @@ export default class MyDocument extends Document {
           <meta content={'HR-system for Blank AS'} name='description'></meta>
           <meta content={'TRAK'} key='ogtitle' property='og:title' />
           <meta content={'HR-system for Blank AS'} key='ogdesc' property='og:description' />
-          <meta content={theme.palette.primary.main} name='theme-color' />
+          <meta content={this.theme.palette.primary.main} name='theme-color' />
           <link href='https://fonts.googleapis.com/css?family=Lato:300,400,500,700&display=swap' rel='stylesheet' />
           <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,500,700&display=swap' rel='stylesheet' />
           <link href='/favicon.ico' rel='shortcut icon' />

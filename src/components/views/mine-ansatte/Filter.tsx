@@ -1,12 +1,11 @@
-import { Box, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Button, Theme, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import Typo from 'components/Typo';
 import { useData } from 'context/Data';
-import theme from 'theme';
 import { IProfession } from 'utils/types';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   gutterBottom: {
     marginBottom: theme.spacing(2),
   },
@@ -21,7 +20,7 @@ const useStyles = makeStyles({
       color: theme.palette.secondary.main,
     },
   },
-});
+}));
 
 /**
  * @typedef {object} FilterProps

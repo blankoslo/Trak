@@ -38,7 +38,7 @@ const Phase = ({ phase, processTemplate }: PhaseProps) => {
       <div className={classes.flexCenter}>
         <Typo variant='body1'>{phase.title}</Typo>
         <IconButton aria-label={`Endre fase ${phase.title}`} onClick={() => setModalIsOpen(true)}>
-          <Edit />
+          <Edit color='primary' />
         </IconButton>
         {modalIsOpen && <PhaseModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} phase_id={phase.id} processTemplate={processTemplate} />}
       </div>

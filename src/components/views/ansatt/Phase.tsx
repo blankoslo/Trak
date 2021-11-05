@@ -1,5 +1,5 @@
 import AlarmIcon from '@mui/icons-material/Alarm';
-import { Box, Button, Divider, Hidden } from '@mui/material';
+import { Box, Button, Divider, Hidden, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import AddButton from 'components/AddButton';
 import Typo from 'components/Typo';
@@ -8,14 +8,19 @@ import TaskModal from 'components/views/ansatt/TaskModal';
 import TaskRow from 'components/views/ansatt/TaskRow';
 import moment from 'moment';
 import { useState } from 'react';
-import theme from 'theme';
 import { IEmployeeTask } from 'utils/types';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   spaceRight: {
     marginRight: theme.spacing(2),
   },
-});
+  marginBottom: {
+    marginBottom: theme.spacing(2),
+  },
+  lessMarginBottom: {
+    marginBottom: theme.spacing(1),
+  },
+}));
 
 /**
  * @typedef {object} PhaseProps
@@ -47,7 +52,7 @@ const Phase = ({ phaseId, title, tasksFinished, totalTasks, employeeTasks, first
   const globalTasks = employeeTasks.filter((task) => task.task.global);
   const nonGlobalTasks = employeeTasks.filter((task) => !task.task.global);
   return (
-    <Box marginBottom={theme.spacing(2)}>
+    <Box classes={classes.marginBottom}>
       <Box alignItems='center' display='flex'>
         <Typo className={classes.spaceRight} variant='h2'>
           {title}
@@ -57,7 +62,7 @@ const Phase = ({ phaseId, title, tasksFinished, totalTasks, employeeTasks, first
         </Button>
       </Box>
       <Box display='flex'>
-        <Box flex={2} mb={theme.spacing(1)}>
+        <Box className={classes.lessMarginBottom} flex={2}>
           <Typo variant='body2'>
             <b>{tasksFinished}</b> av <b>{totalTasks}</b> oppgaver er gjennomført
           </Typo>
@@ -71,10 +76,10 @@ const Phase = ({ phaseId, title, tasksFinished, totalTasks, employeeTasks, first
       })}
       {nonGlobalTasks.length ? (
         <>
-          <Typo style={{ marginTop: `${theme.spacing(1)}` }} variant='body2'>
+          <Typo style={{ marginTop: '8px' }} variant='body2'>
             Egendefinerte oppgaver
           </Typo>
-          <Divider style={{ marginBottom: `${theme.spacing(1)}` }} />
+          <Divider style={{ marginBottom: '8px' }} />
           {nonGlobalTasks.map((employeeTask) => {
             return <TaskRow employeeTask={employeeTask} key={employeeTask.taskId} />;
           })}

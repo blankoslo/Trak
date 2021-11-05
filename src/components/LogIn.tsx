@@ -1,10 +1,9 @@
-import { Box, Paper } from '@mui/material';
+import { Box, Paper, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Image from 'next/image';
 import { signIn } from 'next-auth/client';
 import GoogleButton from 'react-google-button';
-import theme from 'theme';
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(2),
     padding: `${theme.spacing(12)} ${theme.spacing(8)}`,
@@ -14,7 +13,7 @@ const useStyles = makeStyles({
   gutterBottom: {
     marginBottom: theme.spacing(4),
   },
-});
+}));
 
 /**
  * Card to use for log in
