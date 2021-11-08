@@ -11,6 +11,10 @@ import { Dispatch, SetStateAction } from 'react';
 import { thisMonth, thisWeek, today, tomorrow } from 'sortof';
 import { IEmployee, IEmployeeExtended, IEmployeeTask, IPhaseWithEmployees, ITag } from 'utils/types';
 
+export const prismaDateToFormatedDate = (date: string) => {
+  return new Date(date).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long', day: 'numeric' });
+};
+
 moment.locale('nb');
 /**
  * @param  {string} url
