@@ -4,16 +4,28 @@ import { ColorMode } from 'utils/types';
 
 const typography = {
   h1: {
-    fontSize: '2.75rem',
+    fontSize: '3rem',
   },
   h2: {
-    fontSize: '1.75rem',
+    fontSize: '2rem',
+  },
+  h3: {
+    fontSize: '1.5rem',
+  },
+  h4: {
+    fontSize: '1.125rem',
+  },
+  h5: {
+    fontSize: '1rem',
+  },
+  subtitle1: {
+    fontSize: '1.125rem',
   },
   body1: {
-    fontSize: '1.25rem',
+    fontSize: '1rem',
   },
   body2: {
-    fontSize: '0.75rem',
+    fontSize: '0.875rem',
   },
 };
 
