@@ -139,6 +139,7 @@ const Employees = ({ processTemplates }: InferGetServerSidePropsType<typeof getS
                       <Grid item key={employee.id} lg={4} sm={6} xs={12}>
                         <EmployeeCard
                           firstName={employee.firstName}
+                          id={employee.id}
                           imageUrl={employee.imageUrl}
                           lastName={employee.lastName}
                           role={employee.profession.title}
