@@ -1,6 +1,8 @@
-import { Box, Theme } from '@mui/material';
+import { Box, Theme, useMediaQuery } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import BottomBar from 'components/BottomBar';
 import LogIn from 'components/LogIn';
+import NavBar from 'components/NavBar';
 import Sidebar from 'components/Sidebar';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/client';
@@ -42,6 +44,9 @@ const Layout = ({ children }: LayoutProps) => {
   const classes = useStyles();
   const [session, loading] = useSession();
   const router = useRouter();
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
+
+  //TEMP ONLY!!
   useEffect(() => {
     if (!loading) {
       if (session?.user) {
@@ -56,12 +61,20 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <>
       {session?.user ? (
-        <Box display='flex'>
-          <Sidebar />
-          <Box className={classes.root} flexGrow={1} role='main'>
+        router.pathname.includes('ny') ? (
+          <>
+            <NavBar />
             {children}
+            {isSmallScreen && <BottomBar />}
+          </>
+        ) : (
+          <Box display='flex'>
+            <Sidebar />
+            <Box className={classes.root} flexGrow={1} role='main'>
+              {children}
+            </Box>
           </Box>
-        </Box>
+        )
       ) : (
         <Box className={classes.center} display='flex' justifyContent='center'>
           <LogIn />

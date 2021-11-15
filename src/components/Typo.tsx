@@ -5,7 +5,7 @@ import { Typography, TypographyProps } from '@mui/material';
  * @property {string} variant
  */
 export type TypoProps = {
-  variant?: 'h1' | 'h2' | 'body1' | 'body2';
+  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'subtitle1' | 'body1' | 'body2';
 } & TypographyProps;
 
 /**
