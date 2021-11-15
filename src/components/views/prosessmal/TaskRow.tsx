@@ -56,7 +56,7 @@ const TaskRow = ({ task, phase }: TaskProps) => {
     <TableRow className={classes.hideLastBorder} key={task.id}>
       <TableCell style={{ width: '25rem' }}>{task.title}</TableCell>
       <TableCell style={{ width: '55rem' }}>{markdownToTxt(task.description)}</TableCell>
-      <TableCell style={{ width: '55rem' }}>{task.professions.length === 3 ? 'Alle' : task.professions[0].title}</TableCell>
+      <TableCell style={{ width: '55rem' }}>{task.professions.length === 3 ? 'Alle' : task.professions[0]?.title}</TableCell>
       <TableCell style={{ width: '20rem' }}>
         {task.responsible && (
           <div className={classes.flexCenter}>

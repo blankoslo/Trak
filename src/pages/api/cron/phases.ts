@@ -124,7 +124,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         },
       },
     });
-
     employeeTaskCreator(phases, employees);
     await createNotification(responsibleEmployees);
 
