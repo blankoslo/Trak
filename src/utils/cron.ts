@@ -16,7 +16,6 @@ export const syncTrakDatabase = async () => {
       termination_date: true,
     },
   });
-
   await trakClient.$transaction(
     blankEmployees.map((employee) => {
       const data = {

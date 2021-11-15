@@ -193,6 +193,35 @@ export const getTheme = (mode: string) => {
         },
       },
     },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          color: theme.palette.text.primary,
+          padding: theme.spacing(1),
+          marginRight: theme.spacing(1),
+          '&:hover': {
+            color: theme.palette.text.secondary,
+            backgroundColor: theme.palette.primary.light,
+          },
+          '&.Mui-selected': {
+            color: theme.palette.text.secondary,
+            backgroundColor: theme.palette.primary.main,
+          },
+        },
+      },
+    },
+    MuiToggleButtonGroup: {
+      styleOverrides: {
+        grouped: {
+          '&:not(:last-of-type)': {
+            borderRadius: theme.spacing(3),
+          },
+          '&:last-of-type': {
+            borderRadius: theme.spacing(3),
+          },
+        },
+      },
+    },
   };
   return theme;
 };

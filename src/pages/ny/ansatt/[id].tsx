@@ -1,7 +1,7 @@
 import { ExpandMore } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Avatar, Badge, Checkbox, Theme, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Accordion, AccordionDetails, AccordionSummary, Avatar, Checkbox, Container, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useData } from 'context/Data';
 import useSnackbar from 'context/Snackbar';
 import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -9,25 +9,6 @@ import Head from 'next/head';
 import { useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: '40px',
-  },
-  header_text_group: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  avatar: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.text.secondary,
-    padding: '2px',
-  },
-  task: {},
-}));
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id } = query;
@@ -82,38 +63,71 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 };
 
 const Employee = ({ employee }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const classes = useStyles();
+  const { processTemplates } = useData();
+  const [choosenProcess, setChoosenProcess] = useState(processTemplates);
 
-  const done = employee.employeeTask.filter((task) => task.completed).length;
-  const total = employee.employeeTask.length;
+  const handleFormat = (_, newFormats) => {
+    if (newFormats.length === processTemplates.length) {
+      setChoosenProcess([]);
+    } else {
+      setChoosenProcess(newFormats);
+    }
+  };
+
   const hasStarted = new Date(employee.dateOfEmployment) < new Date();
   return (
     <>
       <Head>
         <title>Ansatt</title>
       </Head>
-      <>
-        <div className={classes.header}>
-          <Badge
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            badgeContent={
-              <div className={classes.avatar}>
-                {done}/{total}
-              </div>
-            }
-            overlap='circular'>
-            <Avatar alt={`${employee.firstName} ${employee.lastName}`} src={employee.imageUrl} sx={{ width: 132, height: 132 }} />
-          </Badge>
-          <div className={classes.header_text_group}>
+      <Container maxWidth='md'>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '40px',
+            paddingBottom: '30px',
+          }}>
+          <Avatar alt={`${employee.firstName} ${employee.lastName}`} src={employee.imageUrl} sx={{ width: 132, height: 132 }} />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
             <Typography variant='h3'>{`${employee.firstName} ${employee.lastName}`}</Typography>
             <Typography>{`${hasStarted ? 'Begynte' : 'Begynner'} ${prismaDateToFormatedDate(employee.dateOfEmployment)}`}</Typography>
             <Typography>{employee.profession.title}</Typography>
-          </div>
-        </div>
-        {employee.employeeTask.map((employeeTask, index) => (
-          <Task employeeTask={employeeTask} key={index} />
-        ))}
-      </>
+          </Box>
+        </Box>
+
+        <ToggleButtonGroup onChange={handleFormat} sx={{ marginBottom: '30px' }} value={choosenProcess}>
+          {processTemplates?.map((processTemplate) => (
+            <ToggleButton
+              key={processTemplate.slug}
+              sx={{
+                '&$selected': {
+                  color: 'text.secondary',
+                  backgroundColor: 'primary.main',
+                },
+              }}
+              value={processTemplate.title}>
+              {processTemplate.title}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+        {!employee.employeeTask?.length
+          ? 'Gratulerer. Finnes ingen flere oppgaver :D'
+          : employee.employeeTask
+              .filter((employeeTask) =>
+                !choosenProcess?.length
+                  ? true
+                  : choosenProcess?.some((processTemplate) => {
+                      return processTemplate === employeeTask.task.phase.processTemplate.title;
+                    }),
+              )
+              .map((employeeTask, index) => <Task employeeTask={employeeTask} key={index} />)}
+      </Container>
     </>
   );
 };
