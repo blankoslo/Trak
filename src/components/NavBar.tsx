@@ -28,6 +28,7 @@ const NavBar = () => {
         <Toolbar className={classes.root}>
           <Stack className={classes.centerVertically} direction='row' spacing={1}>
             <Avatar alt={`${user?.firstName} ${user?.lastName}`} src={user?.imageUrl} />
+
             <Typography style={{ textDecoration: 'underline' }} variant='body2'>
               {user?.firstName} {user?.lastName}
             </Typography>
