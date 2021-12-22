@@ -17,11 +17,6 @@ type ProgressbarProps = (loading: boolean) => void;
 
 const ProgressbarContext = createContext<ProgressbarProps | undefined>(undefined);
 
-/**
- * Provider for Progessbar
- * @param {ReactNode} children
- * @returns ProgressbarProvider
- */
 const ProgressbarProvider = ({ children }: { children: ReactNode }) => {
   const classes = useStyles();
   const [progressbarLoading, setProgressbarLoading] = useState(false);
@@ -42,10 +37,6 @@ const ProgressbarProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-/**
- * Hook to access the progressbar context
- * @returns
- */
 const useProgressbar = () => {
   const context = useContext(ProgressbarContext);
   if (context === undefined) {

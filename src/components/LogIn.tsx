@@ -1,7 +1,7 @@
 import { Box, Paper, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Image from 'next/image';
-import { signIn } from 'next-auth/client';
+import { signIn } from 'next-auth/react';
 import GoogleButton from 'react-google-button';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -15,10 +15,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-/**
- * Card to use for log in
- * @returns LogIN
- */
 const LogIn = () => {
   const classes = useStyles();
 
@@ -37,5 +33,7 @@ const LogIn = () => {
     </Paper>
   );
 };
+
+LogIn.displayName = 'LogIn';
 
 export default LogIn;

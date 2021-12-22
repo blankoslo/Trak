@@ -3,11 +3,7 @@ import { makeStyles } from '@mui/styles';
 import BottomBar from 'components/BottomBar';
 import LogIn from 'components/LogIn';
 import NavBar from 'components/NavBar';
-import Sidebar from 'components/Sidebar';
-import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
-import { useEffect } from 'react';
-import urls from 'URLS';
+import { useSession } from 'next-auth/react';
 
 const useStyles = makeStyles((theme: Theme) => ({
   center: {
@@ -27,54 +23,23 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-/**
- * @typedef {object} LayoutProps
- * @property {JSX.Element} children
- */
 export type LayoutProps = {
   children: JSX.Element;
 };
 
-/**
- * Setting the overall layout for the application
- * @param {LayoutProps} params
- * @returns Layout
- */
 const Layout = ({ children }: LayoutProps) => {
   const classes = useStyles();
-  const [session, loading] = useSession();
-  const router = useRouter();
+  const { data: session } = useSession();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
-  //TEMP ONLY!!
-  useEffect(() => {
-    if (!loading) {
-      if (session?.user) {
-        if (router.pathname === '/' || router.pathname === '/#') {
-          router.push(urls[0].links[0].link);
-        }
-      } else {
-        router.push('/');
-      }
-    }
-  }, [loading, session?.user]);
   return (
     <>
       {session?.user ? (
-        router.pathname.includes('ny') ? (
-          <>
-            <NavBar />
-            {children}
-            {isSmallScreen && <BottomBar />}
-          </>
-        ) : (
-          <Box display='flex'>
-            <Sidebar />
-            <Box className={classes.root} flexGrow={1} role='main'>
-              {children}
-            </Box>
-          </Box>
-        )
+        <>
+          <NavBar />
+          {children}
+          {isSmallScreen && <BottomBar />}
+        </>
       ) : (
         <Box className={classes.center} display='flex' justifyContent='center'>
           <LogIn />

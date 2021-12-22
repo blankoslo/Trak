@@ -1,6 +1,8 @@
-import { blankClient, trakClient } from 'lib/prisma';
+import { trakClient } from 'lib/prisma';
+import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 
-export const syncTrakDatabase = async () => {
+export async function syncTrakDatabase() {
+  const blankClient = new BlankClient();
   const blankEmployees = await blankClient.employees.findMany({
     select: {
       id: true,
@@ -57,4 +59,4 @@ export const syncTrakDatabase = async () => {
       });
     }),
   );
-};
+}

@@ -1,14 +1,10 @@
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { createContext, useContext } from 'react';
 import useSWR, { responseInterface } from 'swr';
 import { IEmployee } from 'utils/types';
 import { fetcher } from 'utils/utils';
 
 const UserContext = createContext(undefined);
-/**
- * Hook for accessing the userContext
- * @returns UserContext
- */
 function useUser() {
   const context = useContext(UserContext);
   if (!context) {
@@ -17,14 +13,9 @@ function useUser() {
   return context;
 }
 
-/**
- * UserProvider for the current user
- * @param props
- * @returns UserProvider
- */
 function UserProvider(props) {
-  const [session] = useSession();
-  const { data: user }: responseInterface<IEmployee, unknown> = useSWR(session?.user ? `/api/employee/${session?.user?.id}` : null, fetcher);
+  const { data: session } = useSession();
+  const { data: user }: responseInterface<IEmployee, unknown> = useSWR(session?.user ? `/api/employees/${session?.user?.id}` : null, fetcher);
 
   return <UserContext.Provider value={{ user: user }} {...props} />;
 }

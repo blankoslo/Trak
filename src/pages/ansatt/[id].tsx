@@ -1,146 +1,53 @@
-import HistoryIcon from '@mui/icons-material/History';
-import { Box, Button, Menu, MenuItem, Theme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import Typo from 'components/Typo';
-import Phase from 'components/views/ansatt/Phase';
+import { TextareaAutosize } from '@mui/base';
+import { ExpandMore } from '@mui/icons-material';
+import { Accordion, AccordionDetails, AccordionSummary, Avatar, Button, Checkbox, Container, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import useSnackbar from 'context/Snackbar';
 import { trakClient } from 'lib/prisma';
-import { flattenDeep, uniq, uniqBy } from 'lodash';
-import moment from 'moment';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
-import { createContext, useState } from 'react';
+import { useState } from 'react';
+import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 import safeJsonStringify from 'safe-json-stringify';
-import { IEmployeeTask, ITask, Process } from 'utils/types';
 
-export const EmployeeContext = createContext(undefined);
-
-const useStyles = makeStyles((theme: Theme) => ({
-  spaceRight: {
-    marginRight: theme.spacing(4),
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'flex-end',
-    flexDirection: 'row',
-    [theme.breakpoints.down('md')]: {
-      alignItems: 'flex-start',
-      flexDirection: 'column',
-    },
-  },
-  buttonGroup: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    [theme.breakpoints.down('sm')]: {
-      flexDirection: 'column',
-    },
-  },
-  link: {
-    color: theme.palette.text.primary,
-  },
-}));
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const { id, år: year = null, prosess: process } = query;
+  const { id } = query;
   const parsedId = typeof id === 'string' && parseInt(id);
-  if ((process === Process.LOPENDE && !year) || !id || !process) {
-    return {
-      notFound: true,
-    };
-  }
 
   const employeeQuery = await trakClient.employee.findUnique({
     where: {
       id: parsedId,
     },
-
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
+    include: {
       profession: true,
-      hrManager: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-        },
-      },
       employeeTask: {
         where: {
-          ...(process === Process.LOPENDE && {
-            dueDate: {
-              gte: moment(year.toString()).startOf('year').toDate(),
-              lte: moment(year.toString()).endOf('year').toDate(),
-            },
-          }),
-          task: {
-            phase: {
-              processTemplate: {
-                slug: process.toString(),
+          OR: [
+            {
+              dueDate: {
+                lte: new Date(),
               },
             },
-          },
+            {
+              completed: {
+                equals: false,
+              },
+            },
+          ],
         },
-        select: {
-          dueDate: true,
-          id: true,
-          completed: true,
+        include: {
           responsible: {
             select: {
+              id: true,
               firstName: true,
               lastName: true,
-              imageUrl: true,
-              id: true,
             },
           },
           task: {
-            select: {
-              id: true,
-              title: true,
-              tags: true,
-              global: true,
-              link: true,
-              description: true,
+            include: {
               phase: {
-                select: {
-                  id: true,
-                  title: true,
-                  processTemplate: {
-                    select: {
-                      title: true,
-                      slug: true,
-                    },
-                  },
-                  dueDate: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          dueDate: 'asc',
-        },
-      },
-    },
-  });
-
-  const processesQuery = await trakClient.processTemplate.findMany({
-    select: {
-      title: true,
-      slug: true,
-      phases: {
-        select: {
-          tasks: {
-            select: {
-              id: true,
-              employeeTask: {
-                where: {
-                  employeeId: parsedId,
-                },
-                select: {
-                  id: true,
-                  dueDate: true,
+                include: {
+                  processTemplate: true,
                 },
               },
             },
@@ -149,142 +56,147 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       },
     },
   });
-  if (!employeeQuery) {
-    return {
-      notFound: true,
-    };
-  }
 
   const employee = JSON.parse(safeJsonStringify(employeeQuery));
-  const processes = JSON.parse(safeJsonStringify(processesQuery));
-  const phases = uniqBy(
-    employee.employeeTask.map((element) => {
-      return { id: element.task.phase.id, title: element.task.phase.title };
-    }),
-    'title',
-  );
-  // eslint-disable-next-line
-  const phasesWithTasks = phases.map((unique: any) => {
-    const tasks = employee.employeeTask.filter((task: IEmployeeTask) => task.task.phase.title === unique.title);
-    const finishedTasks = tasks.filter((task: IEmployeeTask) => task.completed);
-    return {
-      id: unique.id,
-      title: unique.title,
-      tasks: tasks,
-      totalTasks: tasks.length,
-      finishedTasks: finishedTasks.length,
-    };
-  });
-  const allTasks = processes.map((process) => {
-    const years = process.phases.map((phase) => {
-      return phase.tasks.map((task: ITask) => {
-        return task.employeeTask.map((employeeTask) => new Date(employeeTask.dueDate).getFullYear());
-      });
-    });
 
-    const filteredYears = years.map((year) => {
-      return year.filter((element) => {
-        return element.length !== 0;
-      });
-    });
-    return { title: process.title, slug: process.slug, years: filteredYears };
+  const processTemplates = await trakClient.processTemplate.findMany({
+    select: {
+      slug: true,
+      title: true,
+    },
   });
 
-  const history = allTasks.map((process) => {
-    const years = flattenDeep(process.years);
-    const uniqeYears = uniq(years);
-    return { title: process.title, slug: process.slug, years: process.slug === Process.LOPENDE ? uniqeYears : Array(uniqeYears.length ? 1 : 0) };
-  });
-
-  return { props: { employee, phasesWithTasks, year, process, history } };
+  return { props: { employee, processTemplates } };
 };
 
-const Employee = ({ employee, phasesWithTasks, year, process, history }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const classes = useStyles();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [choosenProcess, setChoosenProcess] = useState([]);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleFormat = (_, newFormats) => {
+    if (newFormats.length === processTemplates.length) {
+      setChoosenProcess([]);
+    } else {
+      setChoosenProcess(newFormats);
+    }
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const hasStarted = new Date(employee.dateOfEmployment) < new Date();
   return (
     <>
       <Head>
         <title>Ansatt</title>
       </Head>
-      <>
-        <div className={classes.header}>
-          <Typo className={classes.spaceRight} noWrap variant='h1'>
-            {employee.firstName} {employee.lastName}
-          </Typo>
-          {employee.hrManager && (
-            <Typo noWrap variant='body1'>
-              Ansvarlig: {employee.hrManager.firstName} {employee.hrManager.lastName}
-            </Typo>
-          )}
-        </div>
-        <div className={classes.buttonGroup}>
-          <Typo noWrap variant='body1'>
-            {year} {history.find((element) => element.slug === process)?.title}
-          </Typo>
-          <Box display='flex'>
-            <Button
-              aria-controls='historikk_meny'
-              aria-haspopup='true'
-              aria-label='Historikk meny'
-              color='primary'
-              disabled={history.every((element) => !element.years.length)}
-              onClick={handleClick}
-              startIcon={<HistoryIcon />}>
-              Historikk
-            </Button>
-            <Menu
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              id='historikk_meny'
-              keepMounted
-              onClose={handleClose}
-              open={Boolean(anchorEl)}>
-              {history.map((process) => {
-                return process.years.map((year) => {
-                  const linkText = `${process.slug === Process.LOPENDE ? year : ''} ${process.title}`;
-                  const link = `/ansatt/${employee.id}?${process.slug === Process.LOPENDE ? `år=${year}&` : ''}prosess=${process.slug}`;
-                  return (
-                    <MenuItem key={`${process.title} ${year}`} onClick={handleClose}>
-                      <Link href={link}>
-                        <a className={classes.link} style={{ textDecoration: 'none' }}>
-                          {linkText}
-                        </a>
-                      </Link>
-                    </MenuItem>
-                  );
-                });
-              })}
-            </Menu>
+      <Container sx={{ paddingTop: '30px' }} maxWidth='md'>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '40px',
+            paddingBottom: '30px',
+          }}
+        >
+          <Avatar alt={`${employee.firstName} ${employee.lastName}`} src={employee.imageUrl} sx={{ width: 132, height: 132 }} />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Typography variant='h3'>{`${employee.firstName} ${employee.lastName}`}</Typography>
+            <Typography>{`${hasStarted ? 'Begynte' : 'Begynner'} ${prismaDateToFormatedDate(employee.dateOfEmployment)}`}</Typography>
+            <Typography>{employee.profession.title}</Typography>
           </Box>
-        </div>
-        <EmployeeContext.Provider value={{ employee }}>
-          {phasesWithTasks.map((phase, index) => {
-            return (
-              <Phase
-                employeeTasks={phase.tasks}
-                first={index === 0}
-                key={phase.title}
-                phaseId={phase.id}
-                tasksFinished={phase.finishedTasks}
-                title={phase.title}
-                totalTasks={phase.totalTasks}
+        </Box>
+
+        <ToggleButtonGroup onChange={handleFormat} sx={{ marginBottom: '30px' }} value={choosenProcess}>
+          {processTemplates?.map((processTemplate) => (
+            <ToggleButton
+              key={processTemplate.slug}
+              sx={{
+                '&$selected': {
+                  color: 'text.secondary',
+                  backgroundColor: 'primary.main',
+                },
+              }}
+              value={processTemplate.title}
+            >
+              {processTemplate.title}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+        {!employee.employeeTask?.length
+          ? 'Gratulerer. Finnes ingen flere oppgaver :D'
+          : employee.employeeTask
+              .filter((employeeTask) =>
+                !choosenProcess?.length
+                  ? true
+                  : choosenProcess?.some((processTemplate) => {
+                      return processTemplate === employeeTask.task.phase.processTemplate.title;
+                    }),
+              )
+              .map((employeeTask, index) => <Task employeeTask={employeeTask} key={index} />)}
+      </Container>
+    </>
+  );
+};
+
+export const Task = ({ employeeTask }) => {
+  const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
+  const showSnackbar = useSnackbar();
+  const [showCommentField, setShowCommentField] = useState<boolean>(false);
+
+  const checkboxClicked = (e) => {
+    e.stopPropagation();
+    toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
+  };
+  return (
+    <>
+      <Accordion disableGutters sx={{ marginBottom: '16px', borderRadius: '4px' }}>
+        <AccordionSummary aria-controls='TASK1_RENAME_ME_PLEASE' expandIcon={<ExpandMore />} id='TASK1_RENAME_ME_PLEASE'>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <Checkbox
+                checked={completed}
+                onClick={checkboxClicked}
+                sx={{
+                  color: 'primary.main',
+                }}
               />
-            );
-          })}
-        </EmployeeContext.Provider>
-      </>
+              <Typography>{employeeTask.task.title}</Typography>
+            </Box>
+            <Typography>{prismaDateToFormatedDate(employeeTask.dueDate)}</Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails
+          sx={{
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          }}
+        >
+          <Typography variant='body2'>{employeeTask.task.description}</Typography>
+          {showCommentField ? (
+            <TextareaAutosize />
+          ) : (
+            <Button onClick={() => setShowCommentField(true)} size='small' variant='contained'>
+              Skriv ny kommentar
+            </Button>
+          )}
+        </AccordionDetails>
+      </Accordion>
     </>
   );
 };

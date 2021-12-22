@@ -2,32 +2,58 @@ import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { IEmployee } from 'utils/types';
-
-/**
- * GET
- * @returns {IEmployee[]} All Employees
- */
 
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const employees = await trakClient.employee.findMany({
+    const processTemplates = await trakClient.processTemplate.findMany({
       select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        imageUrl: true,
-        employeeSettings: {
+        slug: true,
+        title: true,
+      },
+    });
+    processTemplates.map((processTemplate) => (processTemplate['employees'] = []));
+
+    const employeesQuery = await trakClient.employee.findMany({
+      where: {
+        profession: {
+          NOT: {
+            title: 'Annet',
+          },
+        },
+      },
+      include: {
+        profession: {
           select: {
-            slack: true,
-            notificationSettings: true,
+            title: true,
+          },
+        },
+        employeeTask: {
+          where: {
+            completed: false,
+          },
+          select: {
+            task: {
+              select: {
+                phase: {
+                  select: {
+                    processTemplateId: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
     });
-    res.json(employees);
+
+    employeesQuery.forEach((employee) => {
+      const employeeProcesses = [...new Set(employee.employeeTask.flatMap(({ task }) => task.phase.processTemplateId))];
+      employeeProcesses.forEach((employeeProcess) => {
+        const index = processTemplates.findIndex((pt) => pt.slug === employeeProcess);
+        processTemplates[index].employees.push(employee);
+      });
+    });
+    res.json(processTemplates);
   } else {
     res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
   }

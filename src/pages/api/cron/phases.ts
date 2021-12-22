@@ -1,12 +1,11 @@
+import { addDays, getDate, getMonth, getYear, isSameDay, setYear, subDays } from 'date-fns';
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import { groupBy } from 'lodash';
-import moment, { Moment } from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { syncTrakDatabase } from 'utils/cron';
 import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
 import { Process } from 'utils/types';
-import { addDays, slackMessager } from 'utils/utils';
 let LAST_RUN = undefined;
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const CRON_SECRET = process.env.CRON_SECRET;
@@ -136,7 +135,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
 const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any) => {
   const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
-  const today = moment();
+  const today = new Date();
   employees.forEach((employee) => {
     if (!employee.hrManagerId) {
       return;
@@ -153,34 +152,32 @@ const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | an
   });
 };
 
-const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[], today: Moment) => {
+const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[], today: Date) => {
   const comingPhases = lopendePhases.filter((phase) => {
-    const dueDate = moment(phase.dueDate).subtract(1, 'week');
-    if (dueDate.month() === today.month()) {
-      return dueDate.day() > today.day();
+    const dueDate = subDays(phase.dueDate, 7);
+    if (getMonth(dueDate) === getMonth(today)) {
+      return getDate(dueDate) > getDate(today);
     }
 
-    return dueDate.month() > today.month();
+    return getMonth(dueDate) > getMonth(today);
   });
   if (!comingPhases.length) {
     return;
   }
 
   const nextPhase = comingPhases?.reduce((phaseA, phaseB) => {
-    const dueDatePhaseA = moment(phaseA.dueDate);
-    const dueDatePhaseB = moment(phaseB.dueDate);
-    if (dueDatePhaseA.month() === dueDatePhaseB.month()) {
-      return dueDatePhaseA.day() > dueDatePhaseB.day() ? phaseB : phaseA;
+    if (getMonth(phaseA.dueDate) === getMonth(phaseB.dueDate)) {
+      return getDate(phaseA.dueDate) > getDate(phaseB.dueDate) ? phaseB : phaseA;
     }
 
-    return dueDatePhaseA.month() > dueDatePhaseB.month() ? phaseB : phaseA;
+    return phaseA.dueDate.getMonth() > phaseB.dueDate.getMonth() ? phaseB : phaseA;
   });
   const hasTasksInNextPhase = employee.employeeTask.some(
-    (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && moment(employeeTask.dueDate).year() === today.year(),
+    (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.dueDate) === getYear(today),
   );
 
   if (!hasTasksInNextPhase) {
-    nextPhase.dueDate = moment(nextPhase.dueDate).set('y', today.year()).toDate();
+    nextPhase.dueDate = setYear(nextPhase.dueDate, getYear(today));
     createEmployeeTasks(employee, nextPhase);
   }
 };
@@ -258,11 +255,11 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
       }
       const dates = Object.keys(groupBy(employee.responsibleEmployeeTask, 'dueDate'));
       dates.forEach(async (d) => {
-        const date = moment(d);
+        const date = new Date(d);
         let notificationText = undefined;
-        if (employeeWantsPhaseEndsTodayNotification && moment(today).isSame(date, 'day')) {
+        if (employeeWantsPhaseEndsTodayNotification && isSameDay(today, date)) {
           notificationText = `Du har oppgaver som utgår idag`;
-        } else if (employeeWantsPhaseEndsNextWeekNotification && moment(nextWeek).isSame(date, 'day')) {
+        } else if (employeeWantsPhaseEndsNextWeekNotification && isSameDay(nextWeek, date)) {
           notificationText = `Du har oppgaver som utgår om en uke`;
         }
         if (notificationText) {
@@ -284,6 +281,6 @@ const notificationSender = async (employeeId: number, description: string, email
     },
   });
   if (email) {
-    await slackMessager(email, description);
+    //await slackMessager(email, description);
   }
 };
