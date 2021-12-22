@@ -10,6 +10,7 @@ export default NextAuth({
       clientSecret: process.env.GOOGLE_SECRET,
     }),
   ],
+  secret: process.env.NEXT_AUTH_SECRET,
   debug: true,
   jwt: {
     secret: process.env.JWT_SECRET,
