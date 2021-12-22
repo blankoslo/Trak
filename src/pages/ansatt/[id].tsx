@@ -7,8 +7,8 @@ import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useState } from 'react';
-import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 import safeJsonStringify from 'safe-json-stringify';
+import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id } = query;
@@ -86,7 +86,7 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
       <Head>
         <title>Ansatt</title>
       </Head>
-      <Container sx={{ paddingTop: '30px' }} maxWidth='md'>
+      <Container maxWidth='md' sx={{ paddingTop: '30px' }}>
         <Box
           sx={{
             display: 'flex',
