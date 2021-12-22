@@ -27,8 +27,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
-
-  const processTemplates = await trakClient.processTemplate.findMany({
+  // eslint-disable-next-line
+  const processTemplates: any = await trakClient.processTemplate.findMany({
     select: {
       slug: true,
       title: true,

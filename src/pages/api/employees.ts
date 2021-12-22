@@ -5,7 +5,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const processTemplates = await trakClient.processTemplate.findMany({
+    // eslint-disable-next-line
+    const processTemplates: any = await trakClient.processTemplate.findMany({
       select: {
         slug: true,
         title: true,
