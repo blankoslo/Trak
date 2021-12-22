@@ -1,14 +1,9 @@
-import { Box, Theme } from '@mui/material';
+import { Box, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import Typo from 'components/Typo';
 import Image from 'next/image';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    transform: 'translate(-50%,-50%)',
-    left: '50%',
-    position: 'absolute',
-    top: '50%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -29,18 +24,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-/**
- * Loading page to be used once fetching data
- * @returns LoadingLogo
- */
 const LoadingLogo = () => {
   const classes = useStyles();
   return (
     <Box className={classes.root}>
       <Image className={classes.animateLogo} height={80} priority src='/trak_logo.svg' width={240} />
-      <Typo>Henter data...</Typo>
+      <Typography>Henter data...</Typography>
     </Box>
   );
 };
+
+LoadingLogo.displayName = 'LoadingLogo';
 
 export default LoadingLogo;

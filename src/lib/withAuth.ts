@@ -1,13 +1,13 @@
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import jwt from 'next-auth/jwt';
+import { getToken } from 'next-auth/jwt';
 const secret = process.env.JWT_SECRET;
 
 const withAuth = (handler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      const token = await jwt.getToken({ req, secret });
+      const token = await getToken({ req, secret });
 
       if (token) {
         const user = await trakClient.employee.findUnique({

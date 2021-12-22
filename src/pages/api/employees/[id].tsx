@@ -1,25 +1,20 @@
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
+import { toInteger } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   const {
     query: { id },
   } = req;
-  /**
-   * PUT
-   * @param {string} id
-   */
-  if (req.method === 'PUT') {
-    const notification = await trakClient.notification.update({
+  if (req.method === 'GET') {
+    const employee = await trakClient.employee.findUnique({
       where: {
-        id: id.toString(),
-      },
-      data: {
-        read: true,
+        id: toInteger(id),
       },
     });
-    res.status(HttpStatusCode.OK).json(notification);
+    res.status(HttpStatusCode.OK).json(employee);
   } else {
     res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
   }

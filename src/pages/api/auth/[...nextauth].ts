@@ -1,32 +1,30 @@
 import { trakClient } from 'lib/prisma';
 import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
+import GoogleProviders from 'next-auth/providers/google';
 import { NotificationTypeEnum } from 'utils/types';
 
 export default NextAuth({
   providers: [
-    Providers.Google({
+    GoogleProviders({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
     }),
   ],
   debug: true,
-  session: {
-    jwt: true,
-  },
   jwt: {
     secret: process.env.JWT_SECRET,
   },
   callbacks: {
     //eslint-disabe-next-line
-    async signIn(_, __, profile) {
+    async signIn({ profile }) {
       try {
         const user = await trakClient.employee.findUnique({
           where: {
             email: profile.email,
           },
         });
-        if (user && profile.verified_email) {
+
+        if (user && profile.email_verified) {
           await trakClient.employeeSettings.upsert({
             where: {
               employeeId: user.id,
@@ -51,11 +49,11 @@ export default NextAuth({
       }
       return false;
     },
-    async session(session, user) {
+    async session({ session }) {
       try {
         const user_id = await trakClient.employee.findUnique({
           where: {
-            email: user.email,
+            email: session.user.email,
           },
           select: {
             id: true,

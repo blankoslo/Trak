@@ -1,9 +1,8 @@
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { AppBar, Avatar, Button, Stack, Toolbar, useMediaQuery } from '@mui/material';
+import { AppBar, Avatar, Button, Stack, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/system';
-import Typo from 'components/Typo';
 import { useUser } from 'context/User';
 
 const useStyles = makeStyles(() => ({
@@ -29,9 +28,9 @@ const NavBar = () => {
         <Toolbar className={classes.root}>
           <Stack className={classes.centerVertically} direction='row' spacing={1}>
             <Avatar alt={`${user?.firstName} ${user?.lastName}`} src={user?.imageUrl} />
-            <Typo style={{ textDecoration: 'underline' }} variant='body2'>
+            <Typography style={{ textDecoration: 'underline' }} variant='body2'>
               {user?.firstName} {user?.lastName}
-            </Typo>
+            </Typography>
           </Stack>
           <Stack direction='row' spacing={1}>
             {!isSmallScreen && (
