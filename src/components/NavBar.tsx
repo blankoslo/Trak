@@ -35,7 +35,7 @@ const NavBar = () => {
           <Stack direction='row' spacing={1}>
             {!isSmallScreen && (
               <>
-                <Button color='inherit' startIcon={<AddTaskIcon color='primary' />} variant='text'>
+                <Button color='inherit' href='/prosessmal' startIcon={<AddTaskIcon color='primary' />} variant='text'>
                   Ny oppgave
                 </Button>
                 <Button color='inherit' startIcon={<SettingsIcon color='primary' />} variant='text'>

@@ -100,7 +100,7 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
   useEffect(() => {
     if (!allEmployees.length && selectedOption === selectedOptionEnum.Alle) {
       axios
-        .get('/api/employees')
+        .get('/api/allEmployees')
         .then((res) => {
           setAllEmployees(res.data);
         })
