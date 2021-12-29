@@ -29,10 +29,14 @@ export const axiosBuilder = (
   axiosFunc
     .then(() => {
       closeModal();
-      router.replace(router.asPath).finally(() => {
-        showProgressbar(false);
-        showSnackbar(text, 'success');
-      });
+      router
+        .push({
+          pathname: router.asPath,
+        })
+        .finally(() => {
+          showProgressbar(false);
+          showSnackbar(text, 'success');
+        });
     })
     .catch((error) => {
       showProgressbar(false);
@@ -65,4 +69,8 @@ export const addDays = (date: Date, days: number) => {
   const copy = new Date(Number(date));
   copy.setDate(date.getDate() + days);
   return copy;
+};
+
+export const getMonths = () => {
+  return ['Januar', 'Februar', 'Mars', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Desember'];
 };
