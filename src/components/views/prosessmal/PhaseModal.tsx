@@ -180,7 +180,7 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
           }}
         />
         {(processTemplate.slug === Process.ONBOARDING || processTemplate.slug === Process.OFFBOARDING) && (
-          <div>
+          <>
             <Box alignItems='center' display='flex'>
               <TextField
                 className={classes.marginRight}
@@ -218,7 +218,7 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
               <BeforeToogle control={control} name='offset' />
               <Typography variant='body1'>{processTemplate.slug === Process.ONBOARDING ? 'ansettelsesdato' : 'termineringsdato'}</Typography>
             </Box>
-          </div>
+          </>
         )}
         {processTemplate.slug === Process.LOPENDE && (
           <>

@@ -6,10 +6,6 @@ import TaskModal from 'components/views/prosessmal/TaskModal';
 import { useState } from 'react';
 import { IPhase, ITask } from 'utils/types';
 
-/**
- * @typedef {object} PhaseTableProps
- * @property {IPhase} phase
- */
 export type PhaseTableProps = {
   phase: IPhase;
 };
@@ -37,12 +33,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: theme.spacing(1),
   },
 }));
-
-/**
- * Table to display the phase with the different tasks
- * @param {PhaseTableProps} params
- * @returns PhaseTable
- */
 const PhaseTable = ({ phase }: PhaseTableProps) => {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const classes = useStyles();
