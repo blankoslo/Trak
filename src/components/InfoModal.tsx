@@ -174,7 +174,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <b>Forfallsdato:</b>
           </Typography>
           <Typography variant='body1'>
-            {employeeTask ? format(new Date(employeeTask?.dueDate), 'DD.MM.YYYY') : <Skeleton className={classes.skeleton} />}
+            {employeeTask ? format(new Date(employeeTask?.dueDate), 'dd.MM.yyyy') : <Skeleton className={classes.skeleton} />}
           </Typography>
           {employeeTask?.completedBy && employeeTask?.completedDate && (
             <>
@@ -182,7 +182,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
                 <b>Fullført av:</b>{' '}
               </Typography>
               <Typography variant='body1'>
-                {employeeTask.completedBy.firstName} {employeeTask.completedBy.lastName} den {format(new Date(employeeTask?.completedDate), 'DD.MM.YYYY')}
+                {employeeTask.completedBy.firstName} {employeeTask.completedBy.lastName} den {format(new Date(employeeTask?.completedDate), 'dd.MM.yyyy')}
               </Typography>
             </>
           )}

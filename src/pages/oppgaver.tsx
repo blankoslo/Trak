@@ -4,11 +4,12 @@ import SearchField from 'components/SearchField';
 import Toggle from 'components/Toggle';
 import Process from 'components/views/oppgaver/Process';
 import { trakClient } from 'lib/prisma';
-import { sortBy } from 'lodash';
+import { filter, sortBy } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -96,10 +97,32 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Tasks = ({ processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const classes = useStyles();
   const router = useRouter();
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   const switchPage = () => {
-    router.push('/ny/ansatt');
+    router.push('/ansatt');
   };
+
+  useEffect(() => {
+    if (search) {
+      const res = processTemplates.map((processTemplate) => {
+        return {
+          ...processTemplate,
+          tasks: filter(processTemplate.tasks, (task) => {
+            return (
+              task.task.title.toLowerCase().indexOf(search) > -1 ||
+              task.employee.firstName.toLowerCase().indexOf(search) > -1 ||
+              task.employee.lastName.toLowerCase().indexOf(search) > -1
+            );
+          }),
+        };
+      });
+      setFilteredData(res);
+    } else {
+      setFilteredData([]);
+    }
+  }, [search]);
 
   return (
     <>
@@ -111,9 +134,9 @@ const Tasks = ({ processTemplates }: InferGetServerSidePropsType<typeof getServe
           <Toggle defaultChecked={1} onToggle={switchPage} options={['Ansatte', 'Oppgaver']} />
           <Toggle onToggle={() => null} options={['Mine', 'Alle']} />
         </Stack>
-        <SearchField placeholder='Søk etter tittel, ansatt...' />
+        <SearchField onChange={(e) => setSearch(e.target.value.toLowerCase())} placeholder='Søk etter tittel, ansatt...' />
         <Stack spacing={1} sx={{ width: '100%' }}>
-          {processTemplates.map((processTemplate) => (
+          {(filteredData.length > 0 ? filteredData : processTemplates).map((processTemplate) => (
             <Process key={processTemplate.title} tasks={processTemplate.tasks} title={processTemplate.title} />
           ))}
         </Stack>

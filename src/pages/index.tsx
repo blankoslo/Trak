@@ -8,8 +8,10 @@ import { trakClient } from 'lib/prisma';
 import { capitalize } from 'lodash';
 import type { NextPage } from 'next';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import safeJsonStringify from 'safe-json-stringify';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -66,8 +68,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
-  // const employees = JSON.parse(safeJsonStringify(employeesQuery));
-  employeesQuery.forEach((employee) => {
+  const employees = JSON.parse(safeJsonStringify(employeesQuery));
+  employees.forEach((employee) => {
     const employeeProcesses = [...new Set(employee.employeeTask.flatMap(({ task }) => task.phase.processTemplateId))];
     employeeProcesses.forEach((employeeProcess) => {
       const index = processTemplates.findIndex((pt) => pt.slug === employeeProcess);
@@ -89,7 +91,7 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
   const [allEmployees, setAllEmployees] = useState([]);
   const [gridLayout] = useState({ offboarding: 12, onboarding: 12, lopende: 12 });
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
-
+  const router = useRouter();
   const toogleOption = () => {
     if (selectedOption === selectedOptionEnum.Mine) {
       setSelectedOption(selectedOptionEnum.Alle);
@@ -111,10 +113,14 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
     }
   }, [selectedOption]);
 
+  const switchPage = () => {
+    router.push('/oppgaver');
+  };
+
   return (
     <main className={classes.root}>
       <Stack direction='row' spacing={2}>
-        {!isSmallScreen && <Toggle onToggle={() => null} options={['Ansatte', 'Oppgaver']} />}
+        {!isSmallScreen && <Toggle onToggle={switchPage} options={['Ansatte', 'Oppgaver']} />}
         <Toggle onToggle={toogleOption} options={['Mine', 'Alle']} />
       </Stack>
 

@@ -1,6 +1,7 @@
 import Launch from '@mui/icons-material/Launch';
 import Mail from '@mui/icons-material/Mail';
 import { Theme } from '@mui/material/';
+import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
@@ -13,7 +14,8 @@ import classNames from 'classnames';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import useSnackbar from 'context/Snackbar';
-import { format } from 'date-fns';
+import { format, isBefore } from 'date-fns';
+import { differenceInDays } from 'date-fns/esm';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { IEmployeeTask } from 'utils/types';
@@ -55,21 +57,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
 }));
-
-/**
- * Display a specific task
- * @param {IEmployeeTask} params
- * @returns TaskRow
- */
 const TaskRow = ({ data }: { data: IEmployeeTask }) => {
   const classes = useStyles();
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [completed, setCompleted] = useState<boolean>(data.completed);
   const showSnackbar = useSnackbar();
   const router = useRouter();
+  const daysBeforeDueDate = differenceInDays(new Date(data.dueDate), new Date());
+
+  const hasExpired = isBefore(new Date(data.dueDate), new Date());
   return (
     <TableRow sx={{ border: 0, padding: '0' }}>
-      <TableCell sx={{ border: 0, padding: 0 }}>
+      <TableCell sx={{ border: 0, padding: 0, minWidth: '180px' }}>
         <Checkbox
           checked={completed}
           color='primary'
@@ -77,7 +76,11 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
           onClick={() => toggleCheckBox(data, completed, setCompleted, showSnackbar)}
         />
         <ButtonBase className={classes.textButton} focusRipple onClick={() => setModalIsOpen(true)}>
-          <Typography className={completed ? classes.completedTask : undefined} noWrap style={{ maxWidth: '50vw' }}>
+          <Typography
+            className={completed ? classes.completedTask : undefined}
+            noWrap
+            sx={{ maxWidth: '40vw', color: hasExpired ? 'error.main' : 'text.primary' }}
+          >
             {data.task.title}
           </Typography>
         </ButtonBase>
@@ -92,14 +95,21 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
         )}
       </TableCell>
       {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={data.id} modalIsOpen={modalIsOpen} />}
-      <TableCell sx={{ border: 0, padding: 0 }}>
+      <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' } }}>
         <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple onClick={() => router.push(`/ansatt/${data.employee.id}`)}>
           <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
-          <Typography noWrap>{`${data.employee.firstName} ${data.employee.lastName[0]}.`}</Typography>
+          <Typography
+            noWrap
+            sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}
+          >{`${data.employee.firstName} ${data.employee.lastName[0]}.`}</Typography>
         </ButtonBase>
       </TableCell>
-      <TableCell sx={{ border: 0, padding: 0 }}>
-        <div className={classes.avatarRoot}>{format(new Date(data.dueDate), 'dd.MMM')}</div>
+      <TableCell sx={{ display: { md: 'table-cell', xs: 'none' }, border: 0, padding: 0 }}>
+        <Box className={classes.avatarRoot} sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}>
+          {daysBeforeDueDate === 0 && 'I dag'}
+          {daysBeforeDueDate > 0 && daysBeforeDueDate <= 7 && `Om ${daysBeforeDueDate} dager`}
+          {(daysBeforeDueDate > 7 || daysBeforeDueDate < 0) && format(new Date(data.dueDate), 'dd.MMM.yy')}
+        </Box>
       </TableCell>
     </TableRow>
   );

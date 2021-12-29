@@ -1,8 +1,10 @@
-import { Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import TaskRow from 'components/views/oppgaver/TaskRow';
+import { useState } from 'react';
 import { IEmployeeTask } from 'utils/types';
-
 const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
@@ -16,29 +18,37 @@ type ProcessProps = {
 
 const Process = ({ title, tasks }: ProcessProps) => {
   const classes = useStyles();
+  const [showProcess, setShowProcess] = useState(true);
+
   return (
     <Stack className={classes.root} spacing={1}>
-      <Typography variant='h3'>{`${title} (${tasks.length})`}</Typography>
-      {tasks.length ? (
-        <TableContainer>
-          <Table aria-label='simple table' sx={{ minWidth: 650 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ padding: 0 }}>Oppgavetittel</TableCell>
-                <TableCell sx={{ padding: 0 }}>Gjelder</TableCell>
-                <TableCell sx={{ padding: 0 }}>Forfallsdato</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tasks.map((task) => (
-                <TaskRow data={task} key={task.id} />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <Typography variant='body1'>Du har ingen oppgaver i denne prosessen</Typography>
-      )}
+      <Stack direction={'row'}>
+        <Typography variant='h3'>{`${title} (${tasks.length})`}</Typography>
+        <IconButton onClick={() => setShowProcess(!showProcess)} sx={{ padding: 0, color: 'primary.main' }}>
+          {showProcess ? <ArrowDropUpIcon fontSize='large' /> : <ArrowDropDownIcon fontSize='large' />}
+        </IconButton>
+      </Stack>
+      {showProcess &&
+        (tasks.length ? (
+          <TableContainer>
+            <Table aria-label='simple table'>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ padding: 0 }}>Oppgavetittel</TableCell>
+                  <TableCell sx={{ padding: 0 }}>Gjelder</TableCell>
+                  <TableCell sx={{ display: { md: 'table-cell', xs: 'none' }, padding: 0 }}>Forfaller</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {tasks.map((task) => (
+                  <TaskRow data={task} key={task.id} />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Typography variant='body1'>Du har ingen oppgaver i denne prosessen</Typography>
+        ))}
     </Stack>
   );
 };
