@@ -2,14 +2,13 @@ import HelpIcon from '@mui/icons-material/Help';
 import { Box, Button, InputLabel, MenuItem, Select, Theme, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
-import capitalize from 'capitalize-first-letter';
 import BeforeToogle from 'components/form/BeforeToggle';
 import TextField from 'components/form/TextField';
 import Modal from 'components/Modal';
 import useProgressbar from 'context/Progressbar';
 import useSnackbar from 'context/Snackbar';
-import { format, formatISO } from 'date-fns';
-import monthDays from 'month-days';
+import { format, formatISO, getDaysInMonth } from 'date-fns';
+import { capitalize } from 'lodash';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -75,7 +74,7 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
   const watchSelectedMonth = watch('month');
 
   const daysInMonth = useMemo(() => {
-    return monthDays({ year: 2021, month: watchSelectedMonth });
+    return getDaysInMonth(new Date(2021, watchSelectedMonth));
   }, [watchSelectedMonth]);
 
   useEffect(() => {

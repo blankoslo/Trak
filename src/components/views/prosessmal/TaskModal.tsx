@@ -2,7 +2,6 @@ import HelpIcon from '@mui/icons-material/Help';
 import { Box, Button, InputLabel, MenuItem, Select, Theme, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
-import capitalize from 'capitalize-first-letter';
 import BeforeToogle from 'components/form/BeforeToggle';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import TagSelector from 'components/form/TagSelector';
@@ -12,8 +11,8 @@ import Modal from 'components/Modal';
 import { useData } from 'context/Data';
 import useProgressbar from 'context/Progressbar';
 import useSnackbar from 'context/Snackbar';
-import { format, formatISO } from 'date-fns';
-import monthDays from 'month-days';
+import { format, formatISO, getDaysInMonth } from 'date-fns';
+import { capitalize } from 'lodash';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -102,7 +101,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
   const watchSelectedMonth: number = watch('month');
 
   const daysInMonth = useMemo(() => {
-    return monthDays({ year: 2021, month: watchSelectedMonth });
+    return getDaysInMonth(new Date(2021, watchSelectedMonth));
   }, [watchSelectedMonth]);
 
   useEffect(() => {
@@ -155,7 +154,6 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         ...(phase.processTemplateId === Process.LOPENDE &&
           formData.day >= 0 &&
           formData.month >= 0 && {
-            //dueDate: moment().set({ month: formData.month, date: formData.day }).toDate(),
             dueDate: formatISO(new Date().setMonth(formData.month, formData.day)),
           }),
         dueDateDayOffset: dueDateDayOffset,

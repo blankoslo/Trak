@@ -1001,10 +1001,10 @@ caniuse-lite@^1.0.30001202, caniuse-lite@^1.0.30001219, caniuse-lite@^1.0.300012
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001291.tgz#08a8d2cfea0b2cf2e1d94dd795942d0daef6108c"
   integrity sha512-roMV5V0HNGgJ88s42eE70sstqGW/gwFndosYrikHthw98N5tLnOTxFqMLQjZVRxTWFlJ4rn+MsgXrR7MDPY4jA==
 
-capitalize-first-letter@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/capitalize-first-letter/-/capitalize-first-letter-1.0.0.tgz#effb0990cca52966c254c94644182da00da98b14"
-  integrity sha1-7/sJkMylKWbCVMlGRBgtoA2pixQ=
+capitalize@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/capitalize/-/capitalize-2.0.4.tgz#eed7f94c6699a318eeef6e68967fe139c764b866"
+  integrity sha512-wcSyiFqXRYyCoqu0o0ekXzJAKCLMkqWS5QWGlgTJFJKwRmI6pzcN2hBl5VPq9RzLW5Uf4FF/V/lcFfjCtVak2w==
 
 chalk@2.4.2, chalk@^2.0.0:
   version "2.4.2"
@@ -2741,11 +2741,6 @@ minimist@^1.2.0:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
-
-month-days@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/month-days/-/month-days-4.0.0.tgz#05a588fcd9f79bc610ce679926520a35af7f0b03"
-  integrity sha512-ySI8t8zyauv7yDw+qhh5+R9Q3xTNzWjxVhh4wyTWVvF569C3Opkbc7EPPgiLVJOIAk0rgtb2GmhW8ytYmD8JbQ==
 
 ms@2.0.0:
   version "2.0.0"
