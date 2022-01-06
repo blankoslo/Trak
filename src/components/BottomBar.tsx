@@ -1,7 +1,9 @@
 import GroupIcon from '@mui/icons-material/Group';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
-import { BottomNavigation, BottomNavigationAction, Box } from '@mui/material';
+import Box from '@mui/material/Box';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import BottomNavigation from '@mui/material/BottomNavigation';
 
 const BottomBar = () => {
   return (

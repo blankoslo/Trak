@@ -1,4 +1,6 @@
-import { Box, Theme, useMediaQuery } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import {Theme} from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import { makeStyles } from '@mui/styles';
 import BottomBar from 'components/BottomBar';
 import LogIn from 'components/LogIn';

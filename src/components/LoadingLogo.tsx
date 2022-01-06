@@ -1,4 +1,6 @@
-import { Box, Theme, Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import {Theme} from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import { makeStyles } from '@mui/styles';
 import Image from 'next/image';
 

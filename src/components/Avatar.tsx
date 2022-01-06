@@ -1,4 +1,5 @@
-import { Avatar as MuiAvatar, AvatarProps as MuiAvatarProps, Typography } from '@mui/material';
+import MuiAvatar, { AvatarProps as MuiAvatarProps } from '@mui/material/Avatar';
+import Typography from '@mui/material/Typography';
 
 export type AvatarProps = {
   firstName: string;
