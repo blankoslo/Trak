@@ -1,6 +1,6 @@
-import { Theme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import Image from 'next/image';
 import { signIn } from 'next-auth/react';

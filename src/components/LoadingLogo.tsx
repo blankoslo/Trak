@@ -1,6 +1,6 @@
-import Typography from '@mui/material/Typography';
-import {Theme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import { Theme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import Image from 'next/image';
 

@@ -7,7 +7,6 @@ import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
 import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/system';
 import { useUser } from 'context/User';
