@@ -49,6 +49,7 @@
     "axios": "^0.21.1",
     "capitalize-first-letter": "^1.0.0",
     "classnames": "^2.2.6",
+    "date-fns": "^2.28.0",
     "eslint-plugin-json": "^2.1.2",
     "faker": "^5.4.0",
     "fuse.js": "^6.4.6",

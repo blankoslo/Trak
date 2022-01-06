@@ -1,3 +1,4 @@
+import { compareAsc } from 'date-fns';
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import { groupBy } from 'lodash';
@@ -132,7 +133,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
   }
 }
-
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
 const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any) => {
   const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
@@ -165,7 +165,6 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
   if (!comingPhases.length) {
     return;
   }
-
   const nextPhase = comingPhases?.reduce((phaseA, phaseB) => {
     const dueDatePhaseA = moment(phaseA.dueDate);
     const dueDatePhaseB = moment(phaseB.dueDate);
@@ -179,7 +178,9 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
     (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && moment(employeeTask.dueDate).year() === today.year(),
   );
 
-  if (!hasTasksInNextPhase) {
+  const hasStarted = compareAsc(employee.dateOfEmployment, new Date()) <= 0;
+
+  if (!hasTasksInNextPhase && hasStarted) {
     nextPhase.dueDate = moment(nextPhase.dueDate).set('y', today.year()).toDate();
     createEmployeeTasks(employee, nextPhase);
   }
