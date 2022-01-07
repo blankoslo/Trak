@@ -1,6 +1,6 @@
-import GroupIcon from '@mui/icons-material/Group';
+import AddTaskIcon from '@mui/icons-material/AddTask';
+import HomeIcon from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
-import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import { BottomNavigation, BottomNavigationAction, Box } from '@mui/material';
 import { useRouter } from 'next/router';
 
@@ -9,11 +9,11 @@ const BottomBar = () => {
   return (
     <Box sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
       <BottomNavigation showLabels>
-        <BottomNavigationAction icon={<GroupIcon color='primary' />} label='Ansatte' onClick={() => router.push('/ansatt')} sx={{ color: 'primary.main' }} />
+        <BottomNavigationAction icon={<HomeIcon color='primary' />} label='Hjem' onClick={() => router.push('/')} sx={{ color: 'primary.main' }} />
         <BottomNavigationAction
-          icon={<TaskAltIcon color='primary' />}
-          label='Oppgaver'
-          onClick={() => router.push('/oppgaver')}
+          icon={<AddTaskIcon color='primary' />}
+          label='Prosessmal'
+          onClick={() => router.push('/prosessmal')}
           sx={{ color: 'primary.main' }}
         />
         <BottomNavigationAction icon={<SettingsIcon color='primary' />} label='Innstillinger' sx={{ color: 'primary.main' }} />

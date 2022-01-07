@@ -1,4 +1,7 @@
-import { Grid, Stack, Theme, Typography, useMediaQuery } from '@mui/material';
+import { Theme } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import LoadingLogo from 'components/LoadingLogo';
@@ -90,7 +93,6 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
   const [selectedOption, setSelectedOption] = useState(selectedOptionEnum.Mine);
   const [allEmployees, setAllEmployees] = useState([]);
   const [gridLayout] = useState({ offboarding: 12, onboarding: 12, lopende: 12 });
-  const isSmallScreen = useMediaQuery('(max-width: 600px)');
   const router = useRouter();
   const toogleOption = () => {
     if (selectedOption === selectedOptionEnum.Mine) {
@@ -120,7 +122,7 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
   return (
     <main className={classes.root}>
       <Stack direction='row' spacing={2}>
-        {!isSmallScreen && <Toggle defaultChecked={1} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />}
+        <Toggle defaultChecked={1} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />
         <Toggle onToggle={toogleOption} options={['Mine', 'Alle']} />
       </Stack>
 
