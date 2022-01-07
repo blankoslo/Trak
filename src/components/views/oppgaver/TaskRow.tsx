@@ -104,7 +104,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
         </ButtonBase>
       </TableCell>
       {displayResponsible && (
-        <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' } }}>
+        <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' }, display: { md: 'table-cell', xs: 'none' } }}>
           <div className={classes.avatarRoot}>
             <Avatar className={classes.avatar} firstName={data.responsible.firstName} image={data.responsible.imageUrl} lastName={data.responsible.lastName} />
             <Typography
