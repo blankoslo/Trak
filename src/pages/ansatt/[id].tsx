@@ -1,16 +1,17 @@
-import { TextareaAutosize } from '@mui/base';
-import ExpandMore from '@mui/icons-material';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { AccordionActions, Button } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
+import Link from '@mui/material/Link';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import useSnackbar from 'context/Snackbar';
 import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -80,6 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
 const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [choosenProcess, setChoosenProcess] = useState([]);
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
   const handleFormat = (_, newFormats) => {
     if (newFormats.length === processTemplates.length) {
@@ -117,23 +119,37 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
             <Typography>{employee.profession.title}</Typography>
           </Box>
         </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: { xs: 'center', sm: 'start' },
+          }}
+        >
+          <ToggleButtonGroup
+            onChange={handleFormat}
+            orientation={isSmallScreen ? 'vertical' : 'horizontal'}
+            sx={{ marginBottom: '30px' }}
+            value={choosenProcess}
+          >
+            {processTemplates?.map((processTemplate) => (
+              <ToggleButton
+                key={processTemplate.slug}
+                sx={{
+                  '&$selected': {
+                    color: 'text.secondary',
+                    backgroundColor: 'primary.main',
+                  },
+                }}
+                value={processTemplate.title}
+              >
+                {processTemplate.title}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
 
-        <ToggleButtonGroup onChange={handleFormat} sx={{ marginBottom: '30px' }} value={choosenProcess}>
-          {processTemplates?.map((processTemplate) => (
-            <ToggleButton
-              key={processTemplate.slug}
-              sx={{
-                '&$selected': {
-                  color: 'text.secondary',
-                  backgroundColor: 'primary.main',
-                },
-              }}
-              value={processTemplate.title}
-            >
-              {processTemplate.title}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
         {!employee.employeeTask?.length
           ? 'Gratulerer. Finnes ingen flere oppgaver :D'
           : employee.employeeTask
@@ -153,16 +169,37 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
 export const Task = ({ employeeTask }) => {
   const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
   const showSnackbar = useSnackbar();
-  const [showCommentField, setShowCommentField] = useState<boolean>(false);
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
   const checkboxClicked = (e) => {
     e.stopPropagation();
     toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
   };
   return (
-    <>
-      <Accordion disableGutters sx={{ marginBottom: '16px', borderRadius: '4px' }}>
-        <AccordionSummary aria-controls='TASK1_RENAME_ME_PLEASE' expandIcon={<ExpandMore />} id='TASK1_RENAME_ME_PLEASE'>
+    <Accordion TransitionProps={{ unmountOnExit: true }} disableGutters sx={{ marginBottom: '16px', borderRadius: '4px' }}>
+      <AccordionSummary aria-controls='TASK1_RENAME_ME_PLEASE' expandIcon={<ExpandMore />} id='TASK1_RENAME_ME_PLEASE'>
+        {isSmallScreen ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            <Checkbox
+              checked={completed}
+              onClick={checkboxClicked}
+              sx={{
+                color: 'primary.main',
+              }}
+            />
+            <Box>
+              <Typography>{employeeTask.task.title}</Typography>
+              <Typography>{prismaDateToFormatedDate(employeeTask.dueDate)}</Typography>
+            </Box>
+          </Box>
+        ) : (
           <Box
             sx={{
               display: 'flex',
@@ -190,23 +227,39 @@ export const Task = ({ employeeTask }) => {
             </Box>
             <Typography>{prismaDateToFormatedDate(employeeTask.dueDate)}</Typography>
           </Box>
-        </AccordionSummary>
-        <AccordionDetails
-          sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-          }}
-        >
-          <Typography variant='body2'>{employeeTask.task.description}</Typography>
-          {showCommentField ? (
-            <TextareaAutosize />
-          ) : (
-            <Button onClick={() => setShowCommentField(true)} size='small' variant='contained'>
-              Skriv ny kommentar
-            </Button>
-          )}
-        </AccordionDetails>
-      </Accordion>
-    </>
+        )}
+      </AccordionSummary>
+      <AccordionDetails
+        sx={{
+          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        }}
+      >
+        <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
+        {employeeTask.task.link && (
+          <Typography variant='body2'>
+            {`Ekstern link: `}
+            <Link href={employeeTask.task.link} rel='noopener' target='_blank' underline='hover'>
+              her
+            </Link>
+          </Typography>
+        )}
+        <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
+        <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
+        <Typography variant='body2'>{employeeTask.task.description}</Typography>
+      </AccordionDetails>
+      <AccordionActions
+        sx={{
+          justifyContent: 'start',
+        }}
+      >
+        <Button sx={{ 'text-transform': 'capitalize' }} variant='contained'>
+          Endre oppgaveansvarlig
+        </Button>
+        <Button sx={{ 'text-transform': 'capitalize' }} variant='contained'>
+          Endre forfallsdato
+        </Button>
+      </AccordionActions>
+    </Accordion>
   );
 };
 

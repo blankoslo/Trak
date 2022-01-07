@@ -11,7 +11,10 @@ export type TimeSectionType = {
   defaultOpen?: boolean;
 };
 
-export const prismaDateToFormatedDate = (date: string) => {
+export const prismaDateToFormatedDate = (date: string, isSmallFormat = false) => {
+  if (isSmallFormat) {
+    return new Date(date).toLocaleDateString('nb-NO', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
   return new Date(date).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
