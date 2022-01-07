@@ -1,5 +1,8 @@
-import { Edit } from '@mui/icons-material/';
-import { IconButton, TableCell, TableRow, Theme } from '@mui/material';
+import Edit from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
+import { Theme } from '@mui/material/styles';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
 import { makeStyles } from '@mui/styles';
 import Avatar from 'components/Avatar';
 import TaskModal from 'components/views/prosessmal/TaskModal';

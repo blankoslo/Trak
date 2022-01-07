@@ -1,5 +1,12 @@
 import HelpIcon from '@mui/icons-material/Help';
-import { Box, Button, InputLabel, MenuItem, Select, Theme, Tooltip, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { Theme } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import BeforeToogle from 'components/form/BeforeToggle';

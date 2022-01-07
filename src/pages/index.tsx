@@ -1,4 +1,5 @@
-import { Stack, Theme } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import LoadingLogo from 'components/LoadingLogo';

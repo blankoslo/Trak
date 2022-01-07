@@ -1,4 +1,8 @@
-import { Avatar, ButtonBase, Stack, Theme, Typography } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import ButtonBase from '@mui/material/ButtonBase';
+import Stack from '@mui/material/Stack';
+import { Theme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import { useRouter } from 'next/router';
 const useStyles = makeStyles((theme: Theme) => ({

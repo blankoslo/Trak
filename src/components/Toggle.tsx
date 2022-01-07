@@ -1,4 +1,6 @@
-import { ButtonBase, Stack, Theme } from '@mui/material';
+import ButtonBase from '@mui/material/ButtonBase';
+import Stack from '@mui/material/Stack';
+import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 const useStyles = makeStyles((theme: Theme) => ({

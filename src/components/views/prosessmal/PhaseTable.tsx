@@ -1,4 +1,9 @@
-import { Table, TableBody, TableCell, TableHead, TableRow, Theme } from '@mui/material';
+import { Theme } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import { makeStyles } from '@mui/styles';
 import AddButton from 'components/AddButton';
 import TaskRow from 'components/views/prosessmal//TaskRow';

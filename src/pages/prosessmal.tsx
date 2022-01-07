@@ -1,4 +1,8 @@
-import { Box, Container, Stack, Theme, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
+import { Theme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import AddButton from 'components/AddButton';
 import Phase from 'components/views/prosessmal/Phase';

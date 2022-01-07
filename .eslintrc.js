@@ -105,6 +105,12 @@ module.exports = {
         aspects: ['invalidHref', 'preferButton'],
       },
     ],
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: ['@mui/*/*/*', '!@mui/material/test-utils/*'],
+      },
+    ],
   },
   settings: {
     react: {

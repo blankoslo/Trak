@@ -1,4 +1,5 @@
-import { Autocomplete, TextField } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 import { Controller } from 'react-hook-form';
 import { IEmployee } from 'utils/types';
 export type EmployeeSelectorProps = {

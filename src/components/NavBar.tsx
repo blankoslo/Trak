@@ -1,9 +1,16 @@
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import HomeIcon from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { AppBar, Avatar, Button, Stack, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
+import AppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import { Theme } from '@mui/material/styles';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { makeStyles } from '@mui/styles';
-import { Box } from '@mui/system';
 import { useUser } from 'context/User';
 import { useRouter } from 'next/router';
 

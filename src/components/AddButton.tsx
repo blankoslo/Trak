@@ -1,5 +1,5 @@
-import { Add } from '@mui/icons-material/';
-import { Button } from '@mui/material';
+import Add from '@mui/icons-material/Add';
+import Button from '@mui/material/Button';
 export type AddButtonProps = {
   text: string;
   onClick: () => void;

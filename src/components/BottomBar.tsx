@@ -1,7 +1,9 @@
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import HomeIcon from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { BottomNavigation, BottomNavigationAction, Box } from '@mui/material';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
 
 const BottomBar = () => {

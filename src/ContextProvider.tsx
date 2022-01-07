@@ -1,4 +1,4 @@
-import { CssBaseline } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import Layout from 'components/Layout';
 import { ColorModeProvider } from 'context/ColorMode';
 import { ProgressbarProvider } from 'context/Progressbar';

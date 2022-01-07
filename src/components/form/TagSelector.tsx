@@ -1,4 +1,6 @@
-import { Autocomplete, Chip, createFilterOptions, TextField } from '@mui/material';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import Chip from '@mui/material/Chip';
+import TextField from '@mui/material/TextField';
 import { uniqBy } from 'lodash';
 import { Controller } from 'react-hook-form';
 import { ITag, ITask } from 'utils/types';
