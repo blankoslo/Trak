@@ -1,4 +1,4 @@
-import { useMediaQuery } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import useStorage from 'hooks/useStorage';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { ColorMode } from 'utils/types';

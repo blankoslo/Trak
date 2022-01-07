@@ -1,4 +1,6 @@
-import { CircularProgress, Snackbar, Theme } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 

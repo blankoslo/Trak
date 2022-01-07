@@ -1,5 +1,6 @@
-import { Edit } from '@mui/icons-material/';
-import { IconButton, Typography } from '@mui/material';
+import Edit from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import PhaseModal from 'components/views/prosessmal/PhaseModal';
 import PhaseTable from 'components/views/prosessmal/PhaseTable';

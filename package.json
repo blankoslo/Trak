@@ -20,7 +20,6 @@
     "start": "next start -p $PORT",
     "lint": "eslint --fix --max-warnings=0 .",
     "format": "prettier --write --check --config ./.prettierrc './src/**/*.{js,jsx,ts,tsx,css,md,json}'",
-    "precommit": "yarn format && yarn lint",
     "heroku-postbuild": "yarn generate && yarn build",
     "push": "npx prisma db push --schema src/prisma/trak.prisma --preview-feature",
     "generate": "npx prisma generate --schema src/prisma/blank.prisma && npx prisma generate --schema src/prisma/trak.prisma",

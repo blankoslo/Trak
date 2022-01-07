@@ -1,4 +1,6 @@
-import { Alert, Snackbar, Theme } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 

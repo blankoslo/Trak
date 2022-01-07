@@ -1,4 +1,7 @@
-import { InputLabel, MenuItem, Select, Theme } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { Controller } from 'react-hook-form';
 import { Offset } from 'utils/types';
