@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { makeStyles } from '@mui/styles';
 import { useUser } from 'context/User';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -51,27 +52,31 @@ const NavBar = () => {
           <Stack direction='row' spacing={1}>
             {!isSmallScreen && (
               <>
-                <Button
-                  className={router.asPath === '/' || router.asPath === '/ansatt' ? classes.activeLink : null}
-                  color='inherit'
-                  href='/'
-                  startIcon={<HomeIcon color='primary' />}
-                  variant='text'
-                >
-                  Hjem
-                </Button>
-                <Button
-                  className={router.asPath === '/prosessmal' ? classes.activeLink : null}
-                  color='inherit'
-                  href='/prosessmal'
-                  startIcon={<AddTaskIcon color='primary' />}
-                  variant='text'
-                >
-                  Prosessmal
-                </Button>
-                <Button color='inherit' startIcon={<SettingsIcon color='primary' />} variant='text'>
-                  Innstillinger
-                </Button>
+                <Link href='/' passHref>
+                  <Button
+                    className={router.asPath === '/' || router.asPath === '/ansatt' ? classes.activeLink : null}
+                    color='inherit'
+                    startIcon={<HomeIcon color='primary' />}
+                    variant='text'
+                  >
+                    Hjem
+                  </Button>
+                </Link>
+                <Link href='/prosessmal' passHref>
+                  <Button
+                    className={router.asPath === '/prosessmal' ? classes.activeLink : null}
+                    color='inherit'
+                    startIcon={<AddTaskIcon color='primary' />}
+                    variant='text'
+                  >
+                    Prosessmal
+                  </Button>
+                </Link>
+                <Link href='/prosessmal' passHref>
+                  <Button color='inherit' startIcon={<SettingsIcon color='primary' />} variant='text'>
+                    Innstillinger
+                  </Button>
+                </Link>
               </>
             )}
           </Stack>
