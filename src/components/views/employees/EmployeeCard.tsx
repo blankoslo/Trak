@@ -4,7 +4,8 @@ import Stack from '@mui/material/Stack';
 import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
+
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     borderRadius: theme.spacing(2),
@@ -26,21 +27,18 @@ export type EmployeeCardProps = {
 
 const EmployeeCard = ({ id, firstName, lastName, imageUrl, role }: EmployeeCardProps) => {
   const classes = useStyles();
-  const router = useRouter();
-
-  const onClick = () => {
-    router.push(`/ansatt/${id}`);
-  };
   return (
-    <ButtonBase className={classes.root} onClick={onClick}>
-      <Avatar alt={`${firstName[0]}.${lastName[0]}`} src={imageUrl} sx={{ width: 80, height: 80 }} />
-      <Stack spacing={1} sx={{ justifyContent: 'center' }}>
-        <Typography variant='h4'>
-          {firstName} {lastName[0]}.
-        </Typography>
-        <Typography variant='h5'>{role || 'Ukjent'}</Typography>
-      </Stack>
-    </ButtonBase>
+    <Link href={`/ansatt/${id}`} passHref>
+      <ButtonBase className={classes.root}>
+        <Avatar alt={`${firstName[0]}.${lastName[0]}`} src={imageUrl} sx={{ width: 80, height: 80 }} />
+        <Stack spacing={1} sx={{ justifyContent: 'center' }}>
+          <Typography variant='h4'>
+            {firstName} {lastName[0]}.
+          </Typography>
+          <Typography variant='h5'>{role || 'Ukjent'}</Typography>
+        </Stack>
+      </ButtonBase>
+    </Link>
   );
 };
 

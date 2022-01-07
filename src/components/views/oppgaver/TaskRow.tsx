@@ -16,6 +16,7 @@ import InfoModal from 'components/InfoModal';
 import useSnackbar from 'context/Snackbar';
 import { format } from 'date-fns';
 import { differenceInCalendarDays } from 'date-fns/esm';
+import Link from 'next/link';
 import { useState } from 'react';
 import { IEmployeeTask } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
@@ -95,13 +96,15 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
       </TableCell>
       {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={data.id} modalIsOpen={modalIsOpen} />}
       <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' } }}>
-        <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple href={`/ansatt/${data.employee.id}`}>
-          <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
-          <Typography
-            noWrap
-            sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}
-          >{`${data.employee.firstName} ${data.employee.lastName[0]}.`}</Typography>
-        </ButtonBase>
+        <Link href={`/ansatt/${data.employee.id}`} passHref>
+          <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple>
+            <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
+            <Typography
+              noWrap
+              sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}
+            >{`${data.employee.firstName} ${data.employee.lastName[0]}.`}</Typography>
+          </ButtonBase>
+        </Link>
       </TableCell>
       {displayResponsible && (
         <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' }, display: { md: 'table-cell', xs: 'none' } }}>
