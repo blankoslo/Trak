@@ -104,7 +104,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const ProcessTemplateSelector = ({ active, onClick }) => {
   const classes = useStyles();
   const options = [
-    { title: 'Business as usual', slug: 'lopende' },
+    { title: 'Løpende', slug: 'lopende' },
     { title: 'Offboarding', slug: 'offboarding' },
     { title: 'Onboarding', slug: 'onboarding' },
   ];
