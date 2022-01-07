@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { NextRouter } from 'next/router';
+import qs from 'qs';
 import { Dispatch, SetStateAction } from 'react';
 import { IEmployeeTask } from 'utils/types';
 
@@ -76,4 +77,27 @@ export const addDays = (date: Date, days: number) => {
 
 export const getMonths = () => {
   return ['Januar', 'Februar', 'Mars', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Desember'];
+};
+export const slackMessager = async (email: string, text: string) => {
+  try {
+    const response = await axios.get(`https://slack.com/api/users.lookupByEmail?email=${email}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.SLACK_TOKEN}`,
+      },
+    });
+    const userInSlackWorkspace = response.data.user;
+    if (userInSlackWorkspace) {
+      await axios.post(
+        'https://slack.com/api/chat.postMessage',
+        qs.stringify({
+          token: process.env.SLACK_TOKEN,
+          channel: response.data.user.id,
+          text: text,
+        }),
+      );
+    }
+  } catch (err) {
+    // eslint-disable-next-line
+    console.log(err);
+  }
 };
