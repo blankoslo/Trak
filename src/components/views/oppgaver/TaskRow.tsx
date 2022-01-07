@@ -1,10 +1,10 @@
 import Launch from '@mui/icons-material/Launch';
 import Mail from '@mui/icons-material/Mail';
-import { Theme } from '@mui/material/';
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
+import { Theme } from '@mui/material/styles';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';

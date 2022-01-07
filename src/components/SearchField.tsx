@@ -1,5 +1,6 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { InputAdornment, Theme } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
+import { Theme } from '@mui/material/styles';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
 
