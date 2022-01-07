@@ -74,7 +74,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
           inputProps={{ 'aria-label': `Marker oppgave som ${completed ? 'ikke' : ''} fullført` }}
           onClick={() => toggleCheckBox(data, completed, setCompleted, showSnackbar)}
         />
-        <ButtonBase className={classes.textButton} focusRipple onClick={() => setModalIsOpen(true)}>
+        <ButtonBase className={classes.textButton} focusRipple onClick={() => setModalIsOpen(true)} sx={{ marginRight: 1 }}>
           <Typography
             className={completed ? classes.completedTask : undefined}
             noWrap
