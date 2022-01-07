@@ -5,10 +5,11 @@ import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import LoadingLogo from 'components/LoadingLogo';
+import SearchField from 'components/SearchField';
 import Toggle from 'components/Toggle';
 import EmployeeCard from 'components/views/employees/EmployeeCard';
 import { trakClient } from 'lib/prisma';
-import { capitalize } from 'lodash';
+import { capitalize, filter } from 'lodash';
 import type { NextPage } from 'next';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
@@ -90,9 +91,12 @@ export enum selectedOptionEnum {
 
 const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const classes = useStyles();
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
   const [selectedOption, setSelectedOption] = useState(selectedOptionEnum.Mine);
   const [allEmployees, setAllEmployees] = useState([]);
   const [gridLayout] = useState({ offboarding: 12, onboarding: 12, lopende: 12 });
+
   const router = useRouter();
   const toogleOption = () => {
     if (selectedOption === selectedOptionEnum.Mine) {
@@ -101,6 +105,22 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
       setSelectedOption(selectedOptionEnum.Mine);
     }
   };
+
+  useEffect(() => {
+    if (search) {
+      const res = (selectedOption === selectedOptionEnum.Mine ? processTemplates : allEmployees).map((processTemplate) => {
+        return {
+          ...processTemplate,
+          employees: filter(processTemplate.employees, (employee) => {
+            return employee.firstName.toLowerCase().indexOf(search) > -1 || employee.lastName.toLowerCase().indexOf(search) > -1;
+          }),
+        };
+      });
+      setFilteredData(res);
+    } else {
+      setFilteredData([]);
+    }
+  }, [search]);
   useEffect(() => {
     if (!allEmployees.length && selectedOption === selectedOptionEnum.Alle) {
       axios
@@ -120,16 +140,16 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
   };
 
   return (
-    <main className={classes.root}>
+    <Stack className={classes.root} spacing={2}>
       <Stack direction='row' spacing={2}>
         <Toggle defaultChecked={1} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />
         <Toggle onToggle={toogleOption} options={['Mine', 'Alle']} />
       </Stack>
-
+      <SearchField onChange={(e) => setSearch(e.target.value.toLowerCase())} placeholder='Søk etter tittel, ansatt...' />
       {!allEmployees.length && selectedOption === selectedOptionEnum.Alle && <LoadingLogo />}
       <Stack direction='column' spacing={1}>
         <Grid container rowSpacing={4}>
-          {(selectedOption === selectedOptionEnum.Mine ? processTemplates : allEmployees).map((processTemplate) => {
+          {(filteredData.length > 0 ? filteredData : selectedOption === selectedOptionEnum.Mine ? processTemplates : allEmployees).map((processTemplate) => {
             return (
               <Grid item key={processTemplate.title} sm={gridLayout[processTemplate.title]} xs={12}>
                 <Typography variant='h3'>{capitalize(processTemplate.title)}</Typography>
@@ -155,7 +175,7 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
           })}
         </Grid>
       </Stack>
-    </main>
+    </Stack>
   );
 };
 export default Employees;
