@@ -67,7 +67,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
 
   return (
     <TableRow sx={{ border: 0, padding: '0' }}>
-      <TableCell sx={{ border: 0, padding: 0, minWidth: '180px' }}>
+      <TableCell sx={{ border: 0, padding: 0, whiteSpace: 'nowrap' }}>
         <Checkbox
           checked={completed}
           color='primary'
