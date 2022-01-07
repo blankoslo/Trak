@@ -1,15 +1,19 @@
-import { Grid, Stack, Theme, Typography, useMediaQuery } from '@mui/material';
+import { Stack, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import LoadingLogo from 'components/LoadingLogo';
+import SearchField from 'components/SearchField';
 import Toggle from 'components/Toggle';
-import EmployeeCard from 'components/views/employees/EmployeeCard';
+import Process from 'components/views/oppgaver/Process';
 import { trakClient } from 'lib/prisma';
-import { capitalize } from 'lodash';
-import type { NextPage } from 'next';
+import { filter, sortBy } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
+import { selectedOptionEnum } from 'pages/ansatt';
 import { useEffect, useState } from 'react';
+import safeJsonStringify from 'safe-json-stringify';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -18,45 +22,69 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'center',
     flexDirection: 'column',
     margin: `${theme.spacing(4)} auto`,
-    width: '50%',
+    width: '80%',
     [theme.breakpoints.down('sm')]: {
       width: '90%',
     },
   },
 }));
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
-  // eslint-disable-next-line
-  const processTemplates: any = await trakClient.processTemplate.findMany({
+
+  const processes = await trakClient.processTemplate.findMany({
     select: {
       slug: true,
       title: true,
     },
   });
-  processTemplates.map((processTemplate) => (processTemplate['employees'] = []));
 
-  const employeesQuery = await trakClient.employee.findMany({
+  const initialProcessTemplates = processes.map((processTemplate) => {
+    return {
+      ...processTemplate,
+      tasks: [],
+    };
+  });
+  const query = await trakClient.employeeTask.findMany({
     where: {
-      hrManagerId: parseInt(session?.user?.id) || null,
+      responsible: {
+        email: session?.user?.email,
+      },
+      completed: {
+        equals: false,
+      },
     },
+
+    orderBy: [
+      {
+        dueDate: 'asc',
+      },
+    ],
     include: {
-      profession: {
+      responsible: {
         select: {
-          title: true,
+          firstName: true,
+          lastName: true,
+          imageUrl: true,
+          id: true,
         },
       },
-      employeeTask: {
-        where: {
-          completed: false,
-        },
-
+      employee: {
         select: {
-          task: {
+          imageUrl: true,
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      task: {
+        select: {
+          title: true,
+          phase: {
             select: {
-              phase: {
+              processTemplateId: true,
+              processTemplate: {
                 select: {
-                  processTemplateId: true,
+                  title: true,
                 },
               },
             },
@@ -66,29 +94,25 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
-  // const employees = JSON.parse(safeJsonStringify(employeesQuery));
-  employeesQuery.forEach((employee) => {
-    const employeeProcesses = [...new Set(employee.employeeTask.flatMap(({ task }) => task.phase.processTemplateId))];
-    employeeProcesses.forEach((employeeProcess) => {
-      const index = processTemplates.findIndex((pt) => pt.slug === employeeProcess);
-      processTemplates[index].employees.push(employee);
-    });
+  const tasks = JSON.parse(safeJsonStringify(query));
+  tasks.forEach((employeeTask) => {
+    const processTemplate = employeeTask.task.phase.processTemplate.title;
+    const index = initialProcessTemplates.findIndex((pt) => pt.title === processTemplate);
+    initialProcessTemplates[index].tasks.push(employeeTask);
+  });
+  const processTemplates = initialProcessTemplates.map((processTemplate) => {
+    return { ...processTemplate, tasks: sortBy(processTemplate.tasks, ['dueDate', 'employee.firstName', 'employee.lastName']) };
   });
 
   return { props: { processTemplates } };
 };
-
-enum selectedOptionEnum {
-  Mine,
-  Alle,
-}
-
-const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Tasks = ({ processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const classes = useStyles();
+  const router = useRouter();
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
   const [selectedOption, setSelectedOption] = useState(selectedOptionEnum.Mine);
-  const [allEmployees, setAllEmployees] = useState([]);
-  const [gridLayout] = useState({ offboarding: 12, onboarding: 12, lopende: 12 });
-  const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  const [allTasks, setAllTasks] = useState([]);
 
   const toogleOption = () => {
     if (selectedOption === selectedOptionEnum.Mine) {
@@ -97,12 +121,13 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
       setSelectedOption(selectedOptionEnum.Mine);
     }
   };
+
   useEffect(() => {
-    if (!allEmployees.length && selectedOption === selectedOptionEnum.Alle) {
+    if (!allTasks.length && selectedOption === selectedOptionEnum.Alle) {
       axios
-        .get('/api/allEmployees')
+        .get('/api/allTasks')
         .then((res) => {
-          setAllEmployees(res.data);
+          setAllTasks(res.data);
         })
         .catch((err) => {
           // eslint-disable-next-line
@@ -110,44 +135,59 @@ const Employees: NextPage = ({ processTemplates }: InferGetServerSidePropsType<t
         });
     }
   }, [selectedOption]);
+  const switchPage = () => {
+    router.push('/ansatt');
+  };
+
+  useEffect(() => {
+    if (search) {
+      const res = (selectedOption === selectedOptionEnum.Mine ? processTemplates : allTasks).map((processTemplate) => {
+        return {
+          ...processTemplate,
+          tasks: filter(processTemplate.tasks, (task) => {
+            return (
+              task.task.title.toLowerCase().indexOf(search) > -1 ||
+              task.employee.firstName.toLowerCase().indexOf(search) > -1 ||
+              task.employee.lastName.toLowerCase().indexOf(search) > -1 ||
+              (selectedOption === selectedOptionEnum.Alle && task.responsible.firstName.toLowerCase().indexOf(search) > -1) ||
+              (selectedOption === selectedOptionEnum.Alle && task.responsible.lastName.toLowerCase().indexOf(search) > -1)
+            );
+          }),
+        };
+      });
+      setFilteredData(res);
+    } else {
+      setFilteredData([]);
+    }
+  }, [search]);
 
   return (
-    <main className={classes.root}>
-      <Stack direction='row' spacing={2}>
-        {!isSmallScreen && <Toggle onToggle={() => null} options={['Ansatte', 'Oppgaver']} />}
-        <Toggle onToggle={toogleOption} options={['Mine', 'Alle']} />
-      </Stack>
+    <>
+      <Head>
+        <title>Mine oppgaver</title>
+      </Head>
+      <Stack className={classes.root} spacing={2}>
+        <Stack direction={'row'} spacing={1}>
+          <Toggle defaultChecked={0} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />
+          <Toggle onToggle={toogleOption} options={['Mine', 'Alle']} />
+        </Stack>
+        <SearchField onChange={(e) => setSearch(e.target.value.toLowerCase())} placeholder='Søk etter tittel, ansatt...' />
+        {!allTasks.length && selectedOption === selectedOptionEnum.Alle && <LoadingLogo />}
 
-      {!allEmployees.length && selectedOption === selectedOptionEnum.Alle && <LoadingLogo />}
-      <Stack direction='column' spacing={1}>
-        <Grid container rowSpacing={4}>
-          {(selectedOption === selectedOptionEnum.Mine ? processTemplates : allEmployees).map((processTemplate) => {
-            return (
-              <Grid item key={processTemplate.title} sm={gridLayout[processTemplate.title]} xs={12}>
-                <Typography variant='h3'>{capitalize(processTemplate.title)}</Typography>
-                {!processTemplate.employees.length ? (
-                  <Typography>Ingen ansatte i denne prosessen </Typography>
-                ) : (
-                  <Grid alignItems='center' container justifyContent='center' spacing={2}>
-                    {processTemplate.employees.map((employee) => (
-                      <Grid item key={employee.id} lg={4} sm={6} xs={12}>
-                        <EmployeeCard
-                          firstName={employee.firstName}
-                          id={employee.id}
-                          imageUrl={employee.imageUrl}
-                          lastName={employee.lastName}
-                          role={employee.profession.title}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                )}
-              </Grid>
-            );
-          })}
-        </Grid>
+        <Stack spacing={1} sx={{ width: '100%' }}>
+          {}
+          {(filteredData.length > 0 ? filteredData : selectedOption === selectedOptionEnum.Mine ? processTemplates : allTasks).map((processTemplate) => (
+            <Process
+              displayResponsible={selectedOption === selectedOptionEnum.Alle}
+              key={processTemplate.title}
+              tasks={processTemplate.tasks}
+              title={processTemplate.title}
+            />
+          ))}
+        </Stack>
       </Stack>
-    </main>
+    </>
   );
 };
-export default Employees;
+
+export default Tasks;

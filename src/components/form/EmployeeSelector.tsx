@@ -22,6 +22,7 @@ export const EmployeeSelector = ({ employees, control, name, label, required = f
     />
   );
 };
+
 export type EmployeeSelectorComponentProps = {
   employees: IEmployee[];
   setValue: (IEmployee) => void;

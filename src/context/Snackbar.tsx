@@ -56,7 +56,7 @@ const SnackbarProvider = ({ children }: { children: ReactNode }) => {
     <SnackbarContext.Provider value={value}>
       {children}
       <Snackbar autoHideDuration={length || 3000} className={classes.snackbar} onClose={() => setSnackbarOpen(false)} open={snackbarOpen}>
-        <Alert elevation={6} onClose={() => setSnackbarOpen(false)} severity={severity} variant='filled'>
+        <Alert elevation={6} onClose={() => setSnackbarOpen(false)} severity={severity} sx={{ color: 'black' }} variant='filled'>
           {snackTitle}
         </Alert>
       </Snackbar>
