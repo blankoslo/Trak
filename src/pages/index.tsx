@@ -30,11 +30,20 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
-  const initialProcessTemplates = [
-    { title: 'Offboarding', tasks: [] },
-    { title: 'Onboarding', tasks: [] },
-    { title: 'Løpende', tasks: [] },
-  ];
+
+  const processes = await trakClient.processTemplate.findMany({
+    select: {
+      slug: true,
+      title: true,
+    },
+  });
+
+  const initialProcessTemplates = processes.map((processTemplate) => {
+    return {
+      ...processTemplate,
+      tasks: [],
+    };
+  });
   const query = await trakClient.employeeTask.findMany({
     where: {
       responsible: {
@@ -139,7 +148,9 @@ const Tasks = ({ processTemplates }: InferGetServerSidePropsType<typeof getServe
             return (
               task.task.title.toLowerCase().indexOf(search) > -1 ||
               task.employee.firstName.toLowerCase().indexOf(search) > -1 ||
-              task.employee.lastName.toLowerCase().indexOf(search) > -1
+              task.employee.lastName.toLowerCase().indexOf(search) > -1 ||
+              (selectedOption === selectedOptionEnum.Alle && task.responsible.firstName.toLowerCase().indexOf(search) > -1) ||
+              (selectedOption === selectedOptionEnum.Alle && task.responsible.lastName.toLowerCase().indexOf(search) > -1)
             );
           }),
         };
@@ -166,7 +177,12 @@ const Tasks = ({ processTemplates }: InferGetServerSidePropsType<typeof getServe
         <Stack spacing={1} sx={{ width: '100%' }}>
           {}
           {(filteredData.length > 0 ? filteredData : selectedOption === selectedOptionEnum.Mine ? processTemplates : allTasks).map((processTemplate) => (
-            <Process key={processTemplate.title} tasks={processTemplate.tasks} title={processTemplate.title} />
+            <Process
+              displayResponsible={selectedOption === selectedOptionEnum.Alle}
+              key={processTemplate.title}
+              tasks={processTemplate.tasks}
+              title={processTemplate.title}
+            />
           ))}
         </Stack>
       </Stack>

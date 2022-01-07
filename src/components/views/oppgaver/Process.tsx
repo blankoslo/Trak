@@ -14,9 +14,10 @@ const useStyles = makeStyles(() => ({
 type ProcessProps = {
   title: string;
   tasks: IEmployeeTask[];
+  displayResponsible: boolean;
 };
 
-const Process = ({ title, tasks }: ProcessProps) => {
+const Process = ({ title, tasks, displayResponsible }: ProcessProps) => {
   const classes = useStyles();
   const [showProcess, setShowProcess] = useState(true);
 
@@ -36,12 +37,13 @@ const Process = ({ title, tasks }: ProcessProps) => {
                 <TableRow>
                   <TableCell sx={{ padding: 0 }}>Oppgavetittel</TableCell>
                   <TableCell sx={{ padding: 0 }}>Gjelder</TableCell>
+                  {displayResponsible && <TableCell sx={{ display: { md: 'table-cell', xs: 'none' }, padding: 0 }}>Ansvarlig</TableCell>}
                   <TableCell sx={{ display: { md: 'table-cell', xs: 'none' }, padding: 0 }}>Forfaller</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {tasks.map((task) => (
-                  <TaskRow data={task} key={task.id} />
+                  <TaskRow data={task} displayResponsible={displayResponsible} key={task.id} />
                 ))}
               </TableBody>
             </Table>

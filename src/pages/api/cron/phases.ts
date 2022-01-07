@@ -1,4 +1,4 @@
-import { addDays, getDate, getMonth, getYear, isSameDay, setYear, subDays } from 'date-fns';
+import { addDays, compareAsc, getDate, getMonth, getYear, isSameDay, setYear, subDays } from 'date-fns';
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import { groupBy } from 'lodash';
@@ -176,7 +176,9 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
     (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.dueDate) === getYear(today),
   );
 
-  if (!hasTasksInNextPhase) {
+  const hasStarted = compareAsc(employee.dateOfEmployment, new Date()) <= 0;
+
+  if (!hasTasksInNextPhase && hasStarted) {
     nextPhase.dueDate = setYear(nextPhase.dueDate, getYear(today));
     createEmployeeTasks(employee, nextPhase);
   }

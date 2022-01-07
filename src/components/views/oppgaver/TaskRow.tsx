@@ -14,9 +14,8 @@ import classNames from 'classnames';
 import Avatar from 'components/Avatar';
 import InfoModal from 'components/InfoModal';
 import useSnackbar from 'context/Snackbar';
-import { format, isBefore } from 'date-fns';
-import { differenceInDays } from 'date-fns/esm';
-import { useRouter } from 'next/router';
+import { format } from 'date-fns';
+import { differenceInCalendarDays } from 'date-fns/esm';
 import { useState } from 'react';
 import { IEmployeeTask } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
@@ -57,15 +56,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
 }));
-const TaskRow = ({ data }: { data: IEmployeeTask }) => {
+const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayResponsible: boolean }) => {
   const classes = useStyles();
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [completed, setCompleted] = useState<boolean>(data.completed);
   const showSnackbar = useSnackbar();
-  const router = useRouter();
-  const daysBeforeDueDate = differenceInDays(new Date(data.dueDate), new Date());
+  const daysBeforeDueDate = differenceInCalendarDays(new Date(data.dueDate), new Date());
 
-  const hasExpired = isBefore(new Date(data.dueDate), new Date());
+  const hasExpired = daysBeforeDueDate < 0;
+
   return (
     <TableRow sx={{ border: 0, padding: '0' }}>
       <TableCell sx={{ border: 0, padding: 0, minWidth: '180px' }}>
@@ -96,7 +95,7 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
       </TableCell>
       {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={data.id} modalIsOpen={modalIsOpen} />}
       <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' } }}>
-        <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple onClick={() => router.push(`/ansatt/${data.employee.id}`)}>
+        <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple href={`/ansatt/${data.employee.id}`}>
           <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
           <Typography
             noWrap
@@ -104,10 +103,22 @@ const TaskRow = ({ data }: { data: IEmployeeTask }) => {
           >{`${data.employee.firstName} ${data.employee.lastName[0]}.`}</Typography>
         </ButtonBase>
       </TableCell>
+      {displayResponsible && (
+        <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' } }}>
+          <div className={classes.avatarRoot}>
+            <Avatar className={classes.avatar} firstName={data.responsible.firstName} image={data.responsible.imageUrl} lastName={data.responsible.lastName} />
+            <Typography
+              noWrap
+              sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}
+            >{`${data.responsible.firstName} ${data.responsible.lastName[0]}.`}</Typography>
+          </div>
+        </TableCell>
+      )}
       <TableCell sx={{ display: { md: 'table-cell', xs: 'none' }, border: 0, padding: 0 }}>
         <Box className={classes.avatarRoot} sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}>
           {daysBeforeDueDate === 0 && 'I dag'}
-          {daysBeforeDueDate > 0 && daysBeforeDueDate <= 7 && `Om ${daysBeforeDueDate} dager`}
+          {daysBeforeDueDate === 1 && 'I morgen'}
+          {daysBeforeDueDate > 1 && daysBeforeDueDate <= 7 && `Om ${daysBeforeDueDate} dager`}
           {(daysBeforeDueDate > 7 || daysBeforeDueDate < 0) && format(new Date(data.dueDate), 'dd.MMM.yy')}
         </Box>
       </TableCell>

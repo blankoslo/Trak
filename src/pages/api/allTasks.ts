@@ -6,11 +6,19 @@ import safeJsonStringify from 'safe-json-stringify';
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const initialProcessTemplates = [
-      { title: 'Offboarding', tasks: [] },
-      { title: 'Onboarding', tasks: [] },
-      { title: 'Løpende', tasks: [] },
-    ];
+    const processes = await trakClient.processTemplate.findMany({
+      select: {
+        slug: true,
+        title: true,
+      },
+    });
+
+    const initialProcessTemplates = processes.map((processTemplate) => {
+      return {
+        ...processTemplate,
+        tasks: [],
+      };
+    });
     const query = await trakClient.employeeTask.findMany({
       where: {
         completed: {

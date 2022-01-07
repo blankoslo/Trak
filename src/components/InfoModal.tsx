@@ -1,7 +1,14 @@
 import Edit from '@mui/icons-material/Edit';
-import { Box, Button, Chip, IconButton, Skeleton, Theme, Typography } from '@mui/material';
+import { Theme } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import Skeleton from '@mui/material/Skeleton';
+import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
+import ChipSkeleton from 'components/ChipSkeleton';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';
 import { DataProvider, useData } from 'context/Data';
@@ -38,11 +45,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
-  const [responsibleSelector, setResponsibleSelector] = useState<boolean>(false);
+  const [hasSelectedNewResponsible, setHasSelectedNewResponsible] = useState<boolean>(false);
   const { employees } = useData();
   const classes = useStyles();
   const showSnackbar = useSnackbar();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const { control, reset, handleSubmit } = useForm({
     reValidateMode: 'onChange',
@@ -65,6 +73,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
   const onSubmit = handleSubmit(async (formData) => {
     if (formData.responsible?.id !== employeeTask.responsible.id) {
       try {
+        setLoading(true);
         await axios.put(`/api/employeeTasks/${employeeTask.id}`, {
           completed: employeeTask.completed,
           dueDate: employeeTask.dueDate,
@@ -81,11 +90,16 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
           });
         }
 
-        setResponsibleSelector(false);
+        setLoading(false);
+        setHasSelectedNewResponsible(false);
         employeeTask.responsible = formData.responsible;
-        router.replace(router.asPath).finally(() => {
-          showSnackbar('Ansvarlig byttet', 'success');
-        });
+        router
+          .push({
+            pathname: router.asPath,
+          })
+          .finally(() => {
+            showSnackbar('Ansvarlig byttet', 'success');
+          });
       } catch (error) {
         showSnackbar(error.response?.data?.message || 'Noe gikk galt', 'error');
       }
@@ -94,21 +108,21 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
 
   return (
     <Typography variant='body1'>
-      {employeeTask ? (
-        responsibleSelector ? (
+      {employeeTask && !loading ? (
+        hasSelectedNewResponsible ? (
           <form className={classes.centeringRow} noValidate>
             <EmployeeSelector control={control} employees={employees} label='Oppgaveansvarlig' name='responsible' required />
             <Button aria-label='Lagre' onClick={onSubmit} type='submit'>
               Lagre
             </Button>
-            <Button aria-label='Avbryt' onClick={() => setResponsibleSelector(false)} type='button'>
+            <Button aria-label='Avbryt' onClick={() => setHasSelectedNewResponsible(false)} type='button'>
               Avbryt
             </Button>
           </form>
         ) : (
           <>
             {`${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}`}
-            <IconButton aria-label='Deleger oppgave' onClick={() => setResponsibleSelector(true)} role='button' size='small'>
+            <IconButton aria-label='Deleger oppgave' onClick={() => setHasSelectedNewResponsible(true)} role='button' size='small'>
               <Edit />
             </IconButton>
           </>
@@ -195,15 +209,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
               })}
             </>
           ) : (
-            <div className={classes.centeringRow}>
-              {Array(5)
-                .fill(0)
-                .map((_, i) => (
-                  <Skeleton key={i}>
-                    <Chip />
-                  </Skeleton>
-                ))}
-            </div>
+            <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
         <Typography>
