@@ -51,6 +51,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         task: {
           select: {
             title: true,
+            link: true,
             phase: {
               select: {
                 processTemplateId: true,

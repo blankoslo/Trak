@@ -80,6 +80,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       task: {
         select: {
           title: true,
+          link: true,
           phase: {
             select: {
               processTemplateId: true,
