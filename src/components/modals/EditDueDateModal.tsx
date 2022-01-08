@@ -26,10 +26,10 @@ const EditDueDateModal = ({ employeeTask, isModalOpen, closeModal }: EditDueDate
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const buttonGroup = [
-    <Button key='cancel' onClick={closeModal} sx={{ textTransform: 'capitalize' }} type='button'>
+    <Button key='cancel' onClick={closeModal} type='button'>
       Avbryt
     </Button>,
-    <Button key='update' sx={{ textTransform: 'capitalize' }} type='submit'>
+    <Button key='update' type='submit'>
       Oppdater
     </Button>,
   ];

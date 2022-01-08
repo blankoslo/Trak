@@ -1,20 +1,26 @@
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import Launch from '@mui/icons-material/Launch';
+import Mail from '@mui/icons-material/Mail';
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import Avatar from '@mui/material/Avatar';
+import MuiAvatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
+import IconButton from '@mui/material/IconButton';
+import LinearProgress from '@mui/material/LinearProgress';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import Avatar from 'components/Avatar';
+import DateFormater from 'components/DateFormater';
 import EditDueDateModal from 'components/modals/EditDueDateModal';
 import EditResponsibleModal from 'components/modals/EditResponsibleModal';
+import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
 import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -23,6 +29,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
+import validator from 'validator';
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id } = query;
@@ -35,6 +42,16 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     include: {
       profession: true,
       employeeTask: {
+        orderBy: [
+          {
+            dueDate: 'asc',
+          },
+          {
+            responsible: {
+              id: 'asc',
+            },
+          },
+        ],
         where: {
           OR: [
             {
@@ -62,6 +79,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
               id: true,
               firstName: true,
               lastName: true,
+              imageUrl: true,
             },
           },
           task: {
@@ -118,7 +136,7 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
             paddingBottom: '30px',
           }}
         >
-          <Avatar alt={`${employee.firstName} ${employee.lastName}`} src={employee.imageUrl} sx={{ width: 132, height: 132 }} />
+          <MuiAvatar alt={`${employee.firstName} ${employee.lastName}`} src={employee.imageUrl} sx={{ width: 132, height: 132 }} />
           <Box
             sx={{
               display: 'flex',
@@ -148,6 +166,7 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
               <ToggleButton
                 key={processTemplate.slug}
                 sx={{
+                  backgroundColor: 'background.paper',
                   '&$selected': {
                     color: 'text.secondary',
                     backgroundColor: 'primary.main',
@@ -179,6 +198,7 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
 
 export const Task = ({ employeeTask }) => {
   const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
+  const [loading, isLoading] = useState<boolean>(false);
   const showSnackbar = useSnackbar();
   const router = useRouter();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
@@ -186,53 +206,41 @@ export const Task = ({ employeeTask }) => {
   const accordianBackgroundColor = 'rgba(255, 255, 255, 0.2)';
 
   const checkboxClicked = async (e) => {
+    isLoading(true);
     e.stopPropagation();
     await toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
-
+    isLoading(false);
     router.push({
       pathname: router.asPath,
     });
   };
 
+  const isExpired = new Date(employeeTask.dueDate) < new Date();
+
   return (
-    <Accordion TransitionProps={{ unmountOnExit: true }} disableGutters sx={{ marginBottom: '16px', borderRadius: '4px' }}>
-      <AccordionSummary aria-controls='TASK1_RENAME_ME_PLEASE' expandIcon={<ExpandMore />} id='TASK1_RENAME_ME_PLEASE'>
-        {isSmallScreen ? (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              width: '100%',
-            }}
-          >
-            <Checkbox
-              checked={completed}
-              onClick={checkboxClicked}
-              sx={{
-                color: 'primary.main',
-              }}
-            />
-            <Box>
-              <Typography>{employeeTask.task.title}</Typography>
-              <Typography>{prismaDateToFormatedDate(employeeTask.dueDate)}</Typography>
-            </Box>
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
-            }}
-          >
+    <>
+      {loading && <LinearProgress />}
+      <Accordion
+        TransitionProps={{ unmountOnExit: true }}
+        disableGutters
+        sx={{ marginBottom: '16px', borderRadius: '4px', backgroundColor: isExpired ? 'error.dark' : 'background.paper' }}
+      >
+        <AccordionSummary
+          aria-controls='TASK1_RENAME_ME_PLEASE'
+          expandIcon={
+            <IconButton>
+              <ExpandMore sx={{ color: 'primary.main' }} />
+            </IconButton>
+          }
+          id='TASK1_RENAME_ME_PLEASE'
+        >
+          {isSmallScreen ? (
             <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
+                width: '100%',
               }}
             >
               <Checkbox
@@ -242,46 +250,107 @@ export const Task = ({ employeeTask }) => {
                   color: 'primary.main',
                 }}
               />
-              <Typography>{employeeTask.task.title}</Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}
+              >
+                <Box>
+                  <Typography>{employeeTask.task.title}</Typography>
+                  <DateFormater date={employeeTask.dueDate} />
+                  <Typography>{`${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
+                </Box>
+                {employeeTask?.task?.link && (
+                  <a href={`${validator.isEmail(employeeTask.task.link) ? 'mailto:' : ''}${employeeTask.task.link}`} rel='noopener noreferrer' target='_blank'>
+                    <IconButton disableFocusRipple onClick={(e) => e.stopPropagation()} size='small'>
+                      {validator.isEmail(employeeTask.task.link) ? <Mail color='primary' /> : <Launch color='primary' />}
+                    </IconButton>
+                  </a>
+                )}
+              </Box>
             </Box>
-            <Typography>{prismaDateToFormatedDate(employeeTask.dueDate)}</Typography>
-          </Box>
-        )}
-      </AccordionSummary>
-      <AccordionDetails
-        sx={{
-          backgroundColor: accordianBackgroundColor,
-        }}
-      >
-        {employeeTask.completedById && (
-          <>
-            <Typography variant='body2'>{`Fullført den ${prismaDateToFormatedDate(employeeTask.completedDate)}`}</Typography>
-            <Typography gutterBottom variant='body2'>{`av ${employeeTask.completedBy.firstName} ${employeeTask.completedBy.lastName}`}</Typography>
-          </>
-        )}
-        <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
-        {employeeTask.task.link && (
-          <Typography variant='body2'>
-            {`Ekstern link: `}
-            <Link href={employeeTask.task.link} rel='noopener' target='_blank' underline='hover'>
-              her
-            </Link>
-          </Typography>
-        )}
-        <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
-        <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
-        <Typography variant='body2'>{employeeTask.task.description}</Typography>
-      </AccordionDetails>
-      <AccordionActions
-        sx={{
-          justifyContent: 'start',
-          bgcolor: accordianBackgroundColor,
-        }}
-      >
-        <EditResponsibleButton employeeTask={employeeTask} />
-        <EditDueDateButton employeeTask={employeeTask} />
-      </AccordionActions>
-    </Accordion>
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <Checkbox
+                  checked={completed}
+                  onClick={checkboxClicked}
+                  sx={{
+                    color: 'primary.main',
+                  }}
+                />
+                <Typography>{employeeTask.task.title}</Typography>
+                {employeeTask?.task?.link && (
+                  <a href={`${validator.isEmail(employeeTask.task.link) ? 'mailto:' : ''}${employeeTask.task.link}`} rel='noopener noreferrer' target='_blank'>
+                    <IconButton disableFocusRipple onClick={(e) => e.stopPropagation()} size='small'>
+                      {validator.isEmail(employeeTask.task.link) ? <Mail color='primary' /> : <Launch color='primary' />}
+                    </IconButton>
+                  </a>
+                )}
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: '12px',
+                }}
+              >
+                <DateFormater date={employeeTask.dueDate} />
+                <Avatar
+                  firstName={employeeTask.responsible.firstName}
+                  image={employeeTask.responsible.imageUrl}
+                  lastName={employeeTask.responsible.lastName}
+                ></Avatar>
+              </Box>
+            </Box>
+          )}
+        </AccordionSummary>
+        <AccordionDetails
+          sx={{
+            backgroundColor: accordianBackgroundColor,
+          }}
+        >
+          {employeeTask.completedById && (
+            <>
+              <Typography variant='body2'>{`Fullført den ${prismaDateToFormatedDate(employeeTask.completedDate)}`}</Typography>
+              <Typography gutterBottom variant='body2'>{`av ${employeeTask.completedBy.firstName} ${employeeTask.completedBy.lastName}`}</Typography>
+            </>
+          )}
+          <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
+          <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
+          <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
+          <TextMarkDownWithLink text={employeeTask?.task.description} variant={'body2'} />
+        </AccordionDetails>
+        <AccordionActions
+          sx={{
+            justifyContent: 'start',
+            bgcolor: accordianBackgroundColor,
+          }}
+        >
+          <EditResponsibleButton employeeTask={employeeTask} />
+          <EditDueDateButton employeeTask={employeeTask} />
+        </AccordionActions>
+      </Accordion>
+    </>
   );
 };
 
@@ -292,8 +361,8 @@ const EditResponsibleButton = ({ employeeTask }) => {
     <>
       <Button
         aria-label='Åpne endre oppgaveansvarlig modal'
+        disabled={employeeTask.completed}
         onClick={() => setIsModalOpen(true)}
-        sx={{ textTransform: 'capitalize' }}
         type='button'
         variant='contained'
       >
@@ -310,8 +379,8 @@ const EditDueDateButton = ({ employeeTask }) => {
     <>
       <Button
         aria-label='Åpne endre forfallsdato modal'
+        disabled={employeeTask.completed}
         onClick={() => setIsModalOpen(true)}
-        sx={{ textTransform: 'capitalize' }}
         type='button'
         variant='contained'
       >

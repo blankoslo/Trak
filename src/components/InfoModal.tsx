@@ -11,13 +11,12 @@ import axios from 'axios';
 import ChipSkeleton from 'components/ChipSkeleton';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';
+import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Linkify from 'react-linkify';
-import ReactMarkdown from 'react-markdown';
 import { IEmployeeTask } from 'utils/types';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -208,21 +207,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
-        <Typography>
-          {employeeTask ? (
-            <Linkify
-              componentDecorator={(decoratedHref, decoratedText, key) => (
-                <a href={decoratedHref} key={key} target='blank'>
-                  {decoratedText}
-                </a>
-              )}
-            >
-              <ReactMarkdown>{employeeTask?.task.description}</ReactMarkdown>
-            </Linkify>
-          ) : (
-            <Skeleton className={classes.skeletonHeight} />
-          )}
-        </Typography>
+        <TextMarkDownWithLink text={employeeTask?.task.description} />
       </>
     </Modal>
   );
