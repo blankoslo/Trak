@@ -101,3 +101,8 @@ export const slackMessager = async (email: string, text: string) => {
     console.log(err);
   }
 };
+
+export const isToday = (someDate) => {
+  const today = new Date();
+  return someDate.getDate() === today.getDate() && someDate.getMonth() === today.getMonth() && someDate.getFullYear() === today.getFullYear();
+};

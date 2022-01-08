@@ -13,6 +13,7 @@ import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';
 import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
+import { useUser } from 'context/User';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -48,6 +49,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
   const showSnackbar = useSnackbar();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { user } = useUser();
 
   const { control, reset, handleSubmit } = useForm({
     reValidateMode: 'onChange',
@@ -79,7 +81,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
         const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.notificationSettings?.includes('DELEGATE');
         if (employeeWantsDelegateNotifications) {
           await axios.post('/api/notification', {
-            description: `Du har blitt delegert arbeidsoppgaven "${employeeTask.task.title}" av ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`,
+            description: `Du har blitt delegert arbeidsoppgaven "${employeeTask.task.title}" av ${user.firstName} ${user.lastName} `,
             employeeId: formData.responsible?.id,
             ...(formData.responsible.employeeSettings?.slack && {
               email: formData.responsible.email,
