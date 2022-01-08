@@ -11,7 +11,6 @@ import axios from 'axios';
 import ChipSkeleton from 'components/ChipSkeleton';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';
-import { DataProvider, useData } from 'context/Data';
 import useSnackbar from 'context/Snackbar';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
@@ -46,7 +45,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
   const [hasSelectedNewResponsible, setHasSelectedNewResponsible] = useState<boolean>(false);
-  const { employees } = useData();
   const classes = useStyles();
   const showSnackbar = useSnackbar();
   const router = useRouter();
@@ -111,7 +109,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
       {employeeTask && !loading ? (
         hasSelectedNewResponsible ? (
           <form className={classes.centeringRow} noValidate>
-            <EmployeeSelector control={control} employees={employees} label='Oppgaveansvarlig' name='responsible' required />
+            <EmployeeSelector control={control} label='Oppgaveansvarlig' name='responsible' required />
             <Button aria-label='Lagre' onClick={onSubmit} type='submit'>
               Lagre
             </Button>
@@ -171,9 +169,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           <Typography variant='body1'>
             <b>Ansvarlig:</b>
           </Typography>
-          <DataProvider>
-            <ResponsibleSelector employeeTask={employeeTask} />
-          </DataProvider>
+          <ResponsibleSelector employeeTask={employeeTask} />
           <Typography variant='body1'>
             <b>Gjelder:</b>
           </Typography>

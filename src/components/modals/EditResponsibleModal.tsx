@@ -1,0 +1,77 @@
+import Button from '@mui/material/Button';
+import axios from 'axios';
+import EmployeeSelector from 'components/form/EmployeeSelector';
+import Modal from 'components/Modal';
+import useSnackbar from 'context/Snackbar';
+import { useRouter } from 'next/router';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { IEmployeeTask } from 'utils/types';
+
+export type EditResponsibleModalProps = {
+  isModalOpen: boolean;
+  employeeTask: IEmployeeTask;
+  closeModal: () => void;
+};
+
+const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditResponsibleModalProps) => {
+  const showSnackbar = useSnackbar();
+  const router = useRouter();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const { control, handleSubmit } = useForm({
+    reValidateMode: 'onChange',
+    defaultValues: useMemo(
+      () => ({
+        responsible: employeeTask?.responsible,
+      }),
+      [employeeTask, employeeTask?.responsible],
+    ),
+  });
+
+  const buttonGroup = [
+    <Button key='cancel' onClick={closeModal} sx={{ textTransform: 'capitalize' }} type='button'>
+      Avbryt
+    </Button>,
+    <Button key='update' sx={{ textTransform: 'capitalize' }} type='submit'>
+      Oppdater
+    </Button>,
+  ];
+
+  const onSubmit = handleSubmit(async (formData) => {
+    if (formData.responsible?.id !== employeeTask.responsible.id) {
+      try {
+        setIsSaving(true);
+        await axios.put(`/api/employeeTasks/${employeeTask.id}`, {
+          completed: employeeTask.completed,
+          dueDate: employeeTask.dueDate,
+          responsibleId: formData.responsible?.id,
+        });
+
+        router
+          .push({
+            pathname: router.asPath,
+          })
+          .finally(() => {
+            closeModal();
+            showSnackbar('Ansvarlig byttet', 'success');
+          });
+      } catch (error) {
+        showSnackbar(error.response?.data?.message || 'Noe gikk galt', 'error');
+      } finally {
+        setIsSaving(false);
+      }
+    } else {
+      showSnackbar('Kan ikke bytte til samme ansvarlig', 'error');
+    }
+  });
+
+  return (
+    <>
+      <Modal buttonGroup={buttonGroup} header={'Endre oppgaveansvarlig'} loading={isSaving} onClose={closeModal} onSubmit={onSubmit} open={isModalOpen}>
+        <EmployeeSelector control={control} label='Oppgaveansvarlig' name='responsible' required />
+      </Modal>
+    </>
+  );
+};
+
+export default EditResponsibleModal;

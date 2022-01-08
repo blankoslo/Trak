@@ -48,13 +48,13 @@ export const axiosBuilder = (
     });
 };
 
-export const toggleCheckBox = (
+export const toggleCheckBox = async (
   employeeTask: IEmployeeTask,
   completed: boolean,
   setCompleted: Dispatch<SetStateAction<boolean>>,
   showSnackbar: (arg0: string, arg1: string) => void,
 ) => {
-  axios
+  await axios
     .put(`/api/employeeTasks/${employeeTask.id}`, {
       completed: !completed,
       dueDate: employeeTask.dueDate,

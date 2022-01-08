@@ -13,10 +13,13 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import EditDueDateModal from 'components/modals/EditDueDateModal';
+import EditResponsibleModal from 'components/modals/EditResponsibleModal';
 import useSnackbar from 'context/Snackbar';
 import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
@@ -47,6 +50,13 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           ],
         },
         include: {
+          completedBy: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
           responsible: {
             select: {
               id: true,
@@ -170,12 +180,20 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
 export const Task = ({ employeeTask }) => {
   const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
   const showSnackbar = useSnackbar();
+  const router = useRouter();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
-  const checkboxClicked = (e) => {
+  const accordianBackgroundColor = 'rgba(255, 255, 255, 0.2)';
+
+  const checkboxClicked = async (e) => {
     e.stopPropagation();
-    toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
+    await toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
+
+    router.push({
+      pathname: router.asPath,
+    });
   };
+
   return (
     <Accordion TransitionProps={{ unmountOnExit: true }} disableGutters sx={{ marginBottom: '16px', borderRadius: '4px' }}>
       <AccordionSummary aria-controls='TASK1_RENAME_ME_PLEASE' expandIcon={<ExpandMore />} id='TASK1_RENAME_ME_PLEASE'>
@@ -232,9 +250,15 @@ export const Task = ({ employeeTask }) => {
       </AccordionSummary>
       <AccordionDetails
         sx={{
-          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          backgroundColor: accordianBackgroundColor,
         }}
       >
+        {employeeTask.completedById && (
+          <>
+            <Typography variant='body2'>{`Fullført den ${prismaDateToFormatedDate(employeeTask.completedDate)}`}</Typography>
+            <Typography gutterBottom variant='body2'>{`av ${employeeTask.completedBy.firstName} ${employeeTask.completedBy.lastName}`}</Typography>
+          </>
+        )}
         <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
         {employeeTask.task.link && (
           <Typography variant='body2'>
@@ -251,16 +275,50 @@ export const Task = ({ employeeTask }) => {
       <AccordionActions
         sx={{
           justifyContent: 'start',
+          bgcolor: accordianBackgroundColor,
         }}
       >
-        <Button sx={{ 'text-transform': 'capitalize' }} variant='contained'>
-          Endre oppgaveansvarlig
-        </Button>
-        <Button sx={{ 'text-transform': 'capitalize' }} variant='contained'>
-          Endre forfallsdato
-        </Button>
+        <EditResponsibleButton employeeTask={employeeTask} />
+        <EditDueDateButton employeeTask={employeeTask} />
       </AccordionActions>
     </Accordion>
+  );
+};
+
+const EditResponsibleButton = ({ employeeTask }) => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const closeModal = () => setIsModalOpen(false);
+  return (
+    <>
+      <Button
+        aria-label='Åpne endre oppgaveansvarlig modal'
+        onClick={() => setIsModalOpen(true)}
+        sx={{ textTransform: 'capitalize' }}
+        type='button'
+        variant='contained'
+      >
+        Endre oppgaveansvarlig
+      </Button>
+      <EditResponsibleModal closeModal={closeModal} employeeTask={employeeTask} isModalOpen={isModalOpen} />
+    </>
+  );
+};
+const EditDueDateButton = ({ employeeTask }) => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const closeModal = () => setIsModalOpen(false);
+  return (
+    <>
+      <Button
+        aria-label='Åpne endre forfallsdato modal'
+        onClick={() => setIsModalOpen(true)}
+        sx={{ textTransform: 'capitalize' }}
+        type='button'
+        variant='contained'
+      >
+        Endre forfallsdato
+      </Button>
+      <EditDueDateModal closeModal={closeModal} employeeTask={employeeTask} isModalOpen={isModalOpen} />
+    </>
   );
 };
 

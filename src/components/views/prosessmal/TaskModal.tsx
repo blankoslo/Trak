@@ -18,7 +18,9 @@ import Modal from 'components/Modal';
 import { useData } from 'context/Data';
 import useProgressbar from 'context/Progressbar';
 import useSnackbar from 'context/Snackbar';
-import { format, formatISO, getDaysInMonth } from 'date-fns';
+import format from 'date-fns/format';
+import formatISO from 'date-fns/formatISO';
+import getDaysInMonth from 'date-fns/getDaysInMonth';
 import { capitalize } from 'lodash';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -75,7 +77,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     return false;
   };
 
-  const { professions, tags, employees } = useData();
+  const { professions, tags } = useData();
   const [task, setTask] = useState<TaskData | undefined>(undefined);
   const {
     register,
@@ -273,7 +275,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         />
         <ToggleButtonGroup control={control} name={'professions'} professions={professions} />
         <TagSelector control={control} label='Tags' name='tags' options={tags} />
-        <EmployeeSelector control={control} employees={employees} label='Oppgaveansvarlig' name='responsible' />
+        <EmployeeSelector control={control} label='Oppgaveansvarlig' name='responsible' />
         {phase.processTemplateId === 'lopende' && (
           <Box>
             <Typography variant='body1'>
