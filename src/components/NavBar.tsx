@@ -1,19 +1,32 @@
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import HomeIcon from '@mui/icons-material/Home';
+import LogoutIcon from '@mui/icons-material/Logout';
+import NightlightIcon from '@mui/icons-material/Nightlight';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import SettingsIcon from '@mui/icons-material/Settings';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
+import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import { Theme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { makeStyles } from '@mui/styles';
+import { useColorMode } from 'context/ColorMode';
 import { useUser } from 'context/User';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { signOut } from 'next-auth/react';
+import { useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -37,17 +50,63 @@ const NavBar = () => {
   const classes = useStyles();
   const { user } = useUser();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const { mode, toggleColorMode } = useColorMode();
+
+  const handleColorMode = () => {
+    toggleColorMode();
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const router = useRouter();
   return (
     <Box>
       <AppBar color='transparent' position='static'>
         <Toolbar className={classes.root}>
           <Stack className={classes.centerVertically} direction='row' spacing={1}>
-            <Avatar alt={`${user?.firstName} ${user?.lastName}`} src={user?.imageUrl} />
+            <Button
+              aria-controls={open ? 'basic-menu' : undefined}
+              aria-expanded={open ? 'true' : undefined}
+              aria-haspopup='true'
+              color='inherit'
+              onClick={handleClick}
+            >
+              <Avatar alt={`${user?.firstName} ${user?.lastName}`} src={user?.imageUrl} sx={{ marginRight: 1 }} />
 
-            <Typography style={{ textDecoration: 'underline' }} variant='body2'>
-              {user?.firstName} {user?.lastName}
-            </Typography>
+              <Typography variant='body2'>
+                {user?.firstName} {user?.lastName}
+              </Typography>
+              <ArrowDropDownIcon />
+            </Button>
+            <Menu
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+              anchorEl={anchorEl}
+              id='basic-menu'
+              onClose={handleClose}
+              open={open}
+            >
+              <MenuItem onClick={handleColorMode}>
+                <ListItemIcon>{mode === 'dark' ? <WbSunnyIcon color='primary' /> : <NightlightIcon color='primary' />}</ListItemIcon>
+                <ListItemText>{mode === 'dark' ? 'Light mode' : 'Dark mode'}</ListItemText>
+              </MenuItem>
+              <MenuItem onClick={() => signOut()}>
+                <ListItemIcon>
+                  <LogoutIcon color='primary' />
+                </ListItemIcon>
+                <ListItemText>Logg ut</ListItemText>
+              </MenuItem>
+            </Menu>
+            <Badge badgeContent={4} color='primary'>
+              <NotificationsNoneIcon />
+            </Badge>
           </Stack>
           <Stack direction='row' spacing={1}>
             {!isSmallScreen && (
