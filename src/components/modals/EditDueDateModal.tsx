@@ -49,6 +49,7 @@ const EditDueDateModal = ({ employeeTask, isModalOpen, closeModal }: EditDueDate
         })
         .finally(() => {
           closeModal();
+          setIsSaving(false);
           showSnackbar('Forfallsdato endret', 'success');
         });
     } catch (error) {

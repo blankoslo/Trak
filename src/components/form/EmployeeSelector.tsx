@@ -1,4 +1,5 @@
 import Autocomplete from '@mui/material/Autocomplete';
+import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import { useSession } from 'next-auth/react';
 import { Controller } from 'react-hook-form';
@@ -61,7 +62,25 @@ export const EmployeeSelectorComponent = ({
       onChange={(_, employee) => setValue(employee)}
       options={employees}
       popupIcon={<></>}
-      renderInput={(params) => <TextField {...params} InputLabelProps={{ shrink: true }} fullWidth label={label} required={required} variant='standard' />}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          InputLabelProps={{ shrink: true }}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {!employees.length && <CircularProgress size={20} />}
+                {params.InputProps.endAdornment}
+              </>
+            ),
+          }}
+          fullWidth
+          label={label}
+          required={required}
+          variant='standard'
+        />
+      )}
       value={value}
     />
   );

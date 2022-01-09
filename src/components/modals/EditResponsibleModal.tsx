@@ -53,6 +53,7 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
           })
           .finally(() => {
             closeModal();
+            setIsSaving(false);
             showSnackbar('Ansvarlig byttet', 'success');
           });
       } catch (error) {

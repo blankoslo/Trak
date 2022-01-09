@@ -22,6 +22,7 @@ import EditDueDateModal from 'components/modals/EditDueDateModal';
 import EditResponsibleModal from 'components/modals/EditResponsibleModal';
 import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
 import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
@@ -120,7 +121,8 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
     }
   };
 
-  const hasStarted = new Date(employee.dateOfEmployment) < new Date();
+  const hasStarted = differenceInCalendarDays(new Date(employee.dateOfEmployment), new Date()) <= 0;
+
   return (
     <>
       <Head>
@@ -215,7 +217,7 @@ export const Task = ({ employeeTask }) => {
     });
   };
 
-  const isExpired = new Date(employeeTask.dueDate) < new Date();
+  const hasExpired = differenceInCalendarDays(new Date(employeeTask.dueDate), new Date()) < 0;
 
   return (
     <>
@@ -223,7 +225,7 @@ export const Task = ({ employeeTask }) => {
       <Accordion
         TransitionProps={{ unmountOnExit: true }}
         disableGutters
-        sx={{ marginBottom: '16px', borderRadius: '4px', backgroundColor: isExpired ? 'error.dark' : 'background.paper' }}
+        sx={{ marginBottom: '16px', borderRadius: '4px', backgroundColor: hasExpired ? 'error.dark' : 'background.paper' }}
       >
         <AccordionSummary
           aria-controls='TASK1_RENAME_ME_PLEASE'
