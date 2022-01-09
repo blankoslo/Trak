@@ -11,6 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
@@ -21,12 +22,15 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { makeStyles } from '@mui/styles';
+import NotificationsMenu from 'components/NotificationsMenu';
 import { useColorMode } from 'context/ColorMode';
 import { useUser } from 'context/User';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
+import useSWR from 'swr';
+import { fetcher } from 'utils/utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -50,19 +54,29 @@ const NavBar = () => {
   const classes = useStyles();
   const { user } = useUser();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [anchorElUserMenu, setAnchorElUserMenu] = useState<null | HTMLElement>(null);
+  const [anchorElNotificationMenu, setAnchorElNotificationMenu] = useState<null | HTMLElement>(null);
+  const userMenuOpen = Boolean(anchorElUserMenu);
+  const notificationMenuOpen = Boolean(anchorElNotificationMenu);
   const { mode, toggleColorMode } = useColorMode();
 
+  const { data } = useSWR('/api/meta/notification', fetcher);
   const handleColorMode = () => {
     toggleColorMode();
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleClickUserMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElUserMenu(event.currentTarget);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleCloseUserMenu = () => {
+    setAnchorElUserMenu(null);
+  };
+
+  const handleClickNotificationMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElNotificationMenu(event.currentTarget);
+  };
+  const handleCloseNotificationMenu = () => {
+    setAnchorElNotificationMenu(null);
   };
   const router = useRouter();
   return (
@@ -71,11 +85,11 @@ const NavBar = () => {
         <Toolbar className={classes.root}>
           <Stack className={classes.centerVertically} direction='row' spacing={1}>
             <Button
-              aria-controls={open ? 'basic-menu' : undefined}
-              aria-expanded={open ? 'true' : undefined}
+              aria-controls={userMenuOpen ? 'basic-menu' : undefined}
+              aria-expanded={userMenuOpen ? 'true' : undefined}
               aria-haspopup='true'
               color='inherit'
-              onClick={handleClick}
+              onClick={handleClickUserMenu}
             >
               <Avatar alt={`${user?.firstName} ${user?.lastName}`} src={user?.imageUrl} sx={{ marginRight: 1 }} />
 
@@ -88,10 +102,10 @@ const NavBar = () => {
               MenuListProps={{
                 'aria-labelledby': 'basic-button',
               }}
-              anchorEl={anchorEl}
+              anchorEl={anchorElUserMenu}
               id='basic-menu'
-              onClose={handleClose}
-              open={open}
+              onClose={handleCloseUserMenu}
+              open={userMenuOpen}
             >
               <MenuItem onClick={handleColorMode}>
                 <ListItemIcon>{mode === 'dark' ? <WbSunnyIcon color='primary' /> : <NightlightIcon color='primary' />}</ListItemIcon>
@@ -104,9 +118,14 @@ const NavBar = () => {
                 <ListItemText>Logg ut</ListItemText>
               </MenuItem>
             </Menu>
-            <Badge badgeContent={4} color='primary'>
-              <NotificationsNoneIcon />
+            <Badge badgeContent={data?.unreadNotifications} color='primary'>
+              <IconButton color='inherit' onClick={handleClickNotificationMenu} sx={{ padding: 0 }}>
+                <NotificationsNoneIcon />
+              </IconButton>
             </Badge>
+            {notificationMenuOpen && (
+              <NotificationsMenu anchorEl={anchorElNotificationMenu} onClose={handleCloseNotificationMenu} open={notificationMenuOpen} user={user} />
+            )}
           </Stack>
           <Stack direction='row' spacing={1}>
             {!isSmallScreen && (
