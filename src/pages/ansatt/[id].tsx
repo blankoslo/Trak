@@ -23,11 +23,12 @@ import EditResponsibleModal from 'components/modals/EditResponsibleModal';
 import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
+import startOfDay from 'date-fns/startOfDay';
 import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 import validator from 'validator';
@@ -57,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           OR: [
             {
               dueDate: {
-                lte: new Date(),
+                gte: startOfDay(new Date()),
               },
             },
             {
@@ -126,7 +127,7 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
   return (
     <>
       <Head>
-        <title>Ansatt</title>
+        <title>{`${employee.firstName} ${employee.lastName}`}</title>
       </Head>
       <Container maxWidth='md' sx={{ paddingTop: '30px' }}>
         <Box
@@ -206,6 +207,10 @@ export const Task = ({ employeeTask }) => {
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
   const accordianBackgroundColor = 'rgba(255, 255, 255, 0.2)';
+
+  useEffect(() => {
+    setCompleted(employeeTask.completed);
+  }, [employeeTask, employeeTask.completed]);
 
   const checkboxClicked = async (e) => {
     isLoading(true);
