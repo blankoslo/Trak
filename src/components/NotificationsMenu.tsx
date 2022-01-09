@@ -24,7 +24,7 @@ const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
     });
     const updatedNotifications = data.map((element) => ({ ...element, read: true }));
     mutate(`/api/employees/${user.id}/notifications`, updatedNotifications, false);
-    mutate('/api/meta/notification', 0);
+    mutate('/api/meta/notification', 0, false);
   };
   return (
     <Menu
