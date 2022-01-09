@@ -4,7 +4,18 @@ import qs from 'qs';
 import { Dispatch, SetStateAction } from 'react';
 import { IEmployeeTask } from 'utils/types';
 
-export const prismaDateToFormatedDate = (date: string) => {
+export type TimeSectionType = {
+  title?: string;
+  date?: string;
+  data: IEmployeeTask[];
+  error?: boolean;
+  defaultOpen?: boolean;
+};
+
+export const prismaDateToFormatedDate = (date: string, isSmallFormat = false) => {
+  if (isSmallFormat) {
+    return new Date(date).toLocaleDateString('nb-NO', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
   return new Date(date).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
@@ -37,13 +48,13 @@ export const axiosBuilder = (
     });
 };
 
-export const toggleCheckBox = (
+export const toggleCheckBox = async (
   employeeTask: IEmployeeTask,
   completed: boolean,
   setCompleted: Dispatch<SetStateAction<boolean>>,
   showSnackbar: (arg0: string, arg1: string) => void,
 ) => {
-  axios
+  await axios
     .put(`/api/employeeTasks/${employeeTask.id}`, {
       completed: !completed,
       dueDate: employeeTask.dueDate,

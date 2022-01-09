@@ -45,6 +45,7 @@ export const getTheme = (mode: string) => {
           },
           error: {
             main: '#FF6060',
+            dark: '#BF4040',
           },
           success: {
             main: '#60FFAB',
@@ -75,6 +76,7 @@ export const getTheme = (mode: string) => {
           },
           error: {
             main: '#C11515',
+            dark: '#BF4040',
           },
           success: {
             main: '#50C878',
@@ -202,6 +204,13 @@ export const getTheme = (mode: string) => {
       styleOverrides: {
         root: {
           color: theme.palette.text.primary,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
         },
       },
     },
