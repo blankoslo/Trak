@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { format } from 'date-fns';
+import format from 'date-fns/format';
 import { isToday } from 'utils/utils';
 type NotificationCardProps = {
   time: Date;
