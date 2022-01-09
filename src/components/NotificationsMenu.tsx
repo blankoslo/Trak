@@ -7,9 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import NotificationCard from 'components/NotificationCard';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { IEmployee } from 'utils/types';
 import { fetcher } from 'utils/utils';
 
@@ -19,17 +17,14 @@ type NotificationsMenuProps = {
 
 const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
   const { data } = useSWR(`/api/employees/${user.id}/notifications`, fetcher);
-  const router = useRouter();
-  const [allTasksMarked, setAllTasksMarked] = useState(false);
 
   const markAsRead = () => {
-    data.forEach(async (element) => {
-      await axios.put(`/api/notification/${element.id}`);
+    data.forEach((element) => {
+      axios.put(`/api/notification/${element.id}`);
     });
-    router.push({
-      pathname: router.asPath,
-    });
-    setAllTasksMarked(true);
+    const updatedNotifications = data.map((element) => ({ ...element, read: true }));
+    mutate(`/api/employees/${user.id}/notifications`, updatedNotifications, false);
+    mutate('/api/meta/notification', 0);
   };
   return (
     <Menu
@@ -42,7 +37,7 @@ const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
         horizontal: 'left',
       }}
       id='basic-menu'
-      sx={{ minWidth: '250px', maxWidth: '300px' }}
+      sx={{ minWidth: '250px', maxWidth: '300px', maxHeight: '500px' }}
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right',
@@ -54,7 +49,7 @@ const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
         </MenuItem>
       ) : (
         <>
-          {data.length === 0 || allTasksMarked ? (
+          {data.length === 0 ? (
             <MenuItem>
               <Typography variant='body2'>Du har ingen varsler</Typography>
             </MenuItem>
