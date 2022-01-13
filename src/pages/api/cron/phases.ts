@@ -193,7 +193,7 @@ const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmploy
   });
   const employeeWantsNewEmployeeNotificiation = employee.hrManager.employeeSettings?.notificationSettings?.includes('HIRED');
   if (employeeWantsNewEmployeeNotificiation) {
-    const notificationText = `${employee.firstName} ${employee.lastName} har nettopp startet, og har fått opprettet nye oppgaver i onboarding`;
+    const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i onboarding`;
     await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
   }
 };
@@ -207,7 +207,7 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
   });
   const employeeWantsEmployeeQuittingNotification = employee.hrManager.employeeSettings?.notificationSettings?.includes('TERMINATION');
   if (employeeWantsEmployeeQuittingNotification) {
-    const notificationText = `${employee.firstName} ${employee.lastName} skal slutte, og har fått opprettet nye oppgaver i offboarding`;
+    const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i offboarding`;
     await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
   }
 };

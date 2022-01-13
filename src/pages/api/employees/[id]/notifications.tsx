@@ -16,6 +16,15 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         employeeId: toInteger(id),
         read: false,
       },
+      include: {
+        createdByEmployee: {
+          select: {
+            imageUrl: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
       orderBy: [
         {
           createdAt: 'desc',

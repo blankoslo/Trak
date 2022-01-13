@@ -81,11 +81,12 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
         const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.notificationSettings?.includes('DELEGATE');
         if (employeeWantsDelegateNotifications) {
           await axios.post('/api/notification', {
-            description: `Du har blitt delegert arbeidsoppgaven "${employeeTask.task.title}" av ${user.firstName} ${user.lastName} `,
+            description: `Oppgave delegert: "${employeeTask.task.title}"`,
             employeeId: formData.responsible?.id,
             ...(formData.responsible.employeeSettings?.slack && {
               email: formData.responsible.email,
             }),
+            createdBy: user.id,
           });
         }
 
