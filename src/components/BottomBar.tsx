@@ -18,7 +18,12 @@ const BottomBar = () => {
           onClick={() => router.push('/prosessmal')}
           sx={{ color: 'primary.main' }}
         />
-        <BottomNavigationAction icon={<SettingsIcon color='primary' />} label='Innstillinger' sx={{ color: 'primary.main' }} />
+        <BottomNavigationAction
+          icon={<SettingsIcon color='primary' />}
+          label='Innstillinger'
+          onClick={() => router.push('/innstillinger')}
+          sx={{ color: 'primary.main' }}
+        />
       </BottomNavigation>
     </Box>
   );

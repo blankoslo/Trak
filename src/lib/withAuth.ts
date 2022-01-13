@@ -7,6 +7,11 @@ const secret = process.env.JWT_SECRET;
 const withAuth = (handler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
+      const CRON_SECRET = process.env.CRON_SECRET;
+      if (req.headers.cron_secret === CRON_SECRET) {
+        return handler(req, res);
+      }
+
       const token = await getToken({ req, secret });
 
       if (token) {
