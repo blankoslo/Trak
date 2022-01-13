@@ -4,7 +4,20 @@ import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
+    const today = new Date();
     const employees = await trakClient.employee.findMany({
+      where: {
+        OR: [
+          {
+            terminationDate: null,
+          },
+          {
+            terminationDate: {
+              gte: today,
+            },
+          },
+        ],
+      },
       select: {
         id: true,
         firstName: true,
@@ -18,6 +31,14 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
           },
         },
       },
+      orderBy: [
+        {
+          firstName: 'asc',
+        },
+        {
+          lastName: 'asc',
+        },
+      ],
     });
     res.json(employees);
   } else {
