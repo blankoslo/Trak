@@ -61,11 +61,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const Settings: NextPage = ({ employee }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const showSnackbar = useSnackbar();
-  const cronButton = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const cronButton = async () => {
+    setLoading(true);
+    showSnackbar('Initialiserer oppdatering...', 'info');
     axios
-      .post(`/api/cron/phases`)
-      .then(() => showSnackbar('Systemet oppdateres', 'success'))
-      .catch((err) => showSnackbar(err.response?.data?.message || 'Noe gikk galt', 'error'));
+      .post(`/api/cron/phases?notification=false`)
+      .then(() => showSnackbar('Systemet er oppdatert', 'success'))
+      .catch((err) => showSnackbar(err.response?.data?.message || 'Noe gikk galt', 'error'))
+      .finally(() => setLoading(false));
   };
   return (
     <Container maxWidth='md' sx={{ paddingTop: { xs: 2, md: 7 }, paddingBottom: 8 }}>
@@ -78,7 +83,7 @@ const Settings: NextPage = ({ employee }: InferGetServerSidePropsType<typeof get
       >
         <Stack direction='column' spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
           <PersonaliaPaper employee={employee} />
-          <Button onClick={cronButton} variant='contained'>
+          <Button disabled={loading} onClick={cronButton} variant='contained'>
             Oppdater system
           </Button>
         </Stack>
@@ -98,7 +103,7 @@ const PersonaliaPaper = ({ employee }) => {
         <Typography variant='h2'>Personalia</Typography>
         <Typography sx={{ opacity: '0.85' }} variant='body2'>
           kort oppsummering av din informasjon. <br />
-          om noe er galt vennligst endre det{' '}
+          om noe er galt kan du endre det{' '}
           <a
             href='https://inni.blank.no/employees'
             rel='noopener noreferrer'
@@ -111,13 +116,13 @@ const PersonaliaPaper = ({ employee }) => {
         <Stack alignItems='center' direction='row' spacing={1}>
           <Avatar firstName={employee.firstName} image={employee.imageUrl} lastName={employee.lastName} sx={{ width: 80, height: 80 }} />
           <Stack alignItems='flex-start' direction='column' spacing={0.5}>
-            <PersonaliaText smallText={'navn'} text={`${employee.firstName} ${employee.lastName}`} />
-            <PersonaliaText smallText={'email'} text={employee.email} />
+            <PersonaliaText smallText={''} text={`${employee.firstName} ${employee.lastName}`} />
+            <PersonaliaText smallText={''} text={employee.email} />
           </Stack>
         </Stack>
         <PersonaliaText smallText={'rolle'} text={employee.profession.title} />
         <PersonaliaText smallText={'startet'} text={prismaDateToFormatedDate(employee.dateOfEmployment)} />
-        <PersonaliaText smallText={'ansvarlig'} text={`${employee.hrManager.firstName} ${employee.hrManager.lastName}`} />
+        {employee.hrManager && <PersonaliaText smallText={'ansvarlig'} text={`${employee.hrManager.firstName} ${employee.hrManager.lastName}`} />}
       </Stack>
     </Paper>
   );
@@ -205,7 +210,7 @@ const NotificationPaper = ({ employee }) => {
 const PersonaliaText = ({ smallText, text }) => {
   return (
     <Stack alignItems='flex-end' direction='row' spacing={1}>
-      <Typography sx={{ opacity: '0.85' }} variant='body2'>{`${smallText}:`}</Typography>
+      {smallText && <Typography sx={{ opacity: '0.85' }} variant='body2'>{`${smallText}:`}</Typography>}
       <Typography>{text}</Typography>
     </Stack>
   );
