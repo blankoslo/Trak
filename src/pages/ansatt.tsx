@@ -62,9 +62,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       ...(my && {
         hrManagerId: parseInt(session?.user?.id) || null,
       }),
-      terminationDate: {
-        lte: new Date(),
-      },
     },
     include: {
       profession: {
