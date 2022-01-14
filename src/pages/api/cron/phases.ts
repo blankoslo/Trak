@@ -10,7 +10,7 @@ import { Process } from 'utils/types';
 let LAST_RUN = undefined;
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   const { notification } = req.query;
-  const sendNotification = notification === undefined ? true : notification !== 'false';
+  const sendNotification = notification === undefined ? true : notification === 'true';
 
   if (req.method === 'POST') {
     if (LAST_RUN === new Date()) {
