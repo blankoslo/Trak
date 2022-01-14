@@ -217,9 +217,13 @@ export const Task = ({ employeeTask }) => {
     e.stopPropagation();
     await toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
     isLoading(false);
-    router.push({
-      pathname: router.asPath,
-    });
+    router.push(
+      {
+        pathname: router.asPath,
+      },
+      undefined,
+      { scroll: false },
+    );
   };
 
   const hasExpired = differenceInCalendarDays(new Date(employeeTask.dueDate), new Date()) < 0;

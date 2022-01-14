@@ -1,17 +1,14 @@
 import { addDays, compareAsc, getDate, getMonth, getYear, isSameDay, setYear, subDays } from 'date-fns';
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
+import withAuth from 'lib/withAuth';
 import { groupBy } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { syncTrakDatabase } from 'utils/cron';
 import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
 import { Process } from 'utils/types';
 let LAST_RUN = undefined;
-export default async function (req: NextApiRequest, res: NextApiResponse) {
-  const CRON_SECRET = process.env.CRON_SECRET;
-  if (req.headers.cron_secret !== CRON_SECRET) {
-    res.status(HttpStatusCode.UNAUTHORIZED).end();
-  }
+export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     if (LAST_RUN === new Date()) {
       return;
@@ -130,7 +127,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   } else {
     res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
   }
-}
+});
 
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
 const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any) => {

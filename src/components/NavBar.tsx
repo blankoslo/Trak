@@ -150,7 +150,7 @@ const NavBar = () => {
                     Prosessmal
                   </Button>
                 </Link>
-                <Link href='/prosessmal' passHref>
+                <Link href='/innstillinger' passHref>
                   <Button color='inherit' startIcon={<SettingsIcon color='primary' />} variant='text'>
                     Innstillinger
                   </Button>
