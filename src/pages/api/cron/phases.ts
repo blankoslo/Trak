@@ -9,6 +9,9 @@ import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
 import { Process } from 'utils/types';
 let LAST_RUN = undefined;
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
+  const { notification } = req.query;
+  const sendNotification = notification === undefined ? true : notification === 'true';
+
   if (req.method === 'POST') {
     if (LAST_RUN === new Date()) {
       return;
@@ -120,8 +123,10 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
       },
     });
-    employeeTaskCreator(phases, employees);
-    await createNotification(responsibleEmployees);
+    employeeTaskCreator(phases, employees, sendNotification);
+    if (sendNotification) {
+      await createNotification(responsibleEmployees);
+    }
 
     res.status(HttpStatusCode.OK).end();
   } else {
@@ -130,7 +135,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 });
 
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
-const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any) => {
+const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any, sendNotification: boolean) => {
   const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
   const today = new Date();
   employees.forEach((employee) => {
@@ -141,10 +146,10 @@ const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | an
       lopendeEmployeeTaskCreator(employee, lopendePhases, today);
     }
     if (employee.dateOfEmployment && !employeeHasProcessTask(employee, Process.ONBOARDING)) {
-      onboardingEmployeeTaskCreator(phases, employee);
+      onboardingEmployeeTaskCreator(phases, employee, sendNotification);
     }
     if (employee.terminationDate && !employeeHasProcessTask(employee, Process.OFFBOARDING)) {
-      offboardingEmployeeTaskCreator(phases, employee);
+      offboardingEmployeeTaskCreator(phases, employee, sendNotification);
     }
   });
 };
@@ -181,7 +186,7 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
   }
 };
 
-const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee) => {
+const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee, sendNotification: boolean) => {
   phases.forEach((phase) => {
     if (phase.processTemplate.slug === Process.ONBOARDING) {
       phase.dueDate = addDays(employee.dateOfEmployment, phase.dueDateDayOffset);
@@ -191,11 +196,13 @@ const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmploy
   const employeeWantsNewEmployeeNotificiation = employee.hrManager.employeeSettings?.notificationSettings?.includes('HIRED');
   if (employeeWantsNewEmployeeNotificiation) {
     const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i onboarding`;
-    await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+    if (sendNotification) {
+      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+    }
   }
 };
 
-const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee) => {
+const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee, sendNotification: boolean) => {
   phases.forEach((phase) => {
     if (phase.processTemplate.slug === Process.OFFBOARDING) {
       phase.dueDate = addDays(employee.terminationDate, phase.dueDateDayOffset);
@@ -205,7 +212,9 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
   const employeeWantsEmployeeQuittingNotification = employee.hrManager.employeeSettings?.notificationSettings?.includes('TERMINATION');
   if (employeeWantsEmployeeQuittingNotification) {
     const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i offboarding`;
-    await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+    if (sendNotification) {
+      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+    }
   }
 };
 

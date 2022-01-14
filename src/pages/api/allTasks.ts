@@ -1,3 +1,4 @@
+import addMonths from 'date-fns/addMonths';
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import { sortBy } from 'lodash';
@@ -12,6 +13,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         title: true,
       },
     });
+    const threeMonthsFromNow = addMonths(new Date(), 3);
 
     const initialProcessTemplates = processes.map((processTemplate) => {
       return {
@@ -23,6 +25,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       where: {
         completed: {
           equals: false,
+        },
+        dueDate: {
+          lte: threeMonthsFromNow,
         },
       },
 

@@ -6,6 +6,7 @@ import LoadingLogo from 'components/LoadingLogo';
 import SearchField from 'components/SearchField';
 import Toggle from 'components/Toggle';
 import Process from 'components/views/oppgaver/Process';
+import addMonths from 'date-fns/addMonths';
 import { trakClient } from 'lib/prisma';
 import { filter, sortBy } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -38,7 +39,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       title: true,
     },
   });
-
+  const threeMonthsFromNow = addMonths(new Date(), 3);
   const initialProcessTemplates = processes.map((processTemplate) => {
     return {
       ...processTemplate,
@@ -52,6 +53,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
       completed: {
         equals: false,
+      },
+      dueDate: {
+        lte: threeMonthsFromNow,
       },
     },
 
