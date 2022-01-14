@@ -4,12 +4,29 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import NotificationCard from 'components/NotificationCard';
 import useSWR, { mutate } from 'swr';
 import { IEmployee } from 'utils/types';
 import { fetcher } from 'utils/utils';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  removeScrollbar: {
+    '&::-webkit-scrollbar': {
+      background: 'transparent',
+      width: '2px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: theme.palette.primary.main,
+    },
+    '&::-webkit-scrollbar-track': {
+      background: theme.palette.background.default,
+    },
+  },
+}));
 
 type NotificationsMenuProps = {
   user: IEmployee;
@@ -17,6 +34,7 @@ type NotificationsMenuProps = {
 
 const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
   const { data } = useSWR(`/api/employees/${user.id}/notifications`, fetcher);
+  const classes = useStyles();
 
   const markAsRead = () => {
     data.forEach((element) => {
@@ -32,12 +50,13 @@ const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
         'aria-labelledby': 'basic-button',
       }}
       {...args}
+      PaperProps={{ className: classes.removeScrollbar }}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'left',
       }}
       id='basic-menu'
-      sx={{ minWidth: '250px', maxWidth: '300px', maxHeight: '500px' }}
+      sx={[{ minWidth: '250px', maxWidth: '320px', maxHeight: '500px' }]}
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right',
@@ -65,7 +84,13 @@ const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
               </MenuItem>
               {data.map((notification) => (
                 <>
-                  <NotificationCard description={notification.description} key={notification.id} read={notification.read} time={notification.createdAt} />
+                  <NotificationCard
+                    createdBy={notification.createdByEmployee}
+                    description={notification.description}
+                    key={notification.id}
+                    read={notification.read}
+                    time={notification.createdAt}
+                  />
                   <Divider />
                 </>
               ))}

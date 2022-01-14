@@ -6,13 +6,16 @@ import { slackMessager } from 'utils/utils';
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const {
-      body: { description, employeeId, email },
+      body: { description, employeeId, email, createdBy },
     } = req;
     try {
       const newNotification = await trakClient.notification.create({
         data: {
           employeeId: employeeId,
           description: description,
+          ...(createdBy && {
+            createdBy: createdBy,
+          }),
         },
       });
       if (email) {

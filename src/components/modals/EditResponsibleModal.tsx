@@ -3,6 +3,7 @@ import axios from 'axios';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';
 import useSnackbar from 'context/Snackbar';
+import { useUser } from 'context/User';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -18,6 +19,7 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
   const showSnackbar = useSnackbar();
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const { user } = useUser();
   const { control, handleSubmit } = useForm({
     reValidateMode: 'onChange',
     defaultValues: useMemo(
@@ -46,6 +48,17 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
           dueDate: employeeTask.dueDate,
           responsibleId: formData.responsible?.id,
         });
+        const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.notificationSettings?.includes('DELEGATE');
+        if (employeeWantsDelegateNotifications) {
+          await axios.post('/api/notification', {
+            description: `Oppgave delegert: "${employeeTask.task.title}"`,
+            employeeId: formData.responsible?.id,
+            ...(formData.responsible.employeeSettings?.slack && {
+              email: formData.responsible.email,
+            }),
+            createdBy: user.id,
+          });
+        }
 
         router
           .push({
