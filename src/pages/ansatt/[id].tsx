@@ -53,6 +53,11 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
               id: 'asc',
             },
           },
+          {
+            task: {
+              title: 'asc',
+            },
+          },
         ],
         where: {
           OR: [
