@@ -41,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const my = Boolean(context.query?.mine === 'true');
+  const my = context.query?.mine === 'true';
   const session = await getSession(context);
 
   const processes = await trakClient.processTemplate.findMany({
