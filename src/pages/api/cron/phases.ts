@@ -9,12 +9,8 @@ import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
 import { Process } from 'utils/types';
 let LAST_RUN = undefined;
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
-  const CRON_SECRET = process.env.CRON_SECRET;
-  if (req.headers.cron_secret !== CRON_SECRET) {
-    res.status(HttpStatusCode.UNAUTHORIZED).end();
-  }
   const { notification } = req.query;
-  const sendNotification = notification === undefined ? true : Boolean(notification);
+  const sendNotification = notification === undefined ? true : notification !== 'false';
 
   if (req.method === 'POST') {
     if (LAST_RUN === new Date()) {
