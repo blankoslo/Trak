@@ -25,7 +25,8 @@
     "push": "npx prisma db push --schema src/prisma/trak.prisma --preview-feature",
     "generate": "npx prisma generate --schema src/prisma/blank.prisma && npx prisma generate --schema src/prisma/trak.prisma",
     "fresh": "docker rm -f -v trak && yarn createdb && yarn push",
-    "createdb": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres"
+    "createdb": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@emotion/react": "^11.7.1",
@@ -74,7 +75,7 @@
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
-    "husky": "^7.0.0",
+    "husky": "^7.0.4",
     "lint-staged": "^12.1.3",
     "prettier": "^2.5.1",
     "prisma": "^3.6.0",
