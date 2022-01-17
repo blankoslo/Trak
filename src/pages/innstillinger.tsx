@@ -60,18 +60,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Settings: NextPage = ({ employee }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const showSnackbar = useSnackbar();
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const cronButton = async () => {
-    setLoading(true);
-    showSnackbar('Initialiserer oppdatering...', 'info');
-    axios
-      .post(`/api/cron/phases?notification=false`)
-      .then(() => showSnackbar('Systemet er oppdatert', 'success'))
-      .catch((err) => showSnackbar(err.response?.data?.message || 'Noe gikk galt', 'error'))
-      .finally(() => setLoading(false));
-  };
   return (
     <Container maxWidth='md' sx={{ paddingTop: { xs: 2, md: 7 }, paddingBottom: 8 }}>
       <Stack
@@ -83,9 +71,7 @@ const Settings: NextPage = ({ employee }: InferGetServerSidePropsType<typeof get
       >
         <Stack direction='column' spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
           <PersonaliaPaper employee={employee} />
-          <Button disabled={loading} onClick={cronButton} variant='contained'>
-            Oppdater system
-          </Button>
+          <UpdateSystemPaper />
         </Stack>
         <Stack direction='column' spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
           <NotificationPaper employee={employee} />
@@ -123,6 +109,34 @@ const PersonaliaPaper = ({ employee }) => {
         <PersonaliaText smallText={'rolle'} text={employee.profession.title} />
         <PersonaliaText smallText={'startet'} text={prismaDateToFormatedDate(employee.dateOfEmployment)} />
         {employee.hrManager && <PersonaliaText smallText={'ansvarlig'} text={`${employee.hrManager.firstName} ${employee.hrManager.lastName}`} />}
+      </Stack>
+    </Paper>
+  );
+};
+
+const UpdateSystemPaper = () => {
+  const showSnackbar = useSnackbar();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const cronButton = async () => {
+    setLoading(true);
+    showSnackbar('Initialiserer oppdatering...', 'info');
+    axios
+      .post(`/api/cron/phases?notification=false`)
+      .then(() => showSnackbar('Systemet er oppdatert', 'success'))
+      .catch((err) => showSnackbar(err.response?.data?.message || 'Noe gikk galt', 'error'))
+      .finally(() => setLoading(false));
+  };
+  return (
+    <Paper sx={{ padding: 2, width: 'auto' }}>
+      <Stack alignItems='flex-start' direction='column' spacing={1}>
+        <Typography variant='h2'>Oppdater TRAK</Typography>
+        <Typography sx={{ opacity: '0.85' }} variant='body2'>
+          oppdater trak med nyeste dataen <br /> fra ansattlisten til blank
+        </Typography>
+        <Button fullWidth disabled={loading} onClick={cronButton}>
+          Trykk for å oppdatere
+        </Button>
       </Stack>
     </Paper>
   );
