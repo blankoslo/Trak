@@ -134,7 +134,7 @@ const UpdateSystemPaper = () => {
         <Typography sx={{ opacity: '0.85' }} variant='body2'>
           oppdater trak med nyeste dataen <br /> fra ansattlisten til blank
         </Typography>
-        <Button fullWidth disabled={loading} onClick={cronButton}>
+        <Button disabled={loading} fullWidth onClick={cronButton}>
           Trykk for å oppdatere
         </Button>
       </Stack>
