@@ -8,11 +8,9 @@ import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
-import AddButton from 'components/AddButton';
 import ChipSkeleton from 'components/ChipSkeleton';
-import CommentCard from 'components/CommentCard';
+import Comments from 'components/Comments';
 import EmployeeSelector from 'components/form/EmployeeSelector';
-import TextField from 'components/form/TextField';
 import Modal from 'components/Modal';
 import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
@@ -146,23 +144,8 @@ export type InfoModalProps = {
 };
 const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps) => {
   const classes = useStyles();
-  const [addComment, setAddComment] = useState(false);
-  const { data, mutate } = useSWR(`/api/employeeTasks/${employee_task_id}`, fetcher);
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    reset,
-  } = useForm();
 
-  const onSubmit = handleSubmit(async (formData) => {
-    const newComment = await axios.post(`/api/employeeTasks/${employee_task_id}/comments`, {
-      text: formData.comment,
-    });
-    mutate({ ...data, comments: [...data.comments, newComment.data] });
-    setAddComment(false);
-    reset();
-  });
+  const { data } = useSWR(`/api/employeeTasks/${employee_task_id}`, fetcher);
   return (
     <Modal
       buttonGroup={[
@@ -216,34 +199,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           )}
         </Box>
         <TextMarkDownWithLink text={data?.task.description} />
-        {data?.comments.map((comment) => (
-          <CommentCard comment={comment} key={comment.id} />
-        ))}
-        {!addComment && <AddButton onClick={() => setAddComment(true)} text='Legg til kommentar' />}
-        {addComment && (
-          <form noValidate style={{ marginTop: '4px' }}>
-            <TextField
-              errors={errors}
-              label='Kommentar'
-              minRows={2}
-              multiline
-              name='comment'
-              register={register}
-              required
-              rules={{
-                required: 'Kommentar er påkrevd',
-              }}
-            />
-            <Box display='flex' flexDirection='row' justifyContent='space-between'>
-              <Button onClick={() => setAddComment(false)} type='submit'>
-                Avbryt kommentar{' '}
-              </Button>
-              <Button onClick={onSubmit} type='submit'>
-                Publiser{' '}
-              </Button>
-            </Box>
-          </form>
-        )}
+        <Comments employeeTask={employee_task_id} />
       </>
     </Modal>
   );

@@ -30,6 +30,24 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ message: 'Noe gikk galt med serveren' });
       }
     }
+  } else if (req.method === 'GET') {
+    const {
+      query: { id },
+    } = req;
+    try {
+      const comments = await trakClient.comment.findMany({
+        where: {
+          employeeTaskId: id.toString(),
+        },
+        include: {
+          createdByEmployee: true,
+          employeeTask: true,
+        },
+      });
+      res.json(comments);
+    } catch (err) {
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ message: err?.meta?.cause });
+    }
   } else {
     res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
   }

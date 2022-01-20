@@ -30,14 +30,15 @@ const CommentCard = ({ comment }: CommentCardProps) => {
 
   const deleteComment = async () => {
     await axios.delete(`/api/employeeTasks/${comment.employeeTaskId}/comments/${comment.id}`);
-    mutate(`/api/employeeTasks/${comment.employeeTaskId}`);
+
+    mutate(`/api/employeeTasks/${comment.employeeTaskId}/comments`);
   };
   return (
     <Grid container marginBottom={2} spacing={2}>
-      <Grid item xs={1}>
+      <Grid item sm={1} xs={2}>
         <Avatar firstName={comment.createdByEmployee.firstName} image={comment.createdByEmployee.imageUrl} lastName={comment.createdByEmployee.lastName} />
       </Grid>
-      <Grid item xs={10}>
+      <Grid item sm={10} xs={9}>
         <Stack spacing={1} sx={{ width: '100%' }}>
           <Stack direction='row' justifyContent={'space-between'}>
             <Typography color='primary.main' variant='body2'>
