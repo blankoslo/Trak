@@ -1,16 +1,13 @@
 // https://github.com/prisma/prisma/issues/1983
 
-import { Prisma } from 'prisma';
-import { PrismaClient as TrakClient } from 'prisma/generated/trak';
+import { PrismaClient as TrakClient } from '@prisma/client';
 
-export let trakClient: TrakClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation>;
+declare global {
+  var trakClient: TrakClient | undefined;
+}
 
-if (process.env.NODE_ENV === `production`) {
-  trakClient = new TrakClient();
-} else {
-  if (!global['trak']) {
-    global['trak'] = new TrakClient();
-  }
+export const trakClient = global.trakClient || new TrakClient();
 
-  trakClient = global['trak'];
+if (process.env.NODE_ENV !== 'production') {
+  global.trakClient = trakClient;
 }
