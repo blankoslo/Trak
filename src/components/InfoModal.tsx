@@ -8,8 +8,11 @@ import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
+import AddButton from 'components/AddButton';
 import ChipSkeleton from 'components/ChipSkeleton';
+import CommentCard from 'components/CommentCard';
 import EmployeeSelector from 'components/form/EmployeeSelector';
+import TextField from 'components/form/TextField';
 import Modal from 'components/Modal';
 import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
@@ -18,7 +21,9 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import useSWR from 'swr';
 import { IEmployeeTask } from 'utils/types';
+import { fetcher } from 'utils/utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -122,7 +127,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
         ) : (
           <>
             {`${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}`}
-            <IconButton aria-label='Deleger oppgave' onClick={() => setHasSelectedNewResponsible(true)} role='button' size='small'>
+            <IconButton aria-label='Deleger oppgave' color='primary' onClick={() => setHasSelectedNewResponsible(true)} role='button' size='small'>
               <Edit />
             </IconButton>
           </>
@@ -141,19 +146,23 @@ export type InfoModalProps = {
 };
 const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps) => {
   const classes = useStyles();
-  const [employeeTask, setEmployeeTask] = useState<IEmployeeTask | undefined>(undefined);
-  const showSnackbar = useSnackbar();
+  const [addComment, setAddComment] = useState(false);
+  const { data, mutate } = useSWR(`/api/employeeTasks/${employee_task_id}`, fetcher);
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    reset,
+  } = useForm();
 
-  useEffect(() => {
-    axios
-      .get(`/api/employeeTasks/${employee_task_id}`)
-      .then((res) => {
-        setEmployeeTask(res.data);
-      })
-      .catch((error) => {
-        showSnackbar(error.response.data?.message || 'Noe gikk galt', 'error');
-      });
-  }, [employee_task_id]);
+  const onSubmit = handleSubmit(async (formData) => {
+    const newComment = await axios.post(`/api/employeeTasks/${employee_task_id}/comments`, {
+      text: formData.comment,
+    });
+    mutate({ ...data, comments: [...data.comments, newComment.data] });
+    setAddComment(false);
+    reset();
+  });
   return (
     <Modal
       buttonGroup={[
@@ -161,7 +170,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           Avbryt
         </Button>,
       ]}
-      header={employeeTask ? <>{employeeTask?.task.title}</> : <Skeleton />}
+      header={data ? <>{data?.task.title}</> : <Skeleton />}
       onClose={closeModal}
       onSubmit={null}
       open={modalIsOpen}
@@ -171,38 +180,34 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           <Typography variant='body1'>
             <b>Ansvarlig:</b>
           </Typography>
-          <ResponsibleSelector employeeTask={employeeTask} />
+          <ResponsibleSelector employeeTask={data} />
           <Typography variant='body1'>
             <b>Gjelder:</b>
           </Typography>
-          <Typography variant='body1'>
-            {employeeTask ? `${employeeTask?.employee.firstName} ${employeeTask?.employee.lastName}` : <Skeleton className={classes.skeleton} />}
-          </Typography>
+          <Typography variant='body1'>{data ? `${data.employee.firstName} ${data?.employee.lastName}` : <Skeleton className={classes.skeleton} />}</Typography>
           <Typography variant='body1'>
             <b>Fase:</b>
           </Typography>
-          <Typography variant='body1'>{employeeTask ? `${employeeTask?.task.phase.title}` : <Skeleton className={classes.skeleton} />}</Typography>
+          <Typography variant='body1'>{data ? `${data.task.phase.title}` : <Skeleton className={classes.skeleton} />}</Typography>
           <Typography variant='body1'>
             <b>Forfallsdato:</b>
           </Typography>
-          <Typography variant='body1'>
-            {employeeTask ? format(new Date(employeeTask?.dueDate), 'dd.MM.yyyy') : <Skeleton className={classes.skeleton} />}
-          </Typography>
-          {employeeTask?.completedBy && employeeTask?.completedDate && (
+          <Typography variant='body1'>{data ? format(new Date(data?.dueDate), 'dd.MM.yyyy') : <Skeleton className={classes.skeleton} />}</Typography>
+          {data?.completedBy && data?.completedDate && (
             <>
               <Typography variant='body1'>
                 <b>Fullført av:</b>{' '}
               </Typography>
               <Typography variant='body1'>
-                {employeeTask.completedBy.firstName} {employeeTask.completedBy.lastName} den {format(new Date(employeeTask?.completedDate), 'dd.MM.yyyy')}
+                {data.completedBy.firstName} {data.employeeTask.completedBy.lastName} den {format(new Date(data.completedDate), 'dd.MM.yyyy')}
               </Typography>
             </>
           )}
         </div>
         <Box className={classes.gutterBottom}>
-          {employeeTask ? (
+          {data ? (
             <>
-              {employeeTask?.task.tags.map((tag) => {
+              {data?.task.tags.map((tag) => {
                 return <Chip className={classes.chip} color='primary' key={tag.id} label={tag.title} size='small' />;
               })}
             </>
@@ -210,7 +215,35 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
-        <TextMarkDownWithLink text={employeeTask?.task.description} />
+        <TextMarkDownWithLink text={data?.task.description} />
+        {data?.comments.map((comment) => (
+          <CommentCard comment={comment} key={comment.id} />
+        ))}
+        {!addComment && <AddButton onClick={() => setAddComment(true)} text='Legg til kommentar' />}
+        {addComment && (
+          <form noValidate style={{ marginTop: '4px' }}>
+            <TextField
+              errors={errors}
+              label='Kommentar'
+              minRows={2}
+              multiline
+              name='comment'
+              register={register}
+              required
+              rules={{
+                required: 'Kommentar er påkrevd',
+              }}
+            />
+            <Box display='flex' flexDirection='row' justifyContent='space-between'>
+              <Button onClick={() => setAddComment(false)} type='submit'>
+                Avbryt kommentar{' '}
+              </Button>
+              <Button onClick={onSubmit} type='submit'>
+                Publiser{' '}
+              </Button>
+            </Box>
+          </form>
+        )}
       </>
     </Modal>
   );
