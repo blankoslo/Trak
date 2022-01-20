@@ -135,7 +135,7 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
       <Head>
         <title>{`${employee.firstName} ${employee.lastName}`}</title>
       </Head>
-      <Container maxWidth='md' sx={{ paddingTop: '30px' }}>
+      <Container maxWidth='md' sx={{ paddingTop: '30px', marginBottom: 12 }}>
         <Box
           sx={{
             display: 'flex',
