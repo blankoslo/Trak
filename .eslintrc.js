@@ -26,6 +26,7 @@ module.exports = {
   },
   rules: {
     'arrow-spacing': 'error',
+    'no-var': 'off',
     'babel/no-invalid-this': 'warn',
     'block-spacing': ['error', 'never'],
     'brace-style': ['error', '1tbs'],
