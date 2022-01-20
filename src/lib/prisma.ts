@@ -3,6 +3,7 @@
 import { PrismaClient as TrakClient } from '@prisma/client';
 
 declare global {
+  // eslint-disable-next-line
   var trakClient: TrakClient | undefined;
 }
 
