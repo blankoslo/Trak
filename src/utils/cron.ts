@@ -1,5 +1,86 @@
+import addDays from 'date-fns/addDays';
 import { trakClient } from 'lib/prisma';
 import { PrismaClient as BlankClient } from 'prisma/generated/blank';
+
+const updateTask = async (blankEmployees) => {
+  const blankEmployeeStartEndDate = blankEmployees.map((employee) => ({
+    id: employee.id,
+    dateOfEmployment: employee.date_of_employment,
+    terminationDate: employee.termination_date,
+  }));
+  const updatedTrakEmployee = await trakClient.employee.findMany({
+    where: {
+      NOT: {
+        OR: blankEmployeeStartEndDate,
+      },
+    },
+    select: {
+      id: true,
+      employeeTask: {
+        where: {
+          task: {
+            phase: {
+              processTemplate: {
+                OR: [{ slug: 'onboarding' }, { slug: 'offboarding' }],
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          dueDate: true,
+          task: {
+            select: {
+              dueDateDayOffset: true,
+              phase: {
+                select: {
+                  dueDateDayOffset: true,
+                  processTemplate: {
+                    select: {
+                      slug: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  await Promise.all(
+    updatedTrakEmployee.map(async (employee) => {
+      const blankEmployeeData = blankEmployees.find((blankEmployee) => blankEmployee.id === employee.id);
+      await trakClient.$transaction([
+        ...employee.employeeTask.map((task) => {
+          const onboardingDateRefrence = task.task.phase.processTemplate.slug === 'onboarding' && blankEmployeeData.date_of_employment;
+          const offboardingDateRefrence = task.task.phase.processTemplate.slug === 'offboarding' && blankEmployeeData.termination_date;
+          const refrenceDate = onboardingDateRefrence || offboardingDateRefrence || undefined;
+          const taskOffset = task.task.dueDateDayOffset || task.task.phase.dueDateDayOffset;
+          const newDueDate = addDays(refrenceDate, taskOffset);
+          return trakClient.employeeTask.update({
+            where: {
+              id: task.id,
+            },
+            data: {
+              dueDate: newDueDate,
+            },
+          });
+        }),
+        trakClient.employee.update({
+          where: {
+            id: employee.id,
+          },
+          data: {
+            dateOfEmployment: blankEmployeeData.date_of_employment,
+            terminationDate: blankEmployeeData.termination_date,
+          },
+        }),
+      ]);
+    }),
+  );
+};
 
 const addEmployees = async (blankEmployees, includeHrManager = true) => {
   await trakClient.$transaction(
@@ -73,5 +154,6 @@ export async function syncTrakDatabase() {
   if (isInitialInsert) {
     await addEmployees(blankEmployees, false);
   }
+  await updateTask(blankEmployees);
   await addEmployees(blankEmployees);
 }
