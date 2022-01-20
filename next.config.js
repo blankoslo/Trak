@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   webpack: (config, { isServer }) => {
     if (isServer) {
@@ -7,4 +13,4 @@ module.exports = {
     }
     return config;
   },
-};
+});
