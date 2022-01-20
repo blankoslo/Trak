@@ -26,7 +26,8 @@
     "generate": "npx prisma generate --schema src/prisma/blank.prisma && npx prisma generate --schema src/prisma/trak.prisma",
     "fresh": "docker rm -f -v trak && yarn createdb && yarn push",
     "createdb": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "analyze": "ANALYZE=true yarn build"
   },
   "dependencies": {
     "@emotion/react": "^11.7.1",
