@@ -57,6 +57,13 @@ const updateTask = async (blankEmployees) => {
           const onboardingDateRefrence = task.task.phase.processTemplate.slug === 'onboarding' && blankEmployeeData.date_of_employment;
           const offboardingDateRefrence = task.task.phase.processTemplate.slug === 'offboarding' && blankEmployeeData.termination_date;
           const refrenceDate = onboardingDateRefrence || offboardingDateRefrence || undefined;
+          if (!refrenceDate) {
+            return trakClient.employeeTask.delete({
+              where: {
+                id: task.id,
+              },
+            });
+          }
           const taskOffset = task.task.dueDateDayOffset || task.task.phase.dueDateDayOffset;
           const newDueDate = addDays(refrenceDate, taskOffset);
           return trakClient.employeeTask.update({
