@@ -1,5 +1,5 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Grid from '@mui/material/Grid';
+import Grid, { GridProps } from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,13 +10,15 @@ import Avatar from 'components/Avatar';
 import { format } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { mutate } from 'swr';
 import { IComment } from 'utils/types';
+
 type CommentCardProps = {
   comment: IComment;
-};
+} & GridProps;
 
-const CommentCard = ({ comment }: CommentCardProps) => {
+const CommentCard = ({ comment, ...args }: CommentCardProps) => {
   const user = useSession();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -34,7 +36,7 @@ const CommentCard = ({ comment }: CommentCardProps) => {
     mutate(`/api/employeeTasks/${comment.employeeTaskId}/comments`);
   };
   return (
-    <Grid container marginBottom={2} spacing={2}>
+    <Grid container marginBottom={2} spacing={2} {...args}>
       <Grid item sm={1} xs={2}>
         <Avatar firstName={comment.createdByEmployee.firstName} image={comment.createdByEmployee.imageUrl} lastName={comment.createdByEmployee.lastName} />
       </Grid>
@@ -48,7 +50,7 @@ const CommentCard = ({ comment }: CommentCardProps) => {
               {format(new Date(comment.createdAt), 'dd.MM.yyyy')}
             </Typography>
           </Stack>
-          <Typography variant='body2'>{comment.text}</Typography>
+          <ReactMarkdown>{comment.text}</ReactMarkdown>
         </Stack>
       </Grid>
       <Grid item xs={1}>

@@ -1,10 +1,11 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import AddButton from 'components/AddButton';
 import CommentCard from 'components/CommentCard';
 import TextField from 'components/form/TextField';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
 import { fetcher } from 'utils/utils';
@@ -21,6 +22,7 @@ const Comments = ({ employeeTask }: CommentProps) => {
     handleSubmit,
     reset,
   } = useForm();
+  const scrollRef = useRef(null);
 
   const onSubmit = handleSubmit(async (formData) => {
     const newComment = await axios.post(`/api/employeeTasks/${employeeTask}/comments`, {
@@ -29,12 +31,21 @@ const Comments = ({ employeeTask }: CommentProps) => {
     mutate([...comments, newComment.data]);
     setAddComment(false);
     reset();
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView();
+    }
   });
   return (
     <>
-      {comments?.map((comment) => (
-        <CommentCard comment={comment} key={comment.id} />
-      ))}
+      <Box maxHeight={'300px'} overflow={'auto'}>
+        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+          Kommentarer:
+        </Typography>
+        {comments?.map((comment) => (
+          <CommentCard comment={comment} key={comment.id} />
+        ))}
+        <div ref={scrollRef} />
+      </Box>
       {!addComment && <AddButton onClick={() => setAddComment(true)} text='Legg til kommentar' />}
       {addComment && (
         <form noValidate style={{ marginTop: '32px' }}>
