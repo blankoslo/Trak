@@ -1,3 +1,13 @@
+export type IComment = {
+  id: string;
+  text: string;
+  createdAt: Date;
+  createdByEmployee: IEmployee;
+  createdById: number;
+  employeeTask: IEmployeeTask;
+  employeeTaskId: string;
+};
+
 export type IEmployee = {
   id: number;
   firstName: string;
@@ -53,6 +63,7 @@ export type IEmployeeTask = {
   completedBy?: IEmployee;
   completedById?: number;
   completedDate?: Date;
+  comment: IComment[];
 };
 
 export type INotification = {

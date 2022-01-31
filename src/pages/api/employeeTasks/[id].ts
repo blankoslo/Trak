@@ -34,6 +34,11 @@ const GET = async (res, id) => {
         completedBy: true,
         completedById: true,
         completedDate: true,
+        comments: {
+          include: {
+            createdByEmployee: true,
+          },
+        },
         employee: {
           select: {
             id: true,

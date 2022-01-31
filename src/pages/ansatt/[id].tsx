@@ -17,6 +17,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Avatar from 'components/Avatar';
+import Comments from 'components/Comments';
 import DateFormater from 'components/DateFormater';
 import EditDueDateModal from 'components/modals/EditDueDateModal';
 import EditResponsibleModal from 'components/modals/EditResponsibleModal';
@@ -134,7 +135,7 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
       <Head>
         <title>{`${employee.firstName} ${employee.lastName}`}</title>
       </Head>
-      <Container maxWidth='md' sx={{ paddingTop: '30px' }}>
+      <Container maxWidth='md' sx={{ paddingTop: '30px', marginBottom: 12 }}>
         <Box
           sx={{
             display: 'flex',
@@ -355,6 +356,7 @@ export const Task = ({ employeeTask }) => {
           <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
           <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
           <TextMarkDownWithLink text={employeeTask?.task.description} variant={'body2'} />
+          <Comments employeeTask={employeeTask?.id} />
         </AccordionDetails>
         <AccordionActions
           sx={{
