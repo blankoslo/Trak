@@ -19,6 +19,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     LAST_RUN = new Date();
 
     await syncTrakDatabase();
+
     const phases = await trakClient.phase.findMany({
       where: {
         active: true,
