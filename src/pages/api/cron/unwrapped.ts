@@ -1,10 +1,12 @@
 import { add, sub } from 'date-fns';
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
+import withAuth from 'lib/withAuth';
 import { compact, flatten, uniq } from 'lodash';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getToday } from 'utils/date';
 import { slackMessager } from 'utils/utils';
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
       const employeeTasks = await trakClient.employeeTask.findMany({
@@ -31,14 +33,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         if (!employee_data.employeeSettings?.slack) {
           return;
         }
-        const myCompetedTasks = await getMyCompletedTasks(id);
+        const myCompletedTasks = await getMyCompletedTasks(id);
         const myExpiredTasks = await getExpiredTasks(id);
         const myUpcomingTasks = await getUpcomingTasks(id);
 
-        if (!myCompetedTasks && !myExpiredTasks && !myUpcomingTasks) {
-          return;
-        }
-        const wrappedMessage = createWrappedMessage(myCompetedTasks, myExpiredTasks, myUpcomingTasks);
+        const wrappedMessage = createWrappedMessage(myCompletedTasks, myExpiredTasks, myUpcomingTasks);
 
         await slackMessager(employee_data.email, wrappedMessage);
       });
@@ -50,7 +49,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   } else {
     res.status(HttpStatusCode.METHOD_NOT_ALLOWED).end();
   }
-}
+});
 
 const getMyCompletedTasks = async (id: number) =>
   await trakClient.employeeTask.count({
@@ -58,7 +57,7 @@ const getMyCompletedTasks = async (id: number) =>
       completedById: id,
       completed: true,
       completedDate: {
-        gte: sub(new Date(), { weeks: 1 }),
+        gte: sub(getToday(), { weeks: 1 }),
       },
     },
   });
@@ -68,7 +67,7 @@ const getExpiredTasks = async (id: number) =>
     where: {
       responsibleId: id,
       dueDate: {
-        lte: new Date(),
+        lte: getToday(),
       },
       completed: {
         equals: false,
@@ -81,8 +80,8 @@ const getUpcomingTasks = async (id: number) =>
     where: {
       responsibleId: id,
       dueDate: {
-        gte: new Date(),
-        lte: add(new Date(), { weeks: 1 }),
+        gte: getToday(),
+        lte: add(getToday(), { weeks: 1 }),
       },
       completed: {
         equals: false,
