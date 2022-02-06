@@ -1,4 +1,5 @@
 import { add, sub } from 'date-fns';
+import isMonday from 'date-fns/isMonday';
 import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
@@ -9,6 +10,10 @@ import { slackMessager } from 'utils/utils';
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
+      if (!isMonday(getToday())) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Ikke mandag' });
+        return;
+      }
       const employeeTasks = await trakClient.employeeTask.findMany({
         select: {
           responsibleId: true,
