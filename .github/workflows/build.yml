@@ -13,20 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      - uses: actions/checkout@master
       - name: Installing dependencies
-        uses: borales/actions-yarn@v2.3.0
+        uses: borales/actions-yarn@master
         with:
           cmd: install
-      - name: Generating prisma files
-        uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: generate
       - name: Building Next
-        uses: borales/actions-yarn@v2.3.0
+        uses: borales/actions-yarn@master
         with:
           cmd: build
