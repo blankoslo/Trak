@@ -23,9 +23,7 @@ jobs:
         with:
           cmd: install
       - name: Generate Prisma
-        uses: borales/actions-yarn@master
-        with:
-          cmd: generate
+        run: sudo yarn generate
       - name: Building Next
         uses: borales/actions-yarn@master
         with:
