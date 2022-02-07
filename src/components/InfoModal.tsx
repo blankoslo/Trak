@@ -98,7 +98,8 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
         employeeTask.responsible = formData.responsible;
         router
           .push({
-            pathname: router.asPath,
+            pathname: router.pathname,
+            query: router.query,
           })
           .finally(() => {
             showSnackbar('Ansvarlig byttet', 'success');
@@ -182,7 +183,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
                 <b>Fullført av:</b>{' '}
               </Typography>
               <Typography variant='body1'>
-                {data.completedBy.firstName} {data.employeeTask.completedBy.lastName} den {format(new Date(data.completedDate), 'dd.MM.yyyy')}
+                {data.completedBy.firstName} {data.employeeTask?.completedBy.lastName} den {format(new Date(data.completedDate), 'dd.MM.yyyy')}
               </Typography>
             </>
           )}
