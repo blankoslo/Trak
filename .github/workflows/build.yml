@@ -18,13 +18,9 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-      - name: Installing dependencies
-        uses: borales/actions-yarn@master
-        with:
-          cmd: install
+      - name: Install dependencies
+        run: sudo yarn
       - name: Generate Prisma
         run: sudo yarn generate
       - name: Building Next
-        uses: borales/actions-yarn@master
-        with:
-          cmd: build
+        run: sudo yarn build
