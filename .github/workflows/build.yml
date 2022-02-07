@@ -6,14 +6,15 @@ on:
 
 jobs:
   build:
-    env:
-      TRAK_DB_URL: ${{secrets.TRAK_DB_URL}}
-      BLANK_DB_URL: ${{secrets.BLANK_DB_URL}}
     name: Build
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@master
+      - uses: actions/cache@master
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
       - name: Installing dependencies
         uses: borales/actions-yarn@master
         with:
