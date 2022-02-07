@@ -21,11 +21,12 @@
 		"lint": "eslint --fix --max-warnings=0 .",
 		"format": "prettier --write --check --config ./.prettierrc './src/**/*.{js,jsx,ts,tsx,css,md,json}'",
 		"heroku-postbuild": "yarn generate && yarn build",
-		"push": "npx prisma db push --schema src/prisma/trak.prisma --preview-feature",
+		"push": "npx prisma db push --schema src/prisma/trak.prisma",
 		"generate": "npx prisma generate --schema src/prisma/blank.prisma && npx prisma generate --schema src/prisma/trak.prisma",
 		"fresh": "docker rm -f -v trak && yarn createdb && yarn push",
 		"createdb": "docker run --name trak -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"gh_action": "eslint . && yarn format"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.7.1",

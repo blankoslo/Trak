@@ -1,16 +1,17 @@
-name: Build Project
+name: Prisma Push Prod
 
 on:
-  pull_request:
-    branches: [dev]
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build
+  push:
+    name: Push
     runs-on: ubuntu-latest
     env:
-      TRAK_DB_URL: ${{secrets.DEV_TRAK_DB_URL}}
-      BLANK_DB_URL: ${{secrets.DEV_BLANK_DB_URL}}
+      TRAK_DB_URL: ${{secrets.PROD_TRAK_DB_URL}}
 
     steps:
       - uses: actions/checkout@master
@@ -22,7 +23,8 @@ jobs:
         uses: borales/actions-yarn@master
         with:
           cmd: install
-      - name: Check formating
+      - name: Push prisma changes
         uses: borales/actions-yarn@master
         with:
-          cmd: gh_action
+          cmd: push
+
