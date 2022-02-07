@@ -14,9 +14,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Install dependencies
-        run: sudo yarn
-      - name: Generate Prisma
-        run: sudo yarn generate
-      - name: Building Next
-        run: sudo yarn build
+      - uses: actions/cache@master
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      - name: Installing dependencies
+        uses: borales/actions-yarn@master
+        with:
+          cmd: install
+      - name: Check formating
+        uses: borales/actions-yarn@master
+        with:
+          cmd: gh_action
