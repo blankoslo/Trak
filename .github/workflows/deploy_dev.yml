@@ -1,0 +1,23 @@
+name: Prisma Push Dev
+
+on:
+  pull_request:
+    branches: [ dev ]
+
+  workflow_dispatch:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    env:
+      TRAK_DB_URL: ${{secrets.DEV_TRAK_DB_URL}}
+
+    steps:
+      - uses: actions/checkout@latest
+      - uses: borales/actions-yarn@latest
+        with:
+          cmd: install
+      - uses: borales/actions-yarn@latest
+        with:
+          cmd: push
+
