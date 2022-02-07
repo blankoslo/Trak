@@ -15,6 +15,11 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         return;
       }
       const employeeTasks = await trakClient.employeeTask.findMany({
+        where: {
+          completed: {
+            equals: false,
+          },
+        },
         select: {
           responsibleId: true,
           completedById: true,
@@ -72,7 +77,7 @@ const getExpiredTasks = async (id: number) =>
     where: {
       responsibleId: id,
       dueDate: {
-        lte: getToday(),
+        lt: getToday(),
       },
       completed: {
         equals: false,
@@ -86,7 +91,7 @@ const getUpcomingTasks = async (id: number) =>
       responsibleId: id,
       dueDate: {
         gte: getToday(),
-        lte: add(getToday(), { weeks: 1 }),
+        lt: add(getToday(), { weeks: 1 }),
       },
       completed: {
         equals: false,
