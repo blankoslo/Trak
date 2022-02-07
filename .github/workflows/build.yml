@@ -8,6 +8,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      TRAK_DB_URL: ${{secrets.DEV_TRAK_DB_URL}}
+      BLANK_DB_URL: ${{secrets.DEV_BLANK_DB_URL}}
 
     steps:
       - uses: actions/checkout@master
@@ -19,6 +22,10 @@ jobs:
         uses: borales/actions-yarn@master
         with:
           cmd: install
+      - name: Generate Prisma
+        uses: borales/actions-yarn@master
+        with:
+          cmd: generate
       - name: Building Next
         uses: borales/actions-yarn@master
         with:
