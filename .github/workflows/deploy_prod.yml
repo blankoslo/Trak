@@ -13,11 +13,11 @@ jobs:
       TRAK_DB_URL: ${{secrets.PROD_TRAK_DB_URL}}
 
     steps:
-      - uses: actions/checkout@latest
-      - uses: borales/actions-yarn@latest
+      - uses: actions/checkout@master
+      - uses: borales/actions-yarn@master
         with:
           cmd: install
-      - uses: borales/actions-yarn@latest
+      - uses: borales/actions-yarn@master
         with:
           cmd: push
 
