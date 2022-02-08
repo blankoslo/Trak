@@ -154,6 +154,7 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
                         <Grid item key={employee.id} lg={4} sm={6} xs={12}>
                           <EmployeeCard
                             firstName={employee.firstName}
+                            gender={employee.gender}
                             id={employee.id}
                             imageUrl={employee.imageUrl}
                             lastName={employee.lastName}

@@ -27,6 +27,7 @@ model Employee {
   dateOfEmployment        DateTime?
   terminationDate         DateTime?
   imageUrl                String?
+  gender                  gender?
   hrManagerId             Int?
   hrManager               Employee?         @relation("EmployeeToEmployee", fields: [hrManagerId], references: [id])
   profession              Profession        @relation(fields: [professionId], references: [id])
@@ -131,4 +132,10 @@ enum NotificationType {
   WEEK_BEFORE_DEADLINE
   TERMINATION
   HIRED
+}
+
+enum gender {
+  male
+  female
+  other
 }
