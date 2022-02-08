@@ -89,7 +89,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
             ...(formData.responsible.employeeSettings?.slack && {
               email: formData.responsible.email,
             }),
-            createdBy: user.id,
+            createdBy: user,
           });
         }
 

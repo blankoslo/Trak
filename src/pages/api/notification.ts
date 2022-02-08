@@ -14,12 +14,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           employeeId: employeeId,
           description: description,
           ...(createdBy && {
-            createdBy: createdBy,
+            createdBy: createdBy.id,
           }),
         },
       });
       if (email) {
-        slackMessager(email, description);
+        const descriptionWithCreater = description.concat(` av ${createdBy.firstName} ${createdBy.lastName[0]}.`);
+        slackMessager(email, descriptionWithCreater);
       }
       res.status(HttpStatusCode.CREATED).json(newNotification);
     } catch (err) {
