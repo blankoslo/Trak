@@ -5,6 +5,7 @@ import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import Link from 'next/link';
+import { getEmoji } from 'utils/utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -23,10 +24,13 @@ export type EmployeeCardProps = {
   lastName: string;
   imageUrl: string;
   role: string;
+  gender: string;
 };
 
-const EmployeeCard = ({ id, firstName, lastName, imageUrl, role }: EmployeeCardProps) => {
+const EmployeeCard = ({ id, firstName, lastName, imageUrl, role, gender }: EmployeeCardProps) => {
   const classes = useStyles();
+  const emoji = getEmoji(role, gender);
+
   return (
     <Link href={`/ansatt/${id}`} passHref>
       <ButtonBase className={classes.root}>
@@ -35,7 +39,11 @@ const EmployeeCard = ({ id, firstName, lastName, imageUrl, role }: EmployeeCardP
           <Typography variant='h4'>
             {firstName} {lastName[0]}.
           </Typography>
-          <Typography variant='h5'>{role || 'Ukjent'}</Typography>
+          <Typography variant='h5'>
+            {emoji}
+
+            {role || 'Ukjent'}
+          </Typography>
         </Stack>
       </ButtonBase>
     </Link>

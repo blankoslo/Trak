@@ -99,6 +99,7 @@ const addEmployees = async (blankEmployees, includeHrManager = true) => {
         birthDate: employee.birth_date,
         dateOfEmployment: employee.date_of_employment,
         terminationDate: employee.termination_date,
+        gender: employee.gender,
         imageUrl: employee.image_url,
         ...(employee.hr_manager &&
           includeHrManager && {
@@ -149,6 +150,7 @@ export async function syncTrakDatabase() {
       email: true,
       birth_date: true,
       date_of_employment: true,
+      gender: true,
       image_url: true,
       role: true,
       hr_manager: true,

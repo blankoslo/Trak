@@ -106,3 +106,29 @@ export const isToday = (someDate) => {
   const today = new Date();
   return someDate.getDate() === today.getDate() && someDate.getMonth() === today.getMonth() && someDate.getFullYear() === today.getFullYear();
 };
+
+export const getEmoji = (role: string, gender: string) => {
+  const technologyEmojies = ['💻', '🖥', '⌨️'];
+  const designerEmojies = ['🖼', '🖌', '🎨'];
+  const anotherEmojies = ['🤔', '🥸'];
+
+  if (role === 'Teknolog') {
+    const number = Math.floor(Math.random() * technologyEmojies.length + 1);
+    if (number === technologyEmojies.length) {
+      return gender === 'male' ? '🧑‍💻' : '👩‍💻';
+    }
+    return technologyEmojies[number];
+  } else if (role === 'Designer') {
+    const number = Math.floor(Math.random() * designerEmojies.length + 1);
+    if (number === designerEmojies.length) {
+      return gender === 'male' ? '👨‍🎨' : '👩‍🎨';
+    }
+    return designerEmojies[number];
+  } else {
+    const number = Math.floor(Math.random() * anotherEmojies.length + 1);
+    if (number === anotherEmojies.length) {
+      return gender === 'male' ? '🤷‍♂️' : '🤷‍♀️';
+    }
+    return anotherEmojies[number];
+  }
+};
