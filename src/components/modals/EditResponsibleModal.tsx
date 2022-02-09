@@ -56,7 +56,7 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
             ...(formData.responsible.employeeSettings?.slack && {
               email: formData.responsible.email,
             }),
-            createdBy: user.id,
+            createdBy: user,
           });
         }
 
