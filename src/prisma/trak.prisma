@@ -11,9 +11,9 @@ model Comment {
   id                String       @id @default(uuid())
   text              String
   createdAt         DateTime     @default(now())
-  createdByEmployee Employee     @relation(fields: [createdById], references: [id])
+  createdByEmployee Employee     @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdById       Int
-  employeeTask      EmployeeTask @relation(fields: [employeeTaskId], references: [id])
+  employeeTask      EmployeeTask @relation(fields: [employeeTaskId], references: [id], onDelete: Cascade)
   employeeTaskId    String
 }
 
@@ -29,8 +29,8 @@ model Employee {
   terminationDate         DateTime?
   imageUrl                String?
   hrManagerId             Int?
-  hrManager               Employee?         @relation("EmployeeToEmployee", fields: [hrManagerId], references: [id])
-  profession              Profession        @relation(fields: [professionId], references: [id])
+  hrManager               Employee?         @relation("EmployeeToEmployee", fields: [hrManagerId], references: [id], onDelete: SetNull)
+  profession              Profession        @relation(fields: [professionId], references: [id], onDelete: SetNull)
   employees               Employee[]        @relation("EmployeeToEmployee")
   employeeSettings        EmployeeSettings? @relation("settings")
   completedTasks          EmployeeTask[]    @relation("completed_by")
@@ -46,7 +46,7 @@ model EmployeeSettings {
   employeeId           Int                @id
   slack                Boolean            @default(true)
   notificationSettings NotificationType[]
-  employee             Employee           @relation("settings", fields: [employeeId], references: [id])
+  employee             Employee           @relation("settings", fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model EmployeeTask {
@@ -58,9 +58,9 @@ model EmployeeTask {
   dueDate       DateTime
   completedDate DateTime?
   completedById Int?
-  completedBy   Employee? @relation("completed_by", fields: [completedById], references: [id])
-  employee      Employee  @relation("tasks", fields: [employeeId], references: [id])
-  responsible   Employee  @relation("responsible_employee_tasks", fields: [responsibleId], references: [id])
+  completedBy   Employee? @relation("completed_by", fields: [completedById], references: [id], onDelete: SetNull)
+  employee      Employee  @relation("tasks", fields: [employeeId], references: [id], onDelete: Cascade)
+  responsible   Employee  @relation("responsible_employee_tasks", fields: [responsibleId], references: [id], onDelete: SetNull)
   task          Task      @relation(fields: [taskId], references: [id])
   comments      Comment[]
 }
@@ -72,8 +72,8 @@ model Notification {
   createdAt         DateTime  @default(now())
   read              Boolean   @default(false)
   description       String
-  employee          Employee  @relation("employee", fields: [employeeId], references: [id])
-  createdByEmployee Employee? @relation("created_by_employee", fields: [createdBy], references: [id])
+  employee          Employee  @relation("employee", fields: [employeeId], references: [id], onDelete: Cascade)
+  createdByEmployee Employee? @relation("created_by_employee", fields: [createdBy], references: [id], onDelete: SetNull)
 }
 
 model Phase {
@@ -120,7 +120,7 @@ model Task {
   dueDateDayOffset Int?
   dueDate          DateTime?
   phase            Phase?         @relation(fields: [phaseId], references: [id])
-  responsible      Employee?      @relation("responsible_tasks", fields: [responsibleId], references: [id])
+  responsible      Employee?      @relation("responsible_tasks", fields: [responsibleId], references: [id], onDelete: SetNull)
   employeeTask     EmployeeTask[]
   professions      Profession[]
   tags             Tag[]
