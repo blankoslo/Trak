@@ -55,7 +55,7 @@ const updateTask = async (blankEmployees) => {
       if (blankEmployeeData) {
         await updateOrDeleteTask(employee, blankEmployeeData);
       } else {
-        // await deleteNonExistantUser(employee);
+        await deleteNonExistantUser(employee);
       }
     }),
   );
