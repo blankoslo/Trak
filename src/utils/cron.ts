@@ -1,6 +1,7 @@
 import addDays from 'date-fns/addDays';
 import { trakClient } from 'lib/prisma';
 import { PrismaClient as BlankClient } from 'prisma/generated/blank';
+import { getToday } from 'utils/date';
 
 const updateTask = async (blankEmployees) => {
   const blankEmployeeStartEndDate = blankEmployees.map((employee) => ({
@@ -10,9 +11,18 @@ const updateTask = async (blankEmployees) => {
   }));
   const updatedTrakEmployee = await trakClient.employee.findMany({
     where: {
-      NOT: {
-        OR: blankEmployeeStartEndDate,
-      },
+      AND: [
+        {
+          NOT: {
+            OR: blankEmployeeStartEndDate,
+          },
+        },
+        {
+          terminationDate: {
+            gte: getToday(),
+          },
+        },
+      ],
     },
     select: {
       id: true,
@@ -52,6 +62,9 @@ const updateTask = async (blankEmployees) => {
   await Promise.all(
     updatedTrakEmployee.map(async (employee) => {
       const blankEmployeeData = blankEmployees.find((blankEmployee) => blankEmployee.id === employee.id);
+      if (!blankEmployeeData) {
+        return;
+      }
       await trakClient.$transaction([
         ...employee.employeeTask.map((task) => {
           const onboardingDateRefrence = task.task.phase.processTemplate.slug === 'onboarding' && blankEmployeeData.date_of_employment;
