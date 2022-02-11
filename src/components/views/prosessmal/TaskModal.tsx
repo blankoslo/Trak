@@ -1,8 +1,12 @@
 import HelpIcon from '@mui/icons-material/Help';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import Select from '@mui/material/Select';
 import { Theme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
@@ -44,6 +48,7 @@ export type TaskData = {
   tags?: ITag[];
   dueDate?: Date;
   dueDateDayOffset?: number | null;
+  chooseResponsible?: boolean;
   offset: Offset;
   link: string;
   day: number;
@@ -85,6 +90,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     formState: { errors },
     control,
     reset,
+    resetField,
     watch,
   } = useForm<TaskData>({
     reValidateMode: 'onChange',
@@ -96,6 +102,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         professions: task?.professions,
         tags: task?.tags,
         responsible: task?.responsible,
+        chooseResponsible: Boolean(task?.responsible),
         dueDate: task?.dueDate,
         dueDateDayOffset: task?.dueDateDayOffset,
         offset: task?.offset,
@@ -108,6 +115,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
 
   // @ts-ignore
   const watchSelectedMonth: number = watch('month');
+  const watchShowTaskResponsible: string | boolean = watch('chooseResponsible', false);
 
   const daysInMonth = useMemo(() => {
     return getDaysInMonth(new Date(2021, watchSelectedMonth));
@@ -139,6 +147,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
       professions: task?.professions,
       tags: task?.tags,
       responsible: task?.responsible,
+      chooseResponsible: Boolean(task?.responsible),
       dueDate: task?.dueDate,
       dueDateDayOffset: task?.dueDateDayOffset,
       day: dueDate.getDate() || -1,
@@ -150,13 +159,18 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     axiosBuilder(axiosFunc, text, router, showProgressbar, showSnackbar, closeModal);
   };
 
+  useEffect(() => {
+    if (watchShowTaskResponsible.toString() === 'false') {
+      resetField('responsible');
+    }
+  }, [watchShowTaskResponsible]);
+
   const onSubmit = handleSubmit((formData: TaskData) => {
     const dueDateDayOffset = !formData.dueDateDayOffset
       ? null
       : formData.offset === Offset.Before
       ? -Math.abs(formData.dueDateDayOffset)
       : Math.abs(formData.dueDateDayOffset);
-
     const data = {
       data: {
         ...formData,
@@ -166,6 +180,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
             dueDate: formatISO(new Date().setMonth(formData.month, formData.day)),
           }),
         dueDateDayOffset: dueDateDayOffset,
+        responsible: formData.chooseResponsible.toString() === 'true' ? formData.responsible : null,
       },
       phaseId: phase.id,
       global: true,
@@ -276,12 +291,29 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         />
         <ToggleButtonGroup control={control} name={'professions'} professions={professions} />
         <TagSelector control={control} label='Tags' name='tags' options={tags} />
-        <EmployeeSelector control={control} label='Oppgaveansvarlig' name='responsible' />
+        <FormControl>
+          <Typography variant='body1'>Oppgaveansvarlig</Typography>
+          <Controller
+            control={control}
+            name='chooseResponsible'
+            render={({ field }) => {
+              return (
+                <RadioGroup {...field} row>
+                  <FormControlLabel control={<Radio />} label='Personalansvarlig' value={false} />
+                  <FormControlLabel control={<Radio />} label='Annen' value={true} />
+                </RadioGroup>
+              );
+            }}
+          />
+        </FormControl>
+        {watchShowTaskResponsible.toString() === 'true' && (
+          <EmployeeSelector control={control} errors={errors} label='Oppgaveansvarlig' name='responsible' required />
+        )}
         {phase.processTemplateId === 'lopende' && (
           <Box>
             <Typography variant='body1'>
               Overskriv forfallsdato
-              <Tooltip title='Overskriv forfallsdatoen satt for fasen for hvilken årlig dato skal oppgven forfalle?'>
+              <Tooltip title='Overskriv forfallsdatoen satt for fasen for hvilken årlig dato skal oppgaven forfalle'>
                 <HelpIcon fontSize='small' />
               </Tooltip>
             </Typography>
