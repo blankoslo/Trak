@@ -1,7 +1,6 @@
 import addDays from 'date-fns/addDays';
 import { trakClient } from 'lib/prisma';
 import { PrismaClient as BlankClient } from 'prisma/generated/blank';
-import { getToday } from 'utils/date';
 
 const updateTask = async (blankEmployees) => {
   const blankEmployeeStartEndDate = blankEmployees.map((employee) => ({
@@ -11,18 +10,9 @@ const updateTask = async (blankEmployees) => {
   }));
   const updatedTrakEmployee = await trakClient.employee.findMany({
     where: {
-      AND: [
-        {
-          NOT: {
-            OR: blankEmployeeStartEndDate,
-          },
-        },
-        {
-          terminationDate: {
-            gte: getToday(),
-          },
-        },
-      ],
+      NOT: {
+        OR: blankEmployeeStartEndDate,
+      },
     },
     select: {
       id: true,
@@ -62,45 +52,56 @@ const updateTask = async (blankEmployees) => {
   await Promise.all(
     updatedTrakEmployee.map(async (employee) => {
       const blankEmployeeData = blankEmployees.find((blankEmployee) => blankEmployee.id === employee.id);
-      if (!blankEmployeeData) {
-        return;
+      if (blankEmployeeData) {
+        await updateOrDeleteTask(employee, blankEmployeeData);
+      } else {
+        // await deleteNonExistantUser(employee);
       }
-      await trakClient.$transaction([
-        ...employee.employeeTask.map((task) => {
-          const onboardingDateRefrence = task.task.phase.processTemplate.slug === 'onboarding' && blankEmployeeData.date_of_employment;
-          const offboardingDateRefrence = task.task.phase.processTemplate.slug === 'offboarding' && blankEmployeeData.termination_date;
-          const refrenceDate = onboardingDateRefrence || offboardingDateRefrence || undefined;
-          if (!refrenceDate) {
-            return trakClient.employeeTask.delete({
-              where: {
-                id: task.id,
-              },
-            });
-          }
-          const taskOffset = task.task.dueDateDayOffset || task.task.phase.dueDateDayOffset;
-          const newDueDate = addDays(refrenceDate, taskOffset);
-          return trakClient.employeeTask.update({
-            where: {
-              id: task.id,
-            },
-            data: {
-              dueDate: newDueDate,
-            },
-          });
-        }),
-        trakClient.employee.update({
-          where: {
-            id: employee.id,
-          },
-          data: {
-            dateOfEmployment: blankEmployeeData.date_of_employment,
-            terminationDate: blankEmployeeData.termination_date,
-          },
-        }),
-      ]);
     }),
   );
 };
+// eslint-disable-next-line
+const deleteNonExistantUser = async (employee) =>
+  await trakClient.employee.delete({
+    where: {
+      id: employee.id,
+    },
+  });
+
+const updateOrDeleteTask = async (employee, blankEmployeeData) =>
+  await trakClient.$transaction([
+    ...employee.employeeTask.map((task) => {
+      const onboardingDateRefrence = task.task.phase.processTemplate.slug === 'onboarding' && blankEmployeeData.date_of_employment;
+      const offboardingDateRefrence = task.task.phase.processTemplate.slug === 'offboarding' && blankEmployeeData.termination_date;
+      const refrenceDate = onboardingDateRefrence || offboardingDateRefrence || undefined;
+      if (!refrenceDate) {
+        return trakClient.employeeTask.delete({
+          where: {
+            id: task.id,
+          },
+        });
+      }
+      const taskOffset = task.task.dueDateDayOffset || task.task.phase.dueDateDayOffset;
+      const newDueDate = addDays(refrenceDate, taskOffset);
+      return trakClient.employeeTask.update({
+        where: {
+          id: task.id,
+        },
+        data: {
+          dueDate: newDueDate,
+        },
+      });
+    }),
+    trakClient.employee.update({
+      where: {
+        id: employee.id,
+      },
+      data: {
+        dateOfEmployment: blankEmployeeData.date_of_employment,
+        terminationDate: blankEmployeeData.termination_date,
+      },
+    }),
+  ]);
 
 const addEmployees = async (blankEmployees, includeHrManager = true) => {
   await trakClient.$transaction(
