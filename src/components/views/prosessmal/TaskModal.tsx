@@ -223,13 +223,14 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         <TextField
           errors={errors}
           inputProps={{ 'aria-label': 'Rediger oppgavetittel' }}
-          label='Oppgavetittel'
+          label='Tittel'
           name='title'
           register={register}
           required
           rules={{
             required: 'Oppgavetittel er påkrevd',
           }}
+          sx={{ marginTop: 2 }}
         />
         <TextField
           errors={errors}
