@@ -13,33 +13,231 @@ model employee_role {
   employee_id Int
   role_type   employee_role_type
   created     DateTime?          @default(now()) @db.Date
-  employees   employees          @relation(fields: [employee_id], references: [id])
+  employees   employees          @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model employees {
-  id                         Int             @id @default(autoincrement())
-  first_name                 String
-  last_name                  String
-  title                      String?
-  phone                      String
-  email                      String          @unique
-  gender                     gender
-  birth_date                 DateTime        @db.Date
-  date_of_employment         DateTime?       @db.Date
-  termination_date           DateTime?       @db.Date
-  emergency_contact_name     String?
-  emergency_contact_phone    String?
-  emergency_contact_relation String?
-  address                    String?
-  postal_code                String?
-  city                       String?
-  image_url                  String?
-  has_permanent_position     Boolean?        @default(true)
-  emoji                      String?         @db.VarChar(10)
-  role                       String?
-  bio                        String?
-  hr_manager                 Int?
-  employee_role              employee_role[]
+  id                                                  Int                  @id @default(autoincrement())
+  first_name                                          String
+  last_name                                           String
+  title                                               String?
+  phone                                               String
+  email                                               String               @unique(map: "unique_employee_email")
+  gender                                              gender
+  birth_date                                          DateTime             @db.Date
+  date_of_employment                                  DateTime?            @db.Date
+  termination_date                                    DateTime?            @db.Date
+  emergency_contact_name                              String?
+  emergency_contact_phone                             String?
+  emergency_contact_relation                          String?
+  address                                             String?
+  postal_code                                         String?
+  city                                                String?
+  image_url                                           String?
+  has_permanent_position                              Boolean?             @default(true)
+  emoji                                               String?              @db.VarChar(10)
+  role                                                String?
+  bio                                                 String?
+  hr_manager                                          Int?
+  employees                                           employees?           @relation("employeesToemployees_hr_manager", fields: [hr_manager], references: [id], onUpdate: NoAction)
+  absence                                             absence[]
+  employee_role                                       employee_role[]
+  other_employees                                     employees[]          @relation("employeesToemployees_hr_manager")
+  paid_overtime                                       paid_overtime[]
+  projects                                            projects[]
+  project_sdg_events                                  project_sdg_events[]
+  ranked_matchups_employeesToranked_matchups_user1_id ranked_matchups[]    @relation("employeesToranked_matchups_user1_id")
+  ranked_matchups_employeesToranked_matchups_user2_id ranked_matchups[]    @relation("employeesToranked_matchups_user2_id")
+  staffing                                            staffing[]
+  talks                                               talks[]
+  time_entry_employeesTotime_entry_creator            time_entry[]         @relation("employeesTotime_entry_creator")
+  time_entry_employeesTotime_entry_employee           time_entry[]         @relation("employeesTotime_entry_employee")
+  timelock_events_employeesTotimelock_events_creator  timelock_events[]    @relation("employeesTotimelock_events_creator")
+  timelock_events_employeesTotimelock_events_employee timelock_events[]    @relation("employeesTotimelock_events_employee")
+  vacation_days                                       vacation_days[]
+}
+
+model customers {
+  id       String     @id
+  name     String     @unique(map: "unique_customer_name")
+  projects projects[]
+}
+
+model dropped_foreign_keys {
+  seq BigInt  @id @default(autoincrement())
+  sql String?
+}
+
+model paid_overtime {
+  id              Int       @id @default(autoincrement())
+  employee        Int
+  paid_date       DateTime? @db.Date
+  minutes         Int
+  comment         String
+  registered_date DateTime  @default(now()) @db.Date
+  employees       employees @relation(fields: [employee], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model projects {
+  id                 String               @id
+  name               String
+  billable           time_status
+  customer           String
+  responsible        Int?
+  active             Boolean              @default(true)
+  deductable         Boolean?             @default(false)
+  customers          customers            @relation(fields: [customer], references: [id], onDelete: NoAction)
+  employees          employees?           @relation(fields: [responsible], references: [id], onDelete: NoAction, map: "projects_employees_fkey")
+  invoice_balance    invoice_balance[]
+  project_sdg_events project_sdg_events[]
+  staffing           staffing[]
+  time_entry         time_entry[]
+}
+
+model project_sdg_events {
+  event_id   Int       @id @default(autoincrement())
+  event_type String
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  caused_by  Int
+  project    String
+  goal       Int
+  employees  employees @relation(fields: [caused_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  projects   projects  @relation(fields: [project], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model reporting_visibility {
+  year              Int
+  week              Int
+  available_hours   Decimal  @db.Decimal
+  billable_hours    Decimal  @db.Decimal
+  time_created      DateTime @db.Timestamp(6)
+  unavailable_hours Decimal  @db.Decimal
+
+  @@unique([year, week])
+}
+
+model staffing {
+  employee  Int
+  project   String
+  date      DateTime  @db.Date
+  employees employees @relation(fields: [employee], references: [id], onDelete: NoAction)
+  projects  projects  @relation(fields: [project], references: [id], onDelete: NoAction)
+
+  @@id([employee, date])
+}
+
+model time_entry {
+  id                                       String    @id @default(dbgenerated("uuid_generate_v4()"))
+  employee                                 Int
+  creator                                  Int
+  minutes                                  Int?
+  project                                  String
+  date                                     DateTime  @db.Date
+  created                                  DateTime? @default(now()) @db.Timestamp(6)
+  employees_employeesTotime_entry_creator  employees @relation("employeesTotime_entry_creator", fields: [creator], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees_employeesTotime_entry_employee employees @relation("employeesTotime_entry_employee", fields: [employee], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  projects                                 projects  @relation(fields: [project], references: [id], onDelete: NoAction)
+
+  @@index([date], map: "time_entry_date_index")
+}
+
+model timelock_events {
+  id                                            String    @id @default(dbgenerated("uuid_generate_v4()"))
+  created                                       DateTime? @default(now()) @db.Timestamp(6)
+  creator                                       Int
+  employee                                      Int
+  commit_date                                   DateTime  @db.Date
+  employees_employeesTotimelock_events_creator  employees @relation("employeesTotimelock_events_creator", fields: [creator], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees_employeesTotimelock_events_employee employees @relation("employeesTotimelock_events_employee", fields: [employee], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([commit_date], map: "timelock_events_commit_date_index")
+}
+
+model absence {
+  employee_id Int
+  date        DateTime  @db.Date
+  reason      String
+  employees   employees @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([employee_id, date])
+}
+
+model expense {
+  id                                       String          @id @default(dbgenerated("uuid_generate_v4()"))
+  invoice_balance                          String
+  type                                     expense_type
+  amount                                   Decimal         @db.Decimal(10, 2)
+  created                                  DateTime        @default(now()) @db.Date
+  comment                                  String?
+  invoice_balance_expenseToinvoice_balance invoice_balance @relation(fields: [invoice_balance], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model holidays {
+  date DateTime @id @db.Date
+  name String?
+}
+
+model invoice_balance {
+  id            String         @id @default(dbgenerated("uuid_generate_v4()"))
+  project       String
+  date          DateTime       @db.Date
+  amount        Decimal        @default(0) @db.Decimal(10, 2)
+  minutes       Int            @default(0)
+  created       DateTime       @default(now()) @db.Date
+  invoicenumber String?        @unique(map: "unique_invoicenumber")
+  status        invoice_status @default(not_done)
+  projects      projects       @relation(fields: [project], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  expense       expense[]
+  write_off     write_off[]
+
+  @@unique([project, date], map: "unique_invoiceprojectdate")
+}
+
+model ranked_games {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()"))
+  title           String            @default("")
+  ranked_matchups ranked_matchups[]
+}
+
+model ranked_matchups {
+  id                                            String                @id @default(dbgenerated("uuid_generate_v4()"))
+  game_id                                       String
+  user1_id                                      Int
+  user2_id                                      Int
+  matchup_result                                ranked_matchup_result @default(TIE)
+  created_at                                    DateTime              @default(now()) @db.Timestamp(6)
+  ranked_games                                  ranked_games          @relation(fields: [game_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees_employeesToranked_matchups_user1_id employees             @relation("employeesToranked_matchups_user1_id", fields: [user1_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees_employeesToranked_matchups_user2_id employees             @relation("employeesToranked_matchups_user2_id", fields: [user2_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model talks {
+  employee    Int?
+  talk_date   DateTime   @db.Date
+  title       String
+  description String?
+  location    String
+  created     DateTime   @default(now()) @db.Timestamp(6)
+  id          Int        @id @default(autoincrement())
+  employees   employees? @relation(fields: [employee], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model vacation_days {
+  employee_id Int
+  year        Int
+  days_earnt  Decimal   @db.Decimal
+  comment     String?
+  employees   employees @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([employee_id, year])
+}
+
+model write_off {
+  id                                         String          @id @default(dbgenerated("uuid_generate_v4()"))
+  invoice_balance                            String
+  minutes                                    Int
+  created                                    DateTime        @default(now()) @db.Date
+  invoice_balance_invoice_balanceTowrite_off invoice_balance @relation(fields: [invoice_balance], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum employee_role_type {
@@ -50,4 +248,28 @@ enum gender {
   male
   female
   other
+}
+
+enum expense_type {
+  subcontractor
+  other
+}
+
+enum invoice_status {
+  not_done
+  not_ok
+  ok
+  sent
+}
+
+enum time_status {
+  billable
+  nonbillable
+  unavailable
+}
+
+enum ranked_matchup_result {
+  WIN
+  LOSS
+  TIE
 }

@@ -147,3 +147,9 @@ export enum ColorMode {
   DARK = 'dark',
   LIGHT = 'light',
 }
+
+export enum ResponsibleType {
+  HR_MANAGER = 'HR_MANAGER',
+  PROJECT_MANAGER = 'PROJECT_MANAGER',
+  OTHER = 'OTHER',
+}
