@@ -5,7 +5,7 @@ import withAuth from 'lib/withAuth';
 import { groupBy } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { syncTrakDatabase } from 'utils/cron';
-import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
+import { IEmployee, IEmployeeTask, IPhase, ResponsibleType } from 'utils/types';
 import { Process } from 'utils/types';
 let LAST_RUN = undefined;
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
@@ -46,6 +46,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             id: true,
             dueDate: true,
             dueDateDayOffset: true,
+            responsibleType: true,
             responsibleId: true,
             professions: {
               select: {
@@ -83,6 +84,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             dueDate: true,
             task: {
               select: {
+                responsibleType: true,
                 phase: {
                   select: {
                     id: true,
@@ -238,9 +240,20 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
       if (!task.responsibleId && !employee.hrManagerId) {
         return;
       }
+
+      const responsible = (() => {
+        switch (task.responsibleType) {
+          case ResponsibleType.OTHER:
+            return task.responsibleId;
+          case ResponsibleType.PROJECT_MANAGER:
+            return employee.hrManagerId;
+          default:
+            return employee.hrManagerId;
+        }
+      })();
       return {
         employeeId: employee.id,
-        responsibleId: task.responsibleId || employee.hrManagerId,
+        responsibleId: responsible,
         dueDate: taskDueDate || phase.dueDate,
         taskId: task.id,
       };

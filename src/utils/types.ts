@@ -111,6 +111,7 @@ export type ITask = {
   global: boolean;
   phaseId: string;
   phase: IPhase;
+  responsibleType: ResponsibleType;
   professions?: IProfession[];
   tags?: ITag[];
   employeeTask: IEmployeeTask[];
