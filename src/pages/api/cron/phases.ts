@@ -295,11 +295,6 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, lastPhase
             taskDueDate = addDays(employee.dateOfEmployment, task.dueDateDayOffset);
           }
         }
-
-        if (!task.responsibleId && !employee.hrManagerId) {
-          return;
-        }
-
         const responsible = (async () => {
           switch (task.responsibleType) {
             case ResponsibleType.OTHER:
