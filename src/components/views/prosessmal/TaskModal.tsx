@@ -49,7 +49,6 @@ export type TaskData = {
   dueDate?: Date;
   dueDateDayOffset?: number | null;
   responsibleType: ResponsibleType;
-  chooseResponsible?: boolean;
   offset: Offset;
   link: string;
   day: number;
@@ -104,7 +103,6 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         tags: task?.tags,
         responsible: task?.responsible,
         responsibleType: task?.responsibleType,
-        chooseResponsible: task?.responsibleType === ResponsibleType.OTHER,
         dueDate: task?.dueDate,
         dueDateDayOffset: task?.dueDateDayOffset,
         offset: task?.offset,
@@ -150,7 +148,6 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
       tags: task?.tags,
       responsible: task?.responsible,
       responsibleType: task?.responsibleType,
-      chooseResponsible: task?.responsibleType === ResponsibleType.OTHER,
       dueDate: task?.dueDate,
       dueDateDayOffset: task?.dueDateDayOffset,
       day: dueDate.getDate() || -1,

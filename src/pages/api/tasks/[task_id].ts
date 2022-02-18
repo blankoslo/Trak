@@ -78,6 +78,9 @@ const PUT = async (req, res, task_id) => {
   const {
     body: { data, phaseId, global },
   } = req;
+  if (!data.responsible && data.responsibleType === ResponsibleType.OTHER) {
+    res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Må sende med en personalansvarlig når man velger 'annen' ansvarlig" });
+  }
   try {
     const getTask = await trakClient.task.findUnique({
       where: {

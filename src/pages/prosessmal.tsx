@@ -58,6 +58,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
               id: true,
               title: true,
               description: true,
+              responsibleType: true,
               link: true,
               professions: true,
               responsible: {

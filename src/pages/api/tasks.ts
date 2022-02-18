@@ -9,6 +9,10 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     const {
       body: { data, phaseId, global },
     } = req;
+
+    if (!data.responsible && data.responsibleType === ResponsibleType.OTHER) {
+      res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Må sende med en personalansvarlig når man velger 'annen' ansvarlig" });
+    }
     const newTask = await trakClient.task.create({
       data: {
         title: data.title,

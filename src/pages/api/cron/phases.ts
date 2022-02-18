@@ -259,9 +259,9 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
       project: true,
     },
   });
-
-  if (projectsCount.length === 0) {
-    return employee.hrManagerId;
+  const employeeIsOnProject = projectsCount.length > 0;
+  if (!employeeIsOnProject) {
+    return;
   }
   const projectManager = await new BlankClient().projects.findFirst({
     where: {
@@ -271,7 +271,11 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
       responsible: true,
     },
   });
-  if (projectManager.responsible === employee.id) {
+  if (!projectManager?.responsible) {
+    return employee.hrManagerId;
+  }
+  const employeeIsProjectManager = projectManager.responsible === employee.id;
+  if (employeeIsProjectManager) {
     return employee.hrManagerId;
   }
   return projectManager.responsible;
@@ -306,9 +310,13 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, lastPhase
               return employee.hrManagerId;
           }
         })();
+        const responsibleId = await responsible;
+        if (!responsibleId) {
+          return;
+        }
         return {
           employeeId: employee.id,
-          responsibleId: await responsible,
+          responsibleId: responsibleId,
           dueDate: taskDueDate || phase.dueDate,
           taskId: task.id,
         };
