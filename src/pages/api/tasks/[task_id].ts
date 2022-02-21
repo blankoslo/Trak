@@ -2,7 +2,7 @@ import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ITag } from 'utils/types';
+import { ITag, ResponsibleType } from 'utils/types';
 
 export const config = {
   api: {
@@ -36,6 +36,7 @@ const GET = async (res, task_id) => {
         description: true,
         phaseId: true,
         link: true,
+        responsibleType: true,
         dueDate: true,
         dueDateDayOffset: true,
         tags: {
@@ -77,6 +78,9 @@ const PUT = async (req, res, task_id) => {
   const {
     body: { data, phaseId, global },
   } = req;
+  if (!data.responsible && data.responsibleType === ResponsibleType.OTHER) {
+    res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Må sende med en personalansvarlig når man velger 'annen' ansvarlig" });
+  }
   try {
     const getTask = await trakClient.task.findUnique({
       where: {
@@ -96,13 +100,14 @@ const PUT = async (req, res, task_id) => {
         link: data.link,
         global: global,
         dueDate: data.dueDate,
+        responsibleType: data.responsibleType,
         dueDateDayOffset: data.dueDateDayOffset,
         phase: {
           connect: {
             id: phaseId,
           },
         },
-        ...(data.responsible
+        ...(data.responsible && data.responsibleType === ResponsibleType.OTHER
           ? {
               responsible: {
                 connect: {

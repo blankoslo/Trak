@@ -111,6 +111,7 @@ export type ITask = {
   global: boolean;
   phaseId: string;
   phase: IPhase;
+  responsibleType: ResponsibleType;
   professions?: IProfession[];
   tags?: ITag[];
   employeeTask: IEmployeeTask[];
@@ -146,4 +147,10 @@ export type IPhaseWithEmployees = {
 export enum ColorMode {
   DARK = 'dark',
   LIGHT = 'light',
+}
+
+export enum ResponsibleType {
+  HR_MANAGER = 'HR_MANAGER',
+  PROJECT_MANAGER = 'PROJECT_MANAGER',
+  OTHER = 'OTHER',
 }

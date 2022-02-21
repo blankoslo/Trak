@@ -29,7 +29,7 @@ import { capitalize } from 'lodash';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { IEmployee, IPhase, ITag, Offset, Process } from 'utils/types';
+import { IEmployee, IPhase, ITag, Offset, Process, ResponsibleType } from 'utils/types';
 import { axiosBuilder, getMonths } from 'utils/utils';
 import validator from 'validator';
 
@@ -48,7 +48,7 @@ export type TaskData = {
   tags?: ITag[];
   dueDate?: Date;
   dueDateDayOffset?: number | null;
-  chooseResponsible?: boolean;
+  responsibleType: ResponsibleType;
   offset: Offset;
   link: string;
   day: number;
@@ -102,7 +102,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         professions: task?.professions,
         tags: task?.tags,
         responsible: task?.responsible,
-        chooseResponsible: Boolean(task?.responsible),
+        responsibleType: task?.responsibleType,
         dueDate: task?.dueDate,
         dueDateDayOffset: task?.dueDateDayOffset,
         offset: task?.offset,
@@ -112,10 +112,10 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
       [task],
     ),
   });
-
+  // "HR_MANAGER"
   // @ts-ignore
   const watchSelectedMonth: number = watch('month');
-  const watchShowTaskResponsible: string | boolean = watch('chooseResponsible', false);
+  const watchShowTaskResponsible = watch('responsibleType');
 
   const daysInMonth = useMemo(() => {
     return getDaysInMonth(new Date(2021, watchSelectedMonth));
@@ -147,7 +147,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
       professions: task?.professions,
       tags: task?.tags,
       responsible: task?.responsible,
-      chooseResponsible: Boolean(task?.responsible),
+      responsibleType: task?.responsibleType,
       dueDate: task?.dueDate,
       dueDateDayOffset: task?.dueDateDayOffset,
       day: dueDate.getDate() || -1,
@@ -160,7 +160,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
   };
 
   useEffect(() => {
-    if (watchShowTaskResponsible.toString() === 'false') {
+    if (watchShowTaskResponsible !== ResponsibleType.OTHER) {
       resetField('responsible');
     }
   }, [watchShowTaskResponsible]);
@@ -180,7 +180,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
             dueDate: formatISO(new Date().setMonth(formData.month, formData.day)),
           }),
         dueDateDayOffset: dueDateDayOffset,
-        responsible: formData.chooseResponsible.toString() === 'true' ? formData.responsible : null,
+        responsible: formData.responsibleType === ResponsibleType.OTHER ? formData.responsible : null,
       },
       phaseId: phase.id,
       global: true,
@@ -295,18 +295,22 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           <Typography variant='body1'>Oppgaveansvarlig</Typography>
           <Controller
             control={control}
-            name='chooseResponsible'
+            defaultValue={ResponsibleType.HR_MANAGER}
+            name='responsibleType'
             render={({ field }) => {
               return (
                 <RadioGroup {...field} row>
-                  <FormControlLabel control={<Radio />} label='Personalansvarlig' value={false} />
-                  <FormControlLabel control={<Radio />} label='Annen' value={true} />
+                  <FormControlLabel control={<Radio />} label='Personalansvarlig' value={ResponsibleType.HR_MANAGER} />
+                  {phase.processTemplateId === 'lopende' && (
+                    <FormControlLabel control={<Radio />} label='Oppdragsansvarlig' value={ResponsibleType.PROJECT_MANAGER} />
+                  )}
+                  <FormControlLabel control={<Radio />} label='Annen' value={ResponsibleType.OTHER} />
                 </RadioGroup>
               );
             }}
           />
         </FormControl>
-        {watchShowTaskResponsible.toString() === 'true' && (
+        {watchShowTaskResponsible === ResponsibleType.OTHER && (
           <EmployeeSelector control={control} errors={errors} label='Oppgaveansvarlig' name='responsible' required />
         )}
         {phase.processTemplateId === 'lopende' && (

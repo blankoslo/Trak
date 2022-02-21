@@ -4,8 +4,9 @@ import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import { groupBy } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 import { syncTrakDatabase } from 'utils/cron';
-import { IEmployee, IEmployeeTask, IPhase } from 'utils/types';
+import { IEmployee, IEmployeeTask, IPhase, ResponsibleType } from 'utils/types';
 import { Process } from 'utils/types';
 let LAST_RUN = undefined;
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
@@ -32,6 +33,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         title: true,
         dueDate: true,
         dueDateDayOffset: true,
+        processTemplateId: true,
         processTemplate: {
           select: {
             slug: true,
@@ -46,6 +48,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             id: true,
             dueDate: true,
             dueDateDayOffset: true,
+            responsibleType: true,
             responsibleId: true,
             professions: {
               select: {
@@ -83,11 +86,14 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             dueDate: true,
             task: {
               select: {
+                responsibleType: true,
                 phase: {
                   select: {
                     id: true,
                     title: true,
+                    dueDate: true,
                     processTemplate: true,
+                    processTemplateId: true,
                   },
                 },
               },
@@ -174,6 +180,9 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
 
     return phaseA.dueDate.getMonth() > phaseB.dueDate.getMonth() ? phaseB : phaseA;
   });
+  const index = lopendePhases.findIndex((phase) => phase.id === nextPhase.id);
+  const currentPhaseIndex = index === 0 ? lopendePhases.length - 1 : index - 1;
+  const currentPhase = lopendePhases[currentPhaseIndex];
   const hasTasksInNextPhase = employee.employeeTask.some(
     (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.dueDate) === getYear(today),
   );
@@ -182,7 +191,7 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
 
   if (!hasTasksInNextPhase && hasStarted) {
     nextPhase.dueDate = setYear(nextPhase.dueDate, getYear(today));
-    createEmployeeTasks(employee, nextPhase);
+    createEmployeeTasks(employee, nextPhase, currentPhase);
   }
 };
 
@@ -221,31 +230,94 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
 const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
   employee.employeeTask.some((employeeTask) => employeeTask.task.phase.processTemplate.slug === processTitle);
 
-const createEmployeeTasks = async (employee: IEmployee, phase: IPhase) => {
-  const data = phase?.tasks.map((task) => {
-    if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
-      let taskDueDate = null;
-      if (task.dueDate) {
-        taskDueDate = task.dueDate;
-      } else if (task.dueDateDayOffset) {
-        if (phase.processTemplateId === Process.OFFBOARDING) {
-          taskDueDate = addDays(employee.terminationDate, task.dueDateDayOffset);
-        } else if (phase.processTemplateId === Process.ONBOARDING) {
-          taskDueDate = addDays(employee.dateOfEmployment, task.dueDateDayOffset);
-        }
-      }
+const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase) => {
+  if (phase.processTemplateId !== Process.LOPENDE) {
+    return;
+  }
 
-      if (!task.responsibleId && !employee.hrManagerId) {
-        return;
-      }
-      return {
-        employeeId: employee.id,
-        responsibleId: task.responsibleId || employee.hrManagerId,
-        dueDate: taskDueDate || phase.dueDate,
-        taskId: task.id,
-      };
-    }
+  const projectsCount = await new BlankClient().staffing.groupBy({
+    where: {
+      employee: employee.id,
+      date: {
+        gte: setYear(addDays(lastPhase.dueDate, 1), getYear(new Date())),
+        lte: setYear(phase.dueDate, getYear(new Date())),
+      },
+      projects: {
+        active: true,
+      },
+    },
+    // #TODO:
+    // What if two are equal? @magne?
+    take: 1,
+    orderBy: {
+      _count: {
+        project: 'desc',
+      },
+    },
+    by: ['project', 'employee'],
+    _count: {
+      project: true,
+    },
   });
+  const employeeIsOnProject = projectsCount.length > 0;
+  if (!employeeIsOnProject) {
+    return;
+  }
+  const projectManager = await new BlankClient().projects.findFirst({
+    where: {
+      id: projectsCount[0].project,
+    },
+    select: {
+      responsible: true,
+    },
+  });
+  if (!projectManager?.responsible) {
+    return employee.hrManagerId;
+  }
+  const employeeIsProjectManager = projectManager.responsible === employee.id;
+  if (employeeIsProjectManager) {
+    return employee.hrManagerId;
+  }
+  return projectManager.responsible;
+};
+const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase | undefined = undefined) => {
+  const projectManager = getProjectManager(employee, phase, lastPhase);
+  const data = await Promise.all(
+    phase?.tasks.map(async (task) => {
+      if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
+        let taskDueDate = null;
+        if (task.dueDate) {
+          taskDueDate = task.dueDate;
+        } else if (task.dueDateDayOffset) {
+          if (phase.processTemplateId === Process.OFFBOARDING) {
+            taskDueDate = addDays(employee.terminationDate, task.dueDateDayOffset);
+          } else if (phase.processTemplateId === Process.ONBOARDING) {
+            taskDueDate = addDays(employee.dateOfEmployment, task.dueDateDayOffset);
+          }
+        }
+        const responsible = (async () => {
+          switch (task.responsibleType) {
+            case ResponsibleType.OTHER:
+              return task.responsibleId;
+            case ResponsibleType.PROJECT_MANAGER:
+              return projectManager;
+            default:
+              return employee.hrManagerId;
+          }
+        })();
+        const responsibleId = await responsible;
+        if (!responsibleId) {
+          return;
+        }
+        return {
+          employeeId: employee.id,
+          responsibleId: responsibleId,
+          dueDate: taskDueDate || phase.dueDate,
+          taskId: task.id,
+        };
+      }
+    }),
+  );
   await trakClient.employeeTask.createMany({ data: data, skipDuplicates: true });
 };
 
