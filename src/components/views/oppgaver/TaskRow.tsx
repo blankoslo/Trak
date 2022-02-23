@@ -56,6 +56,12 @@ const useStyles = makeStyles((theme: Theme) => ({
       borderRadius: theme.spacing(0.5),
     },
   },
+  row: {
+    '& td': {
+      borderBottom: `1px solid ${theme.palette.text.primary}25`,
+      padding: 0,
+    },
+  },
 }));
 const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayResponsible: boolean }) => {
   const classes = useStyles();
@@ -67,8 +73,8 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
   const hasExpired = daysBeforeDueDate < 0;
 
   return (
-    <TableRow sx={{ padding: '0' }}>
-      <TableCell sx={{ border: '0', padding: 0, whiteSpace: 'nowrap' }}>
+    <TableRow className={classes.row} sx={{ padding: '0' }}>
+      <TableCell sx={{ whiteSpace: 'nowrap' }}>
         <Checkbox
           checked={completed}
           color='primary'
@@ -95,7 +101,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
         )}
       </TableCell>
       {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={data.id} modalIsOpen={modalIsOpen} />}
-      <TableCell sx={{ border: '0', padding: 0, textAlign: { sm: 'right' } }}>
+      <TableCell sx={{ textAlign: { sm: 'right' } }}>
         <Link href={`/ansatt/${data.employee.id}`} passHref>
           <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple>
             <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
@@ -107,7 +113,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
         </Link>
       </TableCell>
       {displayResponsible && (
-        <TableCell sx={{ border: '0', padding: 0, textAlign: { sm: 'right' }, display: { md: 'table-cell', xs: 'none' } }}>
+        <TableCell sx={{ textAlign: { sm: 'right' }, display: { md: 'table-cell', xs: 'none' } }}>
           <div className={classes.avatarRoot}>
             <Avatar className={classes.avatar} firstName={data.responsible.firstName} image={data.responsible.imageUrl} lastName={data.responsible.lastName} />
             <Typography
@@ -117,7 +123,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
           </div>
         </TableCell>
       )}
-      <TableCell sx={{ border: '0', display: { md: 'table-cell', xs: 'none' }, padding: 0 }}>
+      <TableCell sx={{ display: { md: 'table-cell', xs: 'none' } }}>
         <Box className={classes.avatarRoot} sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}>
           {daysBeforeDueDate === 0 && 'I dag'}
           {daysBeforeDueDate === 1 && 'I morgen'}
