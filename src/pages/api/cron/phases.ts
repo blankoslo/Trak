@@ -154,6 +154,9 @@ const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | an
     if (!employee.terminationDate) {
       lopendeEmployeeTaskCreator(employee, nextPhase, projectManager, today);
     }
+    if (!employee.hrManagerId) {
+      return;
+    }
     if (employee.dateOfEmployment && !employeeHasProcessTask(employee, Process.ONBOARDING)) {
       onboardingEmployeeTaskCreator(phases, employee, sendNotification);
     }
