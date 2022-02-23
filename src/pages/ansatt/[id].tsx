@@ -19,9 +19,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Avatar from 'components/Avatar';
 import Comments from 'components/Comments';
 import DateFormater from 'components/DateFormater';
+import Markdown from 'components/Markdown';
 import EditDueDateModal from 'components/modals/EditDueDateModal';
 import EditResponsibleModal from 'components/modals/EditResponsibleModal';
-import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
 import startOfDay from 'date-fns/startOfDay';
@@ -33,7 +33,6 @@ import { useEffect, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 import validator from 'validator';
-
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id } = query;
   const parsedId = typeof id === 'string' && parseInt(id);
@@ -355,7 +354,7 @@ export const Task = ({ employeeTask }) => {
           <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
           <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
           <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
-          <TextMarkDownWithLink text={employeeTask?.task.description} variant={'body2'} />
+          <Markdown text={employeeTask?.task.description} />
           <Comments employeeTask={employeeTask?.id} />
         </AccordionDetails>
         <AccordionActions

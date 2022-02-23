@@ -11,8 +11,8 @@ import axios from 'axios';
 import ChipSkeleton from 'components/ChipSkeleton';
 import Comments from 'components/Comments';
 import EmployeeSelector from 'components/form/EmployeeSelector';
+import Markdown from 'components/Markdown';
 import Modal from 'components/Modal';
-import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
 import { useUser } from 'context/User';
 import { format } from 'date-fns';
@@ -22,7 +22,6 @@ import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
 import { IEmployeeTask } from 'utils/types';
 import { fetcher } from 'utils/utils';
-
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
     marginRight: theme.spacing(1),
@@ -199,7 +198,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
-        <TextMarkDownWithLink text={data?.task.description} />
+        <Markdown text={data?.task.description} />
         <Comments employeeTask={employee_task_id} />
       </>
     </Modal>
