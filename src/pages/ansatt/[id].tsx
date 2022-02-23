@@ -12,10 +12,12 @@ import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
+import { Theme } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { makeStyles } from '@mui/styles';
 import Avatar from 'components/Avatar';
 import Comments from 'components/Comments';
 import DateFormater from 'components/DateFormater';
@@ -33,7 +35,6 @@ import ReactMarkdown from 'react-markdown';
 import safeJsonStringify from 'safe-json-stringify';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 import validator from 'validator';
-
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id } = query;
   const parsedId = typeof id === 'string' && parseInt(id);
@@ -205,7 +206,16 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
   );
 };
 
+const useStyles = makeStyles((theme: Theme) => ({
+  link: {
+    '& a': {
+      color: theme.palette.text.primary,
+    },
+  },
+}));
+
 export const Task = ({ employeeTask }) => {
+  const classes = useStyles();
   const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
   const [loading, isLoading] = useState<boolean>(false);
   const showSnackbar = useSnackbar();
@@ -355,7 +365,7 @@ export const Task = ({ employeeTask }) => {
           <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
           <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
           <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
-          <ReactMarkdown>{employeeTask?.task.description}</ReactMarkdown>
+          <ReactMarkdown className={classes.link}>{employeeTask?.task.description}</ReactMarkdown>
           <Comments employeeTask={employeeTask?.id} />
         </AccordionDetails>
         <AccordionActions
