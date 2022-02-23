@@ -144,12 +144,15 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any, sendNotification: boolean) => {
   const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
   const today = new Date();
-  employees.forEach((employee) => {
-    if (!employee.hrManagerId) {
+  employees.forEach(async (employee) => {
+    const [currentPhase, nextPhase] = getCurrentAndNextLopendePhase(lopendePhases, today);
+    const projectManager = await getProjectManager(employee, currentPhase, nextPhase);
+
+    if (!employee.hrManagerId && !projectManager) {
       return;
     }
     if (!employee.terminationDate) {
-      lopendeEmployeeTaskCreator(employee, lopendePhases, today);
+      lopendeEmployeeTaskCreator(employee, nextPhase, projectManager, today);
     }
     if (employee.dateOfEmployment && !employeeHasProcessTask(employee, Process.ONBOARDING)) {
       onboardingEmployeeTaskCreator(phases, employee, sendNotification);
@@ -160,7 +163,7 @@ const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | an
   });
 };
 
-const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[], today: Date) => {
+const getCurrentAndNextLopendePhase = (lopendePhases: IPhase[], today: Date) => {
   const comingPhases = lopendePhases.filter((phase) => {
     const dueDate = subDays(phase.dueDate, 7);
     if (getMonth(dueDate) === getMonth(today)) {
@@ -183,6 +186,11 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
   const index = lopendePhases.findIndex((phase) => phase.id === nextPhase.id);
   const currentPhaseIndex = index === 0 ? lopendePhases.length - 1 : index - 1;
   const currentPhase = lopendePhases[currentPhaseIndex];
+  nextPhase.dueDate = setYear(nextPhase.dueDate, getYear(today));
+  return [currentPhase, nextPhase];
+};
+
+const lopendeEmployeeTaskCreator = (employee: IEmployee, nextPhase: IPhase, projectManager: IEmployee['id'], today: Date) => {
   const hasTasksInNextPhase = employee.employeeTask.some(
     (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.dueDate) === getYear(today),
   );
@@ -190,8 +198,7 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
   const hasStarted = compareAsc(employee.dateOfEmployment, new Date()) <= 0;
 
   if (!hasTasksInNextPhase && hasStarted) {
-    nextPhase.dueDate = setYear(nextPhase.dueDate, getYear(today));
-    createEmployeeTasks(employee, nextPhase, currentPhase);
+    createEmployeeTasks(employee, nextPhase, projectManager);
   }
 };
 
@@ -280,8 +287,7 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
   }
   return projectManager.responsible;
 };
-const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase | undefined = undefined) => {
-  const projectManager = getProjectManager(employee, phase, lastPhase);
+const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, projectManager: IEmployee['id'] | undefined = undefined) => {
   const data = await Promise.all(
     phase?.tasks.map(async (task) => {
       if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
