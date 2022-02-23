@@ -11,6 +11,7 @@ import axios from 'axios';
 import ChipSkeleton from 'components/ChipSkeleton';
 import Comments from 'components/Comments';
 import EmployeeSelector from 'components/form/EmployeeSelector';
+import Markdown from 'components/Markdown';
 import Modal from 'components/Modal';
 import useSnackbar from 'context/Snackbar';
 import { useUser } from 'context/User';
@@ -18,7 +19,6 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import ReactMarkdown from 'react-markdown';
 import useSWR from 'swr';
 import { IEmployeeTask } from 'utils/types';
 import { fetcher } from 'utils/utils';
@@ -43,11 +43,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   skeletonHeight: {
     height: theme.spacing(24),
-  },
-  link: {
-    '& a': {
-      color: theme.palette.text.primary,
-    },
   },
 }));
 export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
@@ -203,7 +198,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
-        <ReactMarkdown className={classes.link}>{data?.task.description}</ReactMarkdown>
+        <Markdown text={data?.task.description} />
         <Comments employeeTask={employee_task_id} />
       </>
     </Modal>
