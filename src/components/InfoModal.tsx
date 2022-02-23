@@ -12,17 +12,16 @@ import ChipSkeleton from 'components/ChipSkeleton';
 import Comments from 'components/Comments';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import Modal from 'components/Modal';
-import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
 import { useUser } from 'context/User';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import ReactMarkdown from 'react-markdown';
 import useSWR from 'swr';
 import { IEmployeeTask } from 'utils/types';
 import { fetcher } from 'utils/utils';
-
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
     marginRight: theme.spacing(1),
@@ -199,7 +198,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
-        <TextMarkDownWithLink text={data?.task.description} />
+        <ReactMarkdown>{data?.task.description}</ReactMarkdown>
         <Comments employeeTask={employee_task_id} />
       </>
     </Modal>
