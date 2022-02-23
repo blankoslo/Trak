@@ -44,6 +44,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   skeletonHeight: {
     height: theme.spacing(24),
   },
+  link: {
+    '& a': {
+      color: theme.palette.text.primary,
+    },
+  },
 }));
 export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
   const [hasSelectedNewResponsible, setHasSelectedNewResponsible] = useState<boolean>(false);
@@ -198,7 +203,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
-        <ReactMarkdown>{data?.task.description}</ReactMarkdown>
+        <ReactMarkdown className={classes.link}>{data?.task.description}</ReactMarkdown>
         <Comments employeeTask={employee_task_id} />
       </>
     </Modal>
