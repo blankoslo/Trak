@@ -12,8 +12,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Avatar from 'components/Avatar';
@@ -26,10 +25,11 @@ import useSnackbar from 'context/Snackbar';
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
 import startOfDay from 'date-fns/startOfDay';
 import { trakClient } from 'lib/prisma';
+import { chain } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 import validator from 'validator';
@@ -102,30 +102,29 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       },
     },
   });
-
   const employee = JSON.parse(safeJsonStringify(employeeQuery));
+  // TODO:
+  // Add slug
+  const test1 = chain(employee.employeeTask)
+    .groupBy('task.phase.processTemplate.title')
+    .map((value, key) => ({ title: key, tasks: value }))
+    .value();
 
-  const processTemplates = await trakClient.processTemplate.findMany({
-    select: {
-      slug: true,
-      title: true,
-    },
+  const tasks = test1.map((process) => {
+    return {
+      title: process.title,
+      phases: chain(process.tasks)
+        .groupBy('task.phase.title')
+        .map((value, key) => ({ title: key, tasks: value }))
+        .value(),
+    };
   });
-
-  return { props: { employee, processTemplates } };
+  return { props: { employee, tasks } };
 };
 
-const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [choosenProcess, setChoosenProcess] = useState([]);
-  const isSmallScreen = useMediaQuery('(max-width: 600px)');
-
-  const handleFormat = (_, newFormats) => {
-    if (newFormats.length === processTemplates.length) {
-      setChoosenProcess([]);
-    } else {
-      setChoosenProcess(newFormats);
-    }
-  };
+const Employee = ({ employee, tasks }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+  const { process } = router.query;
 
   const hasStarted = differenceInCalendarDays(new Date(employee.dateOfEmployment), new Date()) <= 0;
 
@@ -156,49 +155,43 @@ const Employee = ({ employee, processTemplates }: InferGetServerSidePropsType<ty
             <Typography>{employee.profession.title}</Typography>
           </Box>
         </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: { xs: 'center', sm: 'start' },
-          }}
-        >
-          <ToggleButtonGroup
-            onChange={handleFormat}
-            orientation={isSmallScreen ? 'vertical' : 'horizontal'}
-            sx={{ marginBottom: '30px' }}
-            value={choosenProcess}
-          >
-            {processTemplates?.map((processTemplate) => (
-              <ToggleButton
-                key={processTemplate.slug}
-                sx={{
-                  backgroundColor: 'background.paper',
-                  '&$selected': {
-                    color: 'text.secondary',
-                    backgroundColor: 'primary.main',
-                  },
-                }}
-                value={processTemplate.title}
+        <Stack direction='row' justifyContent={'flex-end'} spacing={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
+          {tasks.map((value, index) => (
+            <Fragment key={value.title}>
+              <Typography
+                key={value.slug}
+                onClick={() => router.push({ pathname: `/ansatt/${employee.id}`, query: { process: value.title } }, undefined, { shallow: true })}
+                sx={
+                  value.title === process
+                    ? {
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        textDecorationColor: 'primary.main',
+                        textUnderlineOffset: '8px',
+                      }
+                    : { fontSize: '1rem', cursor: 'pointer' }
+                }
               >
-                {processTemplate.title}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-        </Box>
-
-        {!employee.employeeTask?.length
-          ? 'Gratulerer. Finnes ingen flere oppgaver :D'
-          : employee.employeeTask
-              .filter((employeeTask) =>
-                !choosenProcess?.length
-                  ? true
-                  : choosenProcess?.some((processTemplate) => {
-                      return processTemplate === employeeTask.task.phase.processTemplate.title;
-                    }),
-              )
-              .map((employeeTask, index) => <Task employeeTask={employeeTask} key={index} />)}
+                {value.title}
+              </Typography>
+              {index < tasks.length - 1 && <Typography sx={{ color: 'primary.main', fontSize: '1.25rem' }}>/</Typography>}
+            </Fragment>
+          ))}
+        </Stack>
+        {tasks
+          .find((task) => task.title === process)
+          ?.phases?.map((phase) => (
+            <>
+              <Typography gutterBottom variant='h3'>
+                {phase.title}
+              </Typography>
+              {phase.tasks.map((task, index) => (
+                <Task employeeTask={task} key={index} />
+              ))}
+            </>
+          ))}
       </Container>
     </>
   );
