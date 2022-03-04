@@ -49,9 +49,11 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
           responsibleId: formData.responsible?.id,
         });
         const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.notificationSettings?.includes('DELEGATE');
+        const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${employeeTask.id}`;
         if (employeeWantsDelegateNotifications) {
           await axios.post('/api/notification', {
-            description: `Oppgave delegert: "${employeeTask.task.title}"`,
+            description: `Oppgave delegert: "[${employeeTask.task.title}](${taskURL})"`,
+            slack_description: `Oppgave "<${taskURL}|${employeeTask.task.title}>" er delegert til deg av ${user.firstName} ${user.lastName}`,
             employeeId: formData.responsible?.id,
             ...(formData.responsible.employeeSettings?.slack && {
               email: formData.responsible.email,
