@@ -188,7 +188,7 @@ const Employee = ({ employee, tasks }: InferGetServerSidePropsType<typeof getSer
                 {phase.title}
               </Typography>
               {phase.tasks.map((task, index) => (
-                <Task employeeTask={task} key={index} />
+                <Task employeeId={employee.id} employeeTask={task} key={index} />
               ))}
             </>
           ))}
@@ -196,8 +196,7 @@ const Employee = ({ employee, tasks }: InferGetServerSidePropsType<typeof getSer
     </>
   );
 };
-
-export const Task = ({ employeeTask }) => {
+export const Task = ({ employeeTask, employeeId }) => {
   const [completed, setCompleted] = useState<boolean>(employeeTask.completed);
   const [loading, isLoading] = useState<boolean>(false);
   const showSnackbar = useSnackbar();
@@ -215,13 +214,10 @@ export const Task = ({ employeeTask }) => {
     e.stopPropagation();
     await toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
     isLoading(false);
-    router.push(
-      {
-        pathname: router.asPath,
-      },
-      undefined,
-      { scroll: false },
-    );
+    router.push({ pathname: `/ansatt/${employeeId}`, query: { process: employeeTask.task.phase.processTemplate.title } }, undefined, {
+      shallow: true,
+      scroll: false,
+    });
   };
 
   const hasExpired = differenceInCalendarDays(new Date(employeeTask.dueDate), new Date()) < 0;
