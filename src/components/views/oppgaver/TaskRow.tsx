@@ -126,7 +126,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
         />
       )}
       <TableCell sx={{ textAlign: { sm: 'right' } }}>
-        <Link href={`/ansatt/${data.employee.id}`} passHref>
+        <Link href={`/ansatt/${data.employee.id}?process=${data.task.phase.processTemplate.title}`} passHref>
           <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple>
             <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
             <Typography
