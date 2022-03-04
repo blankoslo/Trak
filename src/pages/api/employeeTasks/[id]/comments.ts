@@ -43,6 +43,9 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
           createdByEmployee: true,
           employeeTask: true,
         },
+        orderBy: {
+          createdAt: 'asc',
+        },
       });
       res.json(comments);
     } catch (err) {
