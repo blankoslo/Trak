@@ -85,7 +85,7 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
       updateMentions={updateMentions}
     />
   ) : (
-    <Stack flexDirection={'row'} gap='16px' {...args}>
+    <Stack flexDirection={'row'} gap='16px' sx={{ marginBottom: 1 }} {...args}>
       <Avatar firstName={comment.createdByEmployee.firstName} image={comment.createdByEmployee.imageUrl} lastName={comment.createdByEmployee.lastName} />
       <Stack spacing={1} sx={{ width: '100%' }}>
         <Stack direction='row' justifyContent={'space-between'}>
