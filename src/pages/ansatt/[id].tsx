@@ -355,7 +355,10 @@ export const Task = ({ employeeTask }) => {
           <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
           <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
           <Markdown text={employeeTask?.task.description} />
-          <Comments employeeTask={employeeTask} />
+          <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+            Kommentarer:
+          </Typography>
+          <Comments employeeTask={employeeTask?.id} />
         </AccordionDetails>
         <AccordionActions
           sx={{
