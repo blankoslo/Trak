@@ -103,22 +103,19 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
   });
   const employee = JSON.parse(safeJsonStringify(employeeQuery));
-  // TODO:
-  // Add slug
-  const test1 = chain(employee.employeeTask)
+  const tasks = chain(employee.employeeTask)
     .groupBy('task.phase.processTemplate.title')
     .map((value, key) => ({ title: key, tasks: value }))
-    .value();
-
-  const tasks = test1.map((process) => {
-    return {
-      title: process.title,
-      phases: chain(process.tasks)
-        .groupBy('task.phase.title')
-        .map((value, key) => ({ title: key, tasks: value }))
-        .value(),
-    };
-  });
+    .value()
+    .map((process) => {
+      return {
+        title: process.title,
+        phases: chain(process.tasks)
+          .groupBy('task.phase.title')
+          .map((value, key) => ({ title: key, tasks: value }))
+          .value(),
+      };
+    });
   return { props: { employee, tasks } };
 };
 
