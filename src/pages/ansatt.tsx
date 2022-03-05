@@ -8,7 +8,7 @@ import { trakClient } from 'lib/prisma';
 import { capitalize } from 'lodash';
 import uniqBy from 'lodash/uniqBy';
 import type { InferGetServerSidePropsType, NextPage } from 'next';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { MineAlleToggle } from 'pages/index';
