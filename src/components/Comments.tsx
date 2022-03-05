@@ -29,21 +29,20 @@ const Comments = ({ employeeTask }: CommentProps) => {
   };
 
   const onSubmit = handleSubmit(async (formData) => {
-    const trueMentions = mentions.filter((mention) => formData.comment.includes(mention.display));
-    const uniqueMentions = uniqBy(trueMentions, 'id');
-
     const newComment = await axios.post(`/api/employeeTasks/${employeeTask.id}/comments`, {
       text: formData.comment,
     });
     mutate([...comments, newComment.data]);
+    const trueMentions = mentions.filter((mention) => formData.comment.includes(mention.display));
+    const uniqueMentions = uniqBy(trueMentions, 'id');
     const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${employeeTask.id}`;
     uniqueMentions.forEach((mention) => {
       axios.post('/api/notification', {
         description: `Du er nevnt i "[${employeeTask.task.title}](${taskURL})"`,
-        slack_description: `Du er nevnt i "<${taskURL}|${employeeTask.task.title}>" av ${session.firstName} ${session.lastName}`,
+        slack_description: `Du er nevnt i "<${taskURL}|${employeeTask.task.title}>" av ${session.user.name}`,
         employeeId: mention.id,
         email: mention.email,
-        createdBy: session.id,
+        createdBy: session.user.id,
       });
     });
 

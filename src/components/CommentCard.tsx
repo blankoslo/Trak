@@ -13,6 +13,7 @@ import axios from 'axios';
 import Avatar from 'components/Avatar';
 import CommentEditor from 'components/form/CommentEditor';
 import { format } from 'date-fns';
+import uniqBy from 'lodash/uniqBy';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,11 +30,8 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
   const [displayEditComment, setDisplayEditComment] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm({ defaultValues: { comment: comment.text } });
+
+  const { control, handleSubmit } = useForm({ defaultValues: { comment: comment.text } });
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -42,11 +40,29 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
   };
   const { mutate } = useSWRConfig();
 
+  const [mentions, setMentions] = useState<{ id: number; display: string; email: string }[]>([]);
+
+  const updateMentions = (id, display, email) => {
+    setMentions((m) => [...m, { id: id, display: display, email: email }]);
+  };
+
   const onSubmit = handleSubmit(async (formData) => {
     await axios.put(`/api/employeeTasks/${comment.employeeTaskId}/comments/${comment.id}`, {
       data: { ...comment, text: formData.comment },
     });
     mutate(`/api/employeeTasks/${comment.employeeTaskId}/comments`);
+    const trueMentions = mentions.filter((mention) => formData.comment.includes(mention.display));
+    const uniqueMentions = uniqBy(trueMentions, 'id');
+    const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${comment.employeeTaskId}`;
+    uniqueMentions.forEach((mention) => {
+      axios.post('/api/notification', {
+        description: `Du er nevnt i "[${comment.employeeTask.task.title}](${taskURL})"`,
+        slack_description: `Du er nevnt i "<${taskURL}|${comment.employeeTask.task.title}>" av ${user.data.user.name}`,
+        employeeId: mention.id,
+        email: mention.email,
+        createdBy: user.data.user,
+      });
+    });
     setDisplayEditComment(false);
     handleClose();
   });
@@ -61,7 +77,14 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
     setDisplayEditComment(true);
   };
   return displayEditComment ? (
-    <CommentEditor cancel={setDisplayEditComment} cancelText={'Avbryt'} confirmText={'Endre'} errors={errors} onSubmit={onSubmit} register={register} />
+    <CommentEditor
+      cancel={setDisplayEditComment}
+      cancelText={'Avbryt'}
+      confirmText={'Endre'}
+      control={control}
+      onSubmit={onSubmit}
+      updateMentions={updateMentions}
+    />
   ) : (
     <Grid container marginBottom={2} spacing={2} {...args}>
       <Grid item sm={1} xs={2}>
