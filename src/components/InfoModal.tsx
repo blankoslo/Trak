@@ -199,7 +199,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           )}
         </Box>
         <Markdown text={data?.task.description} />
-        <Comments employeeTask={employee_task_id} />
+        <Comments employeeTask={data.employeeTask} />
       </>
     </Modal>
   );
