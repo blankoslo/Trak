@@ -1,13 +1,12 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Grid, { GridProps } from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Stack from '@mui/material/Stack';
+import Stack, { StackProps } from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import Avatar from 'components/Avatar';
@@ -23,7 +22,7 @@ import { IComment } from 'utils/types';
 
 type CommentCardProps = {
   comment: IComment;
-} & GridProps;
+} & StackProps;
 
 const CommentCard = ({ comment, ...args }: CommentCardProps) => {
   const user = useSession();
@@ -86,55 +85,49 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
       updateMentions={updateMentions}
     />
   ) : (
-    <Grid container marginBottom={2} spacing={2} {...args}>
-      <Grid item sm={1} xs={2}>
-        <Avatar firstName={comment.createdByEmployee.firstName} image={comment.createdByEmployee.imageUrl} lastName={comment.createdByEmployee.lastName} />
-      </Grid>
-      <Grid item sm={10} xs={9}>
-        <Stack spacing={1} sx={{ width: '100%' }}>
-          <Stack direction='row' justifyContent={'space-between'}>
-            <Typography color='primary.main' variant='body2'>
-              {comment.createdByEmployee.firstName}
-            </Typography>
-            <Typography color='primary.main' variant='body2'>
-              {format(new Date(comment.createdAt), 'dd.MM.yyyy')}
-            </Typography>
-          </Stack>
-          <ReactMarkdown>{comment.text}</ReactMarkdown>
+    <Stack flexDirection={'row'} gap='16px' {...args}>
+      <Avatar firstName={comment.createdByEmployee.firstName} image={comment.createdByEmployee.imageUrl} lastName={comment.createdByEmployee.lastName} />
+      <Stack spacing={1} sx={{ width: '100%' }}>
+        <Stack direction='row' justifyContent={'space-between'}>
+          <Typography color='primary.main' variant='body2'>
+            {comment.createdByEmployee.firstName}
+          </Typography>
+          <Typography color='primary.main' variant='body2'>
+            {format(new Date(comment.createdAt), 'dd.MM.yyyy')}
+          </Typography>
         </Stack>
-      </Grid>
-      <Grid item xs={1}>
-        {parseInt(user.data.user.id) === comment.createdById && (
-          <>
-            <IconButton color='inherit' onClick={handleClick} sx={{ padding: 0 }}>
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              MenuListProps={{
-                'aria-labelledby': 'basic-button',
-              }}
-              anchorEl={anchorEl}
-              id='basic-menu'
-              onClose={handleClose}
-              open={open}
-            >
-              <MenuItem onClick={editComment}>
-                <ListItemIcon>
-                  <EditIcon color='primary' />
-                </ListItemIcon>
-                <ListItemText primary='Rediger' />
-              </MenuItem>
-              <MenuItem onClick={deleteComment}>
-                <ListItemIcon>
-                  <DeleteIcon color='primary' />
-                </ListItemIcon>
-                <ListItemText primary='Slett' />
-              </MenuItem>
-            </Menu>
-          </>
-        )}
-      </Grid>
-    </Grid>
+        <ReactMarkdown>{comment.text}</ReactMarkdown>
+      </Stack>
+      {parseInt(user.data.user.id) === comment.createdById && (
+        <>
+          <IconButton color='inherit' onClick={handleClick} sx={{ padding: '4px', width: 'fit-content', height: 'fit-content' }}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+            anchorEl={anchorEl}
+            id='basic-menu'
+            onClose={handleClose}
+            open={open}
+          >
+            <MenuItem onClick={editComment}>
+              <ListItemIcon>
+                <EditIcon color='primary' />
+              </ListItemIcon>
+              <ListItemText primary='Rediger' />
+            </MenuItem>
+            <MenuItem onClick={deleteComment}>
+              <ListItemIcon>
+                <DeleteIcon color='primary' />
+              </ListItemIcon>
+              <ListItemText primary='Slett' />
+            </MenuItem>
+          </Menu>
+        </>
+      )}
+    </Stack>
   );
 };
 

@@ -53,7 +53,7 @@ const Comments = ({ employeeTask }: CommentProps) => {
   });
   return (
     <>
-      <Box maxHeight={'300px'} sx={{ overflowY: 'auto' }}>
+      <Box maxHeight={'300px'} sx={{ overflowY: 'auto', overflowX: 'auto' }}>
         {comments?.map((comment) => (
           <CommentCard comment={comment} key={comment.id} />
         ))}
