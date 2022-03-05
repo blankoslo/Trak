@@ -164,7 +164,7 @@ const TaskCommentCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
     <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
       <Typography variant='h2'>Kommentarer</Typography>
 
-      <Comments employeeTask={employeeTask.id} />
+      <Comments employeeTask={employeeTask} />
     </Paper>
   );
 };

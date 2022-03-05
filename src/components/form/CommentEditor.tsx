@@ -75,7 +75,7 @@ const CommentEditor = ({ onSubmit, control, cancel, cancelText, confirmText, upd
                 displayTransform={(id, display) => `@${display}`}
                 markup={'@**__display__**'}
                 onAdd={(id, display) => {
-                  const employee = formatedEmployees.find((employee) => (employee.id = id));
+                  const employee = employees.find((employee) => employee.id === id);
                   updateMentions(id, display, employee.email);
                 }}
                 trigger='@'

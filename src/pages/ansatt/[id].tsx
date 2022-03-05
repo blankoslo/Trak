@@ -358,7 +358,7 @@ export const Task = ({ employeeTask }) => {
           <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
             Kommentarer:
           </Typography>
-          <Comments employeeTask={employeeTask?.id} />
+          <Comments employeeTask={employeeTask} />
         </AccordionDetails>
         <AccordionActions
           sx={{

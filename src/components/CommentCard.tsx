@@ -60,7 +60,7 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
         slack_description: `Du er nevnt i "<${taskURL}|${comment.employeeTask.task.title}>" av ${user.data.user.name}`,
         employeeId: mention.id,
         email: mention.email,
-        createdBy: user.data.user,
+        createdBy: user.data.user.id,
       });
     });
     setDisplayEditComment(false);
@@ -87,10 +87,10 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
     />
   ) : (
     <Grid container marginBottom={2} spacing={2} {...args}>
-      <Grid item xs={2}>
+      <Grid item sm={1} xs={2}>
         <Avatar firstName={comment.createdByEmployee.firstName} image={comment.createdByEmployee.imageUrl} lastName={comment.createdByEmployee.lastName} />
       </Grid>
-      <Grid item xs={9}>
+      <Grid item sm={10} xs={9}>
         <Stack spacing={1} sx={{ width: '100%' }}>
           <Stack direction='row' justifyContent={'space-between'}>
             <Typography color='primary.main' variant='body2'>
