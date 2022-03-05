@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import AddButton from 'components/AddButton';
 import CommentCard from 'components/CommentCard';
@@ -36,10 +35,7 @@ const Comments = ({ employeeTask }: CommentProps) => {
   });
   return (
     <>
-      <Box maxHeight={'300px'} overflow={'auto'}>
-        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-          Kommentarer:
-        </Typography>
+      <Box maxHeight={'300px'}>
         {comments?.map((comment) => (
           <CommentCard comment={comment} key={comment.id} />
         ))}

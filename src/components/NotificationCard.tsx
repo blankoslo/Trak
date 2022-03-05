@@ -3,6 +3,7 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Avatar from 'components/Avatar';
+import Markdown from 'components/Markdown';
 import format from 'date-fns/format';
 import Image from 'next/image';
 import { IEmployee } from 'utils/types';
@@ -35,9 +36,7 @@ const NotificationCard = ({ time, description, createdBy, read }: NotificationCa
               {createdToday ? format(new Date(time), 'HH:mm') : format(new Date(time), 'dd/MM')}
             </Typography>
           </Box>
-          <Typography sx={{ maxWidth: '80%' }} variant='body2'>
-            {description}
-          </Typography>
+          <Markdown text={description} />
         </Stack>
       </Grid>
     </Grid>
