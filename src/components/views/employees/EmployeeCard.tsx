@@ -41,9 +41,8 @@ const EmployeeCard = ({ id, firstName, lastName, imageUrl, role, gender, nrOfMyT
 
             {role || 'Ukjent'}
           </Typography>
-          {Boolean(nrOfMyTasks) && <Typography variant='caption'>{`Du har ${nrOfMyTasks} oppgave${nrOfMyTasks > 1 ? 'r' : ''}`}</Typography>}
+          {Boolean(nrOfMyTasks) && <Typography variant='caption'>{`${nrOfMyTasks} oppgave${nrOfMyTasks > 1 ? 'r' : ''} gjenstår`}</Typography>}
         </Stack>
-        <Stack></Stack>
       </ButtonBase>
     </Link>
   );

@@ -217,6 +217,7 @@ const Tasks = ({ processTemplates, selectedOption }: InferGetServerSidePropsType
           <MineAlleToggle selectedOption={selectedOption} />
         </Stack>
         <SearchField
+          defaultValue={router.query.search}
           onChange={(e) => {
             router.push({
               pathname: router.pathname,

@@ -182,6 +182,7 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
         <MineAlleToggle selectedOption={selectedOption} />
       </Stack>
       <SearchField
+        defaultValue={router.query.search}
         onChange={(e) => {
           router.push({
             pathname: router.pathname,
