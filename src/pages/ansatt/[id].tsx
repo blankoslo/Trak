@@ -104,7 +104,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   });
   const employee = JSON.parse(safeJsonStringify(employeeQuery));
   const tasks = chain(employee.employeeTask)
-    .groupBy('task.phase.processTemplate.title')
+    .groupBy('task.phase.processTemplate.slug')
     .map((value, key) => ({ title: key, tasks: value }))
     .value()
     .map((process) => {
@@ -116,12 +116,23 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           .value(),
       };
     });
-  return { props: { employee, tasks } };
+
+  const processTemplates = await trakClient.processTemplate.findMany({
+    select: {
+      slug: true,
+      title: true,
+    },
+  });
+  return { props: { employee, tasks, processTemplates } };
 };
 
-const Employee = ({ employee, tasks }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Employee = ({ employee, tasks, processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { process } = router.query;
+
+  const getTitle = (slug) => {
+    return processTemplates.find((processTemplate) => processTemplate.slug === slug).title;
+  };
 
   const hasStarted = differenceInCalendarDays(new Date(employee.dateOfEmployment), new Date()) <= 0;
 
@@ -154,7 +165,7 @@ const Employee = ({ employee, tasks }: InferGetServerSidePropsType<typeof getSer
         </Box>
         <Stack direction='row' justifyContent={'flex-end'} spacing={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
           {tasks.map((value, index) => (
-            <Fragment key={value.title}>
+            <Fragment key={value.slug}>
               <Typography
                 key={value.slug}
                 onClick={() => router.push({ pathname: `/ansatt/${employee.id}`, query: { process: value.title } }, undefined, { shallow: true })}
@@ -171,7 +182,7 @@ const Employee = ({ employee, tasks }: InferGetServerSidePropsType<typeof getSer
                     : { fontSize: '1rem', cursor: 'pointer' }
                 }
               >
-                {value.title}
+                {getTitle(value.title)}
               </Typography>
               {index < tasks.length - 1 && <Typography sx={{ color: 'primary.main', fontSize: '1.25rem' }}>/</Typography>}
             </Fragment>

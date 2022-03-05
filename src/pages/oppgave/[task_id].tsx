@@ -191,7 +191,7 @@ const ActionCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
         >
           {employeeTask.completed ? 'Ikke fullfør oppgave' : 'Fullfør oppgave'}
         </Button>
-        <Link href={`/ansatt/${employeeTask.employee.id}?process=${employeeTask.task.phase.processTemplate.title}`} passHref>
+        <Link href={`/ansatt/${employeeTask.employee.id}?process=${employeeTask.task.phase.processTemplate.slug}`} passHref>
           <Button fullWidth variant='contained'>
             Til ansattside
           </Button>

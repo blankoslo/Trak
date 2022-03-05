@@ -193,33 +193,44 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
       />
       <Stack direction='column' spacing={1}>
         <Grid container rowSpacing={4}>
-          {processTemplates.map((processTemplate) => {
-            return (
-              <Grid item key={processTemplate.title} sm={gridLayout[processTemplate.title]} xs={12}>
-                <Typography variant='h3'>{capitalize(processTemplate.title)}</Typography>
-                {!processTemplate.employees.length ? (
-                  <Typography>Ingen ansatte i denne prosessen </Typography>
-                ) : (
-                  <Grid alignItems='center' container justifyContent='center' spacing={2}>
-                    {processTemplate.employees.map((employee) => (
-                      <Grid item key={employee.id} lg={4} sm={6} xs={12}>
-                        <EmployeeCard
-                          firstName={employee.firstName}
-                          gender={employee.gender}
-                          id={employee.id}
-                          imageUrl={employee.imageUrl}
-                          lastName={employee.lastName}
-                          nrOfMyTasks={employee.employeeTask.length}
-                          processTemplate={processTemplate.slug}
-                          role={employee.profession.title}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                )}
-              </Grid>
-            );
-          })}
+          {processTemplates
+            .map((processTemplate) => {
+              if (!search) {
+                return processTemplate;
+              }
+              return {
+                ...processTemplate,
+                employees: filter(processTemplate.employees, (employee) => {
+                  return employee.firstName.toLowerCase().indexOf(search) > -1 || employee.lastName.toLowerCase().indexOf(search) > -1;
+                }),
+              };
+            })
+            .map((processTemplate) => {
+              return (
+                <Grid item key={processTemplate.title} sm={gridLayout[processTemplate.title]} xs={12}>
+                  <Typography variant='h3'>{capitalize(processTemplate.title)}</Typography>
+                  {!processTemplate.employees.length ? (
+                    <Typography>Ingen ansatte i denne prosessen </Typography>
+                  ) : (
+                    <Grid alignItems='center' container justifyContent='center' spacing={2}>
+                      {processTemplate.employees.map((employee) => (
+                        <Grid item key={employee.id} lg={4} sm={6} xs={12}>
+                          <EmployeeCard
+                            firstName={employee.firstName}
+                            gender={employee.gender}
+                            id={employee.id}
+                            imageUrl={employee.imageUrl}
+                            lastName={employee.lastName}
+                            processTemplate={processTemplate.slug}
+                            role={employee.profession.title}
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </Grid>
+              );
+            })}
         </Grid>
       </Stack>
     </Stack>
