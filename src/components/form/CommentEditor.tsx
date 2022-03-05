@@ -43,7 +43,6 @@ const CommentEditor = ({ onSubmit, control, cancel, cancelText, confirmText, upd
                   fontSize: 14,
                   fontWeight: 'normal',
                   minHeight: 63,
-                  border: '1px solid red',
                 },
                 input: {
                   color: theme.palette.text.primary,
