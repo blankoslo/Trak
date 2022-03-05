@@ -1,7 +1,10 @@
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Comments from 'components/Comments';
 import { ResponsibleSelector } from 'components/InfoModal';
@@ -17,7 +20,6 @@ import { PersonaliaText } from 'pages/innstillinger';
 import safeJsonStringify from 'safe-json-stringify';
 import { IEmployeeTask } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const task_query = await trakClient.employeeTask.findUnique({
     where: {
@@ -113,13 +115,24 @@ const TaskPage = ({ task }: InferGetServerSidePropsType<typeof getServerSideProp
 };
 
 const TaskCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
+  const theme = useTheme();
+
   return (
     <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
       <Stack alignItems='flex-start' direction='column' spacing={1}>
         <Typography variant='h2'>{employeeTask.task.title}</Typography>
         <PersonaliaText smallText={''} text={`${employeeTask.task.phase.processTemplate.title} / ${employeeTask.task.phase.title}`} />
         <PersonaliaText smallText={'forfallsdato'} text={`${format(new Date(employeeTask.dueDate), 'dd MMM yyyy')}`} />
-        {employeeTask.task.link && <PersonaliaText smallText={'ekstern link'} text={<a href={employeeTask.task.link}>{employeeTask.task.link}</a>} />}
+        {employeeTask.task.link && (
+          <PersonaliaText
+            smallText={'ekstern link'}
+            text={
+              <a href={employeeTask.task.link} style={{ color: theme.palette.primary.main }}>
+                {employeeTask.task.link}
+              </a>
+            }
+          />
+        )}
         <Markdown text={employeeTask.task.description} />
       </Stack>
     </Paper>
@@ -129,8 +142,7 @@ const TaskInfoCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
   return (
     <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
       <Stack alignItems='flex-start' direction='column' spacing={1}>
-        <Typography variant='h2'>Gjelder</Typography>
-        <PersonaliaText smallText={''} text={`${employeeTask.employee.firstName} ${employeeTask.employee.lastName}`} />
+        <PersonaliaText smallText={'gjelder'} text={`${employeeTask.employee.firstName} ${employeeTask.employee.lastName}`} />
         <PersonaliaText smallText={'ansvarlig'} text={<ResponsibleSelector employeeTask={employeeTask} />} />
       </Stack>
     </Paper>
@@ -174,9 +186,10 @@ const ActionCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
               }),
             )
           }
+          startIcon={employeeTask.completed ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
           variant='contained'
         >
-          {employeeTask.completed ? 'Ikke fullført oppgave' : 'Fullført oppgave'}
+          {employeeTask.completed ? 'Ikke fullfør oppgave' : 'Fullfør oppgave'}
         </Button>
         <Link href={`/ansatt/${employeeTask.employee.id}`} passHref>
           <Button fullWidth variant='contained'>
