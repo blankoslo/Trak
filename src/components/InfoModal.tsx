@@ -149,6 +149,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
   const classes = useStyles();
 
   const { data } = useSWR(`/api/employeeTasks/${employee_task_id}`, fetcher);
+
   return (
     <Modal
       buttonGroup={[
@@ -205,7 +206,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
         <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
           Kommentarer:
         </Typography>
-        <Comments employeeTask={employee_task_id} />
+        {data && <Comments employeeTask={data} />}
       </>
     </Modal>
   );

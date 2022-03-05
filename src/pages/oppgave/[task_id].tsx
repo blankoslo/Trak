@@ -93,8 +93,8 @@ const TaskPage = ({ task }: InferGetServerSidePropsType<typeof getServerSideProp
       </Head>
       <Container maxWidth='md' sx={{ paddingTop: { xs: 2, md: 7 }, paddingBottom: 8 }}>
         <Stack
-          alignItems={{ xs: 'center', sm: 'center', md: 'flex-start' }}
-          direction={{ xs: 'column', sm: 'row', md: 'row' }}
+          alignItems={{ xs: 'center', sm: 'flex-start' }}
+          direction={{ xs: 'column', sm: 'row' }}
           justifyContent='space-evenly'
           spacing={2}
           sx={{ width: '100%' }}
@@ -140,7 +140,7 @@ const TaskCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
 };
 const TaskInfoCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
   return (
-    <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
+    <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' }, minWidth: '200px' }}>
       <Stack alignItems='flex-start' direction='column' spacing={1}>
         <PersonaliaText smallText={'gjelder'} text={`${employeeTask.employee.firstName} ${employeeTask.employee.lastName}`} />
         <PersonaliaText smallText={'ansvarlig'} text={<ResponsibleSelector employeeTask={employeeTask} />} />
@@ -164,7 +164,7 @@ const TaskCommentCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
     <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
       <Typography variant='h2'>Kommentarer</Typography>
 
-      <Comments employeeTask={employeeTask.id} />
+      <Comments employeeTask={employeeTask} />
     </Paper>
   );
 };

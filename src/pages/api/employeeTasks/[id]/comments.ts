@@ -41,7 +41,15 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
         include: {
           createdByEmployee: true,
-          employeeTask: true,
+          employeeTask: {
+            select: {
+              task: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          },
         },
         orderBy: {
           createdAt: 'asc',
