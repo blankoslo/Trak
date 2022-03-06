@@ -210,6 +210,7 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
                           imageUrl={employee.imageUrl}
                           lastName={employee.lastName}
                           nrOfMyTasks={employee.employeeTask.length}
+                          processTemplate={processTemplate.slug}
                           role={employee.profession.title}
                         />
                       </Grid>

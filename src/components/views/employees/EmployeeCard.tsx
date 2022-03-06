@@ -13,13 +13,14 @@ export type EmployeeCardProps = {
   role: string;
   gender: string;
   nrOfMyTasks: number;
+  processTemplate: string;
 };
 
-const EmployeeCard = ({ id, firstName, lastName, imageUrl, role, gender, nrOfMyTasks }: EmployeeCardProps) => {
+const EmployeeCard = ({ id, firstName, lastName, imageUrl, role, gender, nrOfMyTasks, processTemplate }: EmployeeCardProps) => {
   const emoji = getEmoji(role, gender);
 
   return (
-    <Link href={`/ansatt/${id}`} passHref>
+    <Link href={`/ansatt/${id}?process=${processTemplate}`} passHref>
       <ButtonBase
         sx={{
           borderRadius: 2,
