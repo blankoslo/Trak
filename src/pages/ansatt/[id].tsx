@@ -222,8 +222,8 @@ export const Task = ({ employeeTask, employeeId }) => {
     e.stopPropagation();
     await toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
     isLoading(false);
-    router.push({ pathname: `/ansatt/${employeeId}`, query: { process: employeeTask.task.phase.processTemplate.title } }, undefined, {
-      shallow: true,
+    router.push({ pathname: `/ansatt/${employeeId}`, query: { process: employeeTask.task.phase.processTemplate.slug } }, undefined, {
+      shallow: false,
       scroll: false,
     });
   };
