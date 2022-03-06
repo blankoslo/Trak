@@ -61,10 +61,10 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
             createdBy: user,
           });
         }
-
         router
-          .push({
-            pathname: router.asPath,
+          .push({ pathname: `/ansatt/${employeeTask.employeeId}`, query: { process: employeeTask.task.phase.processTemplate.slug } }, undefined, {
+            shallow: false,
+            scroll: false,
           })
           .finally(() => {
             closeModal();
