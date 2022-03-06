@@ -6,10 +6,9 @@ import { groupBy } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 import { syncTrakDatabase } from 'utils/cron';
-import { IEmployee, IEmployeeTask, IPhase, ResponsibleType } from 'utils/types';
+import { IEmployee, IEmployeeTask, IPhase, ITask, ResponsibleType } from 'utils/types';
 import { Process } from 'utils/types';
 
-import { ITask } from './../../../utils/types';
 let LAST_RUN = undefined;
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   const { notification } = req.query;
