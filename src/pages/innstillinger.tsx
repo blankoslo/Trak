@@ -221,11 +221,11 @@ const NotificationPaper = ({ employee }) => {
   );
 };
 
-const PersonaliaText = ({ smallText, text }) => {
+export const PersonaliaText = ({ smallText, text }) => {
   return (
     <Stack alignItems='flex-end' direction='row' spacing={1}>
       {smallText && <Typography sx={{ opacity: '0.85' }} variant='body2'>{`${smallText}:`}</Typography>}
-      <Typography>{text}</Typography>
+      <Typography noWrap>{text}</Typography>
     </Stack>
   );
 };

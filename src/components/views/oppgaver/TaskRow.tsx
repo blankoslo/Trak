@@ -17,6 +17,8 @@ import useSnackbar from 'context/Snackbar';
 import { format } from 'date-fns';
 import { differenceInCalendarDays } from 'date-fns/esm';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useContextualRouting } from 'next-use-contextual-routing';
 import { useState } from 'react';
 import { IEmployeeTask } from 'utils/types';
 import { toggleCheckBox } from 'utils/utils';
@@ -56,6 +58,12 @@ const useStyles = makeStyles((theme: Theme) => ({
       borderRadius: theme.spacing(0.5),
     },
   },
+  row: {
+    '& td': {
+      borderBottom: `1px solid ${theme.palette.text.primary}25`,
+      padding: 0,
+    },
+  },
 }));
 const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayResponsible: boolean }) => {
   const classes = useStyles();
@@ -66,16 +74,29 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
 
   const hasExpired = daysBeforeDueDate < 0;
 
+  const router = useRouter();
+  const { makeContextualHref, returnHref } = useContextualRouting();
+
   return (
-    <TableRow sx={{ border: 0, padding: '0' }}>
-      <TableCell sx={{ border: 0, padding: 0, whiteSpace: 'nowrap' }}>
+    <TableRow className={classes.row} sx={{ padding: '0' }}>
+      <TableCell sx={{ whiteSpace: 'nowrap' }}>
         <Checkbox
           checked={completed}
           color='primary'
           inputProps={{ 'aria-label': `Marker oppgave som ${completed ? 'ikke' : ''} fullført` }}
           onClick={() => toggleCheckBox(data, completed, setCompleted, showSnackbar)}
         />
-        <ButtonBase className={classes.textButton} focusRipple onClick={() => setModalIsOpen(true)} sx={{ marginRight: 1 }}>
+        <ButtonBase
+          className={classes.textButton}
+          focusRipple
+          onClick={() => {
+            setModalIsOpen(true);
+            router.push(makeContextualHref({ id: data.id }), `/oppgave/${data.id}`, {
+              shallow: true,
+            });
+          }}
+          sx={{ marginRight: 1 }}
+        >
           <Typography
             className={completed ? classes.completedTask : undefined}
             noWrap
@@ -94,9 +115,18 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
           </Tooltip>
         )}
       </TableCell>
-      {modalIsOpen && <InfoModal closeModal={() => setModalIsOpen(false)} employee_task_id={data.id} modalIsOpen={modalIsOpen} />}
-      <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' } }}>
-        <Link href={`/ansatt/${data.employee.id}`} passHref>
+      {modalIsOpen && (
+        <InfoModal
+          closeModal={() => {
+            setModalIsOpen(false);
+            router.push(returnHref, undefined, { shallow: true });
+          }}
+          employee_task_id={data.id}
+          modalIsOpen={modalIsOpen}
+        />
+      )}
+      <TableCell sx={{ textAlign: { sm: 'right' } }}>
+        <Link href={`/ansatt/${data.employee.id}?process=${data.task.phase.processTemplateId}`} passHref>
           <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple>
             <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
             <Typography
@@ -107,7 +137,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
         </Link>
       </TableCell>
       {displayResponsible && (
-        <TableCell sx={{ border: 0, padding: 0, textAlign: { sm: 'right' }, display: { md: 'table-cell', xs: 'none' } }}>
+        <TableCell sx={{ textAlign: { sm: 'right' }, display: { md: 'table-cell', xs: 'none' } }}>
           <div className={classes.avatarRoot}>
             <Avatar className={classes.avatar} firstName={data.responsible.firstName} image={data.responsible.imageUrl} lastName={data.responsible.lastName} />
             <Typography
@@ -117,7 +147,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
           </div>
         </TableCell>
       )}
-      <TableCell sx={{ display: { md: 'table-cell', xs: 'none' }, border: 0, padding: 0 }}>
+      <TableCell sx={{ display: { md: 'table-cell', xs: 'none' } }}>
         <Box className={classes.avatarRoot} sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}>
           {daysBeforeDueDate === 0 && 'I dag'}
           {daysBeforeDueDate === 1 && 'I morgen'}

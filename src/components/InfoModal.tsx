@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
 import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
@@ -11,8 +12,8 @@ import axios from 'axios';
 import ChipSkeleton from 'components/ChipSkeleton';
 import Comments from 'components/Comments';
 import EmployeeSelector from 'components/form/EmployeeSelector';
+import Markdown from 'components/Markdown';
 import Modal from 'components/Modal';
-import TextMarkDownWithLink from 'components/TextMarkDownWithLink';
 import useSnackbar from 'context/Snackbar';
 import { useUser } from 'context/User';
 import { format } from 'date-fns';
@@ -22,7 +23,6 @@ import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
 import { IEmployeeTask } from 'utils/types';
 import { fetcher } from 'utils/utils';
-
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
     marginRight: theme.spacing(1),
@@ -82,9 +82,11 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
           responsibleId: formData.responsible?.id,
         });
         const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.notificationSettings?.includes('DELEGATE');
+        const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${employeeTask.id}`;
         if (employeeWantsDelegateNotifications) {
           await axios.post('/api/notification', {
-            description: `Oppgave delegert: "${employeeTask.task.title}"`,
+            description: `Oppgave delegert: "[${employeeTask.task.title}](${taskURL})"`,
+            slack_description: `Oppgave "<${taskURL}|${employeeTask.task.title}>" er delegert til deg av ${user.firstName} ${user.lastName}`,
             employeeId: formData.responsible?.id,
             ...(formData.responsible.employeeSettings?.slack && {
               email: formData.responsible.email,
@@ -124,12 +126,12 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
             </Button>
           </form>
         ) : (
-          <>
-            {`${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}`}
+          <Stack alignItems='flex-end' direction='row'>
+            <Typography>{`${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}`}</Typography>
             <IconButton aria-label='Deleger oppgave' color='primary' onClick={() => setHasSelectedNewResponsible(true)} role='button' size='small'>
               <Edit />
             </IconButton>
-          </>
+          </Stack>
         )
       ) : (
         <Skeleton className={classes.skeleton} />
@@ -147,6 +149,7 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
   const classes = useStyles();
 
   const { data } = useSWR(`/api/employeeTasks/${employee_task_id}`, fetcher);
+
   return (
     <Modal
       buttonGroup={[
@@ -199,8 +202,11 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
             <ChipSkeleton chipsAmount={5} />
           )}
         </Box>
-        <TextMarkDownWithLink text={data?.task.description} />
-        <Comments employeeTask={employee_task_id} />
+        <Markdown text={data?.task.description} />
+        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+          Kommentarer:
+        </Typography>
+        {data && <Comments employeeTask={data} />}
       </>
     </Modal>
   );

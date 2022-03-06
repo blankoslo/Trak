@@ -1,5 +1,6 @@
 {
-	"contributors": [{
+	"contributors": [
+		{
 			"name": "Zaim Imran",
 			"email": "zaim.imran@gmail.com",
 			"url": "https://zaim.no"
@@ -44,6 +45,7 @@
 		"markdown-to-txt": "^2.0.0",
 		"next": "12.0.7",
 		"next-auth": "^4.0.5",
+		"next-use-contextual-routing": "^2.1.0",
 		"qs": "^6.10.2",
 		"react": "17.0.2",
 		"react-dom": "17.0.2",
@@ -51,6 +53,7 @@
 		"react-hook-form": "^7.22.2",
 		"react-linkify": "^1.0.0-alpha",
 		"react-markdown": "^7.1.1",
+		"react-mentions": "^4.3.1",
 		"react-scrollable-feed": "^1.3.1",
 		"safe-json-stringify": "^1.2.0",
 		"swr": "^1.1.1",

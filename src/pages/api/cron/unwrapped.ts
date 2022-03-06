@@ -106,7 +106,7 @@ Din ukentlige oppsummering 🚧
 • Du har *${myExpiredTasks ? `${myExpiredTasks}* ${pluralTaskText(myExpiredTasks)} som har forfalt 💀` : `ingen* forfalt oppgaver 🥇`}
 • ${myUpcomingTasks ? `Denne uken forfaller *${myUpcomingTasks}* ${pluralTaskText(myUpcomingTasks)} ⏰` : `Du har *ingen* oppgaver som forfaller denne uken 🌴`}
 
-Du kan se oppgavene dine på <${process.env.TRAK_URL}|her>
+Du kan se oppgavene dine <${process.env.NEXT_PUBLIC_TRAK_URL}|her>
 
 Ha en strålende uke ☀️
 Hilsen traky 🤖
