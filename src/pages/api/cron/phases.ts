@@ -8,6 +8,8 @@ import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 import { syncTrakDatabase } from 'utils/cron';
 import { IEmployee, IEmployeeTask, IPhase, ResponsibleType } from 'utils/types';
 import { Process } from 'utils/types';
+
+import { ITask } from './../../../utils/types';
 let LAST_RUN = undefined;
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   const { notification } = req.query;
@@ -144,19 +146,19 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any, sendNotification: boolean) => {
   const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
   const today = new Date();
+  const blankClient = new BlankClient();
   employees.forEach(async (employee) => {
     const [currentPhase, nextPhase] = getCurrentAndNextLopendePhase(lopendePhases, today);
-    const projectManager = await getProjectManager(employee, currentPhase, nextPhase);
+    const projectManager = await getProjectManager(blankClient, employee, currentPhase, nextPhase);
 
-    if (!employee.hrManagerId && !projectManager) {
-      return;
-    }
-    if (!employee.terminationDate) {
-      lopendeEmployeeTaskCreator(employee, nextPhase, projectManager, today);
-    }
     if (!employee.hrManagerId) {
       return;
     }
+
+    if (!employee.terminationDate) {
+      lopendeEmployeeTaskCreator(employee, nextPhase, projectManager, today);
+    }
+
     if (employee.dateOfEmployment && !employeeHasProcessTask(employee, Process.ONBOARDING)) {
       onboardingEmployeeTaskCreator(phases, employee, sendNotification);
     }
@@ -240,12 +242,12 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
 const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
   employee.employeeTask.some((employeeTask) => employeeTask.task.phase.processTemplate.slug === processTitle);
 
-const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase) => {
+const getProjectManager = async (blankClient: BlankClient, employee: IEmployee, phase: IPhase, lastPhase: IPhase) => {
   if (phase.processTemplateId !== Process.LOPENDE) {
     return;
   }
 
-  const projectsCount = await new BlankClient().staffing.groupBy({
+  const projectsCount = await blankClient.staffing.groupBy({
     where: {
       employee: employee.id,
       date: {
@@ -273,7 +275,7 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
   if (!employeeIsOnProject) {
     return;
   }
-  const projectManager = await new BlankClient().projects.findFirst({
+  const projectManager = await blankClient.projects.findFirst({
     where: {
       id: projectsCount[0].project,
     },
@@ -290,43 +292,45 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
   }
   return projectManager.responsible;
 };
+
+const getTaskDueDate = (employee: IEmployee, phase: IPhase, task: ITask) => {
+  if (task.dueDate) {
+    return task.dueDate;
+  } else if (task.dueDateDayOffset) {
+    if (phase.processTemplateId === Process.OFFBOARDING) {
+      return addDays(employee.terminationDate, task.dueDateDayOffset);
+    } else if (phase.processTemplateId === Process.ONBOARDING) {
+      return addDays(employee.dateOfEmployment, task.dueDateDayOffset);
+    }
+  }
+};
+
 const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, projectManager: IEmployee['id'] | undefined = undefined) => {
-  const data = await Promise.all(
-    phase?.tasks.map(async (task) => {
-      if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
-        let taskDueDate = null;
-        if (task.dueDate) {
-          taskDueDate = task.dueDate;
-        } else if (task.dueDateDayOffset) {
-          if (phase.processTemplateId === Process.OFFBOARDING) {
-            taskDueDate = addDays(employee.terminationDate, task.dueDateDayOffset);
-          } else if (phase.processTemplateId === Process.ONBOARDING) {
-            taskDueDate = addDays(employee.dateOfEmployment, task.dueDateDayOffset);
-          }
+  const data = phase?.tasks.map((task) => {
+    if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
+      const responsible = (() => {
+        switch (task.responsibleType) {
+          case ResponsibleType.OTHER:
+            return task.responsibleId;
+          case ResponsibleType.PROJECT_MANAGER:
+            return projectManager;
+          default:
+            return employee.hrManagerId;
         }
-        const responsible = (async () => {
-          switch (task.responsibleType) {
-            case ResponsibleType.OTHER:
-              return task.responsibleId;
-            case ResponsibleType.PROJECT_MANAGER:
-              return projectManager;
-            default:
-              return employee.hrManagerId;
-          }
-        })();
-        const responsibleId = await responsible;
-        if (!responsibleId) {
-          return;
-        }
-        return {
-          employeeId: employee.id,
-          responsibleId: responsibleId,
-          dueDate: taskDueDate || phase.dueDate,
-          taskId: task.id,
-        };
+      })();
+      const responsibleId = responsible;
+      if (!responsibleId) {
+        return;
       }
-    }),
-  );
+      const taskDueDate = getTaskDueDate(employee, phase, task);
+      return {
+        employeeId: employee.id,
+        responsibleId: responsibleId,
+        dueDate: taskDueDate || phase.dueDate,
+        taskId: task.id,
+      };
+    }
+  });
   await trakClient.employeeTask.createMany({ data: data, skipDuplicates: true });
 };
 
