@@ -4,13 +4,13 @@ import Toggle from 'components/Toggle';
 import Process from 'components/views/oppgaver/Process';
 import addMonths from 'date-fns/addMonths';
 import { trakClient } from 'lib/prisma';
+import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { selectedOptionEnum } from 'pages/ansatt';
 import safeJsonStringify from 'safe-json-stringify';
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!context.query?.mine) {
     return {
@@ -108,11 +108,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                     },
                   ],
                 },
-                orderBy: [
-                  {
-                    dueDate: 'asc',
-                  },
-                ],
                 select: {
                   id: true,
                   dueDate: true,
@@ -171,16 +166,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     });
   }
-  const processTemplateWithEmployeeFlatten = processTemplateQuery.map((processTemplate) => {
+  const processTemplateWithEmployeeFlattenAndOrdered = processTemplateQuery.map((processTemplate) => {
     const tempEmployeeList = [];
     collect(processTemplate.phases, tempEmployeeList);
     return {
       ...processTemplate,
-      tasks: tempEmployeeList,
+      tasks: orderBy(tempEmployeeList, ['dueDate'], ['asc']),
     };
   });
 
-  const processTemplates = JSON.parse(safeJsonStringify(processTemplateWithEmployeeFlatten));
+  const processTemplates = JSON.parse(safeJsonStringify(processTemplateWithEmployeeFlattenAndOrdered));
 
   const selectedOption = my ? selectedOptionEnum.Mine : selectedOptionEnum.Alle;
 
