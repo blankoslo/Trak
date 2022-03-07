@@ -6,7 +6,6 @@ import withAuth from 'lib/withAuth';
 import { compact, flatten, uniq } from 'lodash';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getToday } from 'utils/date';
-// eslint-disable-next-line
 import { slackMessager } from 'utils/utils';
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -49,9 +48,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         const myUpcomingTasks = await getUpcomingTasks(id);
 
         const wrappedMessage = createWrappedMessage(myCompletedTasks, myExpiredTasks, myUpcomingTasks);
-        // eslint-disable-next-line
-        console.log(wrappedMessage);
-        // await slackMessager(employee_data.email, wrappedMessage);
+        await slackMessager(employee_data.email, wrappedMessage);
       });
 
       res.status(HttpStatusCode.OK).end();
