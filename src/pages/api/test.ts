@@ -49,9 +49,13 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         const myUpcomingTasks = await getUpcomingTasks(id);
 
         const wrappedMessage = createWrappedMessage(myCompletedTasks, myExpiredTasks, myUpcomingTasks);
+        // eslint-disable-next-line
         console.log('MAX TESTER!!!');
+        // eslint-disable-next-line
         console.log(`Employee ${employee_data.email}`);
+        // eslint-disable-next-line
         console.log(wrappedMessage);
+        // eslint-disable-next-line
         console.log(process.env.NEXT_PUBLIC_TRAK_URL);
         // await slackMessager(employee_data.email, wrappedMessage);
       });
