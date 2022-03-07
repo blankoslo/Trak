@@ -171,7 +171,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     collect(processTemplate.phases, tempEmployeeList);
     return {
       ...processTemplate,
-      tasks: orderBy(tempEmployeeList, ['dueDate'], ['asc']),
+      tasks: orderBy(tempEmployeeList, ['dueDate', 'employee.firstName', 'employee.lastName'], ['asc', 'asc', 'asc']),
     };
   });
 
