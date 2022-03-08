@@ -1,4 +1,5 @@
 import Stack from '@mui/material/Stack';
+import Notifier from 'components/Notifier';
 import SearchField from 'components/SearchField';
 import Toggle from 'components/Toggle';
 import Process from 'components/views/oppgaver/Process';
@@ -11,6 +12,7 @@ import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { selectedOptionEnum } from 'pages/ansatt';
 import safeJsonStringify from 'safe-json-stringify';
+import { listToMarkdown } from 'utils/utils';
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!context.query?.mine) {
     return {
@@ -179,9 +181,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const selectedOption = my ? selectedOptionEnum.Mine : selectedOptionEnum.Alle;
 
-  return { props: { processTemplates, selectedOption } };
+  const employeesWithoutHrManagerQuery = await trakClient.employee.findMany({
+    where: {
+      hrManagerId: null,
+      terminationDate: null,
+    },
+    select: {
+      firstName: true,
+      lastName: true,
+    },
+  });
+
+  const employeesWithoutHrManager = employeesWithoutHrManagerQuery.map((employee) => `${employee.firstName} ${employee.lastName}`);
+
+  return { props: { processTemplates, selectedOption, employeesWithoutHrManager } };
 };
-const Tasks = ({ processTemplates, selectedOption }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Tasks = ({ processTemplates, selectedOption, employeesWithoutHrManager }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
 
   const switchPage = () => {
@@ -211,6 +226,12 @@ const Tasks = ({ processTemplates, selectedOption }: InferGetServerSidePropsType
           <Toggle defaultChecked={0} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />
           <MineAlleToggle selectedOption={selectedOption} />
         </Stack>
+        {employeesWithoutHrManager.length > 0 && (
+          <Notifier
+            expandedMessage={listToMarkdown(employeesWithoutHrManager)}
+            header={`${employeesWithoutHrManager.length} ansatte mangler personalansvarlig`}
+          />
+        )}
         <SearchField
           defaultValue={router.query.search}
           onChange={(e) => {
