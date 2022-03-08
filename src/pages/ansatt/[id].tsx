@@ -23,7 +23,7 @@ import EditDueDateModal from 'components/modals/EditDueDateModal';
 import EditResponsibleModal from 'components/modals/EditResponsibleModal';
 import useSnackbar from 'context/Snackbar';
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
-import startOfDay from 'date-fns/startOfDay';
+import startOfYear from 'date-fns/startOfYear';
 import { trakClient } from 'lib/prisma';
 import { chain } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -31,6 +31,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Fragment, useEffect, useState } from 'react';
 import safeJsonStringify from 'safe-json-stringify';
+import { Process } from 'utils/types';
 import { prismaDateToFormatedDate, toggleCheckBox } from 'utils/utils';
 import validator from 'validator';
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
@@ -62,13 +63,27 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
         where: {
           OR: [
             {
+              task: {
+                phase: {
+                  processTemplateId: Process.LOPENDE,
+                },
+              },
               dueDate: {
-                gte: startOfDay(new Date()),
+                gte: startOfYear(new Date()),
               },
             },
             {
-              completed: {
-                equals: false,
+              task: {
+                phase: {
+                  OR: [
+                    {
+                      processTemplateId: Process.ONBOARDING,
+                    },
+                    {
+                      processTemplateId: Process.OFFBOARDING,
+                    },
+                  ],
+                },
               },
             },
           ],
@@ -236,7 +251,7 @@ export const Task = ({ employeeTask, employeeId }) => {
       <Accordion
         TransitionProps={{ unmountOnExit: true }}
         disableGutters
-        sx={{ marginBottom: '16px', borderRadius: '4px', backgroundColor: hasExpired ? 'error.dark' : 'background.paper' }}
+        sx={{ marginBottom: '16px', borderRadius: '4px', backgroundColor: hasExpired && !completed ? 'error.dark' : 'background.paper' }}
       >
         <AccordionSummary
           aria-controls='TASK1_RENAME_ME_PLEASE'
