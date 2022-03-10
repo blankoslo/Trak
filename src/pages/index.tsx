@@ -1,4 +1,5 @@
 import Stack from '@mui/material/Stack';
+import Notifier from 'components/Notifier';
 import SearchField from 'components/SearchField';
 import Toggle from 'components/Toggle';
 import Process from 'components/views/oppgaver/Process';
@@ -179,9 +180,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const selectedOption = my ? selectedOptionEnum.Mine : selectedOptionEnum.Alle;
 
-  return { props: { processTemplates, selectedOption } };
+  const employeesWithoutHrManagerQuery = await trakClient.employee.findMany({
+    where: {
+      hrManagerId: null,
+      terminationDate: null,
+    },
+    select: {
+      firstName: true,
+      lastName: true,
+    },
+  });
+
+  const employeesWithoutHrManager = employeesWithoutHrManagerQuery.map((employee) => `- ${employee.firstName} ${employee.lastName}`);
+  const employeesWithoutHrManagerList = employeesWithoutHrManager.join('\n');
+  const employeesWithoutHrManagerLength = employeesWithoutHrManager.length;
+  return { props: { processTemplates, selectedOption, employeesWithoutHrManagerLength, employeesWithoutHrManagerList } };
 };
-const Tasks = ({ processTemplates, selectedOption }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Tasks = ({
+  processTemplates,
+  selectedOption,
+  employeesWithoutHrManagerLength,
+  employeesWithoutHrManagerList,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
 
   const switchPage = () => {
@@ -211,6 +231,9 @@ const Tasks = ({ processTemplates, selectedOption }: InferGetServerSidePropsType
           <Toggle defaultChecked={0} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />
           <MineAlleToggle selectedOption={selectedOption} />
         </Stack>
+        {employeesWithoutHrManagerLength > 0 && (
+          <Notifier expandedMessage={employeesWithoutHrManagerList} header={`${employeesWithoutHrManagerLength} ansatte mangler personalansvarlig`} />
+        )}
         <SearchField
           defaultValue={router.query.search}
           onChange={(e) => {
