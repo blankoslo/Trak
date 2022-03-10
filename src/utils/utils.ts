@@ -132,11 +132,3 @@ export const getEmoji = (role: string, gender: string) => {
     return anotherEmojies[number];
   }
 };
-
-export const listToMarkdown = (arr) => {
-  let string = '';
-  arr.forEach((element) => {
-    string += `- ${element}\n`;
-  });
-  return string;
-};

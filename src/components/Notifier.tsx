@@ -16,9 +16,8 @@ const Notifier = ({ header, expandedMessage }: NotifierProps) => {
     <div>
       <Button endIcon={showExpandedMessage ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} onClick={() => setShowExpandedMessage(!showExpandedMessage)}>
         <span aria-label='Utropstegn' role='img'>
-          {' '}
           ❗️
-        </span>{' '}
+        </span>
         {header}
       </Button>
       {showExpandedMessage && <Markdown text={expandedMessage} />}

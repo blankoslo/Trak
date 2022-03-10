@@ -12,7 +12,6 @@ import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { selectedOptionEnum } from 'pages/ansatt';
 import safeJsonStringify from 'safe-json-stringify';
-import { listToMarkdown } from 'utils/utils';
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!context.query?.mine) {
     return {
@@ -192,11 +191,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
-  const employeesWithoutHrManager = employeesWithoutHrManagerQuery.map((employee) => `${employee.firstName} ${employee.lastName}`);
-
-  return { props: { processTemplates, selectedOption, employeesWithoutHrManager } };
+  const employeesWithoutHrManager = employeesWithoutHrManagerQuery.map((employee) => `- ${employee.firstName} ${employee.lastName}`);
+  const employeesWithoutHrManagerList = employeesWithoutHrManager.join('\n');
+  const employeesWithoutHrManagerLength = employeesWithoutHrManager.length;
+  return { props: { processTemplates, selectedOption, employeesWithoutHrManagerLength, employeesWithoutHrManagerList } };
 };
-const Tasks = ({ processTemplates, selectedOption, employeesWithoutHrManager }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Tasks = ({
+  processTemplates,
+  selectedOption,
+  employeesWithoutHrManagerLength,
+  employeesWithoutHrManagerList,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
 
   const switchPage = () => {
@@ -226,11 +231,8 @@ const Tasks = ({ processTemplates, selectedOption, employeesWithoutHrManager }: 
           <Toggle defaultChecked={0} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />
           <MineAlleToggle selectedOption={selectedOption} />
         </Stack>
-        {employeesWithoutHrManager.length > 0 && (
-          <Notifier
-            expandedMessage={listToMarkdown(employeesWithoutHrManager)}
-            header={`${employeesWithoutHrManager.length} ansatte mangler personalansvarlig`}
-          />
+        {employeesWithoutHrManagerLength > 0 && (
+          <Notifier expandedMessage={employeesWithoutHrManagerList} header={`${employeesWithoutHrManagerLength} ansatte mangler personalansvarlig`} />
         )}
         <SearchField
           defaultValue={router.query.search}
