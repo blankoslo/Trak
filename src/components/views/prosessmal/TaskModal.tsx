@@ -1,4 +1,5 @@
 import HelpIcon from '@mui/icons-material/Help';
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -18,6 +19,7 @@ import EmployeeSelector from 'components/form/EmployeeSelector';
 import TagSelector from 'components/form/TagSelector';
 import TextField from 'components/form/TextField';
 import ToggleButtonGroup from 'components/form/ToggleButtonGroup';
+import MarkdownEditor from 'components/MarkdownEditor';
 import Modal from 'components/Modal';
 import { useData } from 'context/Data';
 import useProgressbar from 'context/Progressbar';
@@ -42,7 +44,8 @@ export type TaskModalProps = {
 
 export type TaskData = {
   title: string;
-  description?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  description?: any; // Any because markdownEditor does not return a string but an object of the actualt markdown text and html
   professions?: string[];
   responsible?: IEmployee;
   tags?: ITag[];
@@ -179,6 +182,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           formData.month >= 0 && {
             dueDate: formatISO(new Date().setMonth(formData.month, formData.day)),
           }),
+        description: formData.description.text,
         dueDateDayOffset: dueDateDayOffset,
         responsible: formData.responsibleType === ResponsibleType.OTHER ? formData.responsible : null,
       },
@@ -247,7 +251,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           }}
           sx={{ marginTop: 2 }}
         />
-        <TextField
+        {/* <TextField
           errors={errors}
           inputProps={{ 'aria-label': 'Rediger oppggavebeskrivelse' }}
           label={
@@ -271,7 +275,11 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           name='description'
           register={register}
           rows={4}
-        />
+        /> */}
+        <Stack spacing={1}>
+          <Typography variant='body1'>Beskrivelse</Typography>
+          <MarkdownEditor control={control} name='description' />
+        </Stack>
         <TextField
           errors={errors}
           inputProps={{ 'aria-label': 'Rediger hurtiglink' }}
