@@ -251,7 +251,11 @@ export const Task = ({ employeeTask, employeeId }) => {
       <Accordion
         TransitionProps={{ unmountOnExit: true }}
         disableGutters
-        sx={{ marginBottom: '16px', borderRadius: '4px', backgroundColor: hasExpired && !completed ? 'error.dark' : 'background.paper' }}
+        sx={{
+          marginBottom: '16px',
+          borderRadius: '4px',
+          backgroundColor: completed ? 'background.default' : hasExpired && !completed ? 'error.dark' : 'background.paper',
+        }}
       >
         <AccordionSummary
           aria-controls='TASK1_RENAME_ME_PLEASE'
