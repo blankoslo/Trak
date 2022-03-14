@@ -33,14 +33,13 @@ const MarkdownEditor = ({ name, control }: MarkdownEditorProps) => {
       render={({ field: { onChange, value, name } }) => {
         return (
           <MdEditor
-            canView={{ menu: true, md: false, html: true, fullScreen: false, hideMenu: true }}
             className={classes.root}
             name={name}
             onChange={onChange}
+            plugins={['header', 'font-bold', 'font-italic', 'font-underline', 'list-unordered', 'list-ordered', 'link', 'mode-toggle']}
             renderHTML={(text) => <Markdown text={text} />}
             style={{ height: '200px' }}
-            value={value?.text || value}
-            view={{ menu: true, md: true, html: false }}
+            value={typeof value === 'object' ? value?.text : typeof value === 'string' ? value : ''}
           />
         );
       }}
