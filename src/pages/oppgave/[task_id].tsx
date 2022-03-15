@@ -6,8 +6,8 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import Avatar from 'components/Avatar';
 import Comments from 'components/Comments';
-import { ResponsibleSelector } from 'components/InfoModal';
 import Markdown from 'components/Markdown';
 import useSnackbar from 'context/Snackbar';
 import format from 'date-fns/format';
@@ -16,6 +16,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { EditResponsibleButton } from 'pages/ansatt/[id]';
 import { PersonaliaText } from 'pages/innstillinger';
 import safeJsonStringify from 'safe-json-stringify';
 import { IEmployeeTask } from 'utils/types';
@@ -47,6 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           id: true,
           firstName: true,
           lastName: true,
+          imageUrl: true,
         },
       },
       responsible: {
@@ -54,6 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           id: true,
           firstName: true,
           lastName: true,
+          imageUrl: true,
         },
       },
       task: {
@@ -99,18 +102,38 @@ const TaskPage = ({ task }: InferGetServerSidePropsType<typeof getServerSideProp
           spacing={2}
           sx={{ width: '100%' }}
         >
-          <Stack direction='column' spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
+          <Stack direction='column' spacing={2} sx={{ width: { xs: '100%', md: '100%' } }}>
             <TaskCard employeeTask={task} />
             <TaskCommentCard employeeTask={task} />
           </Stack>
           <Stack direction='column' spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
-            <TaskInfoCard employeeTask={task} />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
+              <PersonaliaPaper employee={task.employee} title='Gjelder' />
+              <PersonaliaPaper employee={task.responsible} title='Ansvarlig' />
+            </Stack>
             <ActionCard employeeTask={task} />
             {task.completed && <CompletedCard employeeTask={task} />}
           </Stack>
         </Stack>
       </Container>
     </>
+  );
+};
+
+const PersonaliaPaper = ({ employee, title }) => {
+  return (
+    <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'fit-content' } }}>
+      <Stack alignItems='center' direction='column' spacing={1}>
+        <Typography variant='h3'>{title}</Typography>
+        <Stack alignItems='center' direction='column' spacing={1}>
+          <Avatar firstName={employee.firstName} image={employee.imageUrl} lastName={employee.lastName} sx={{ width: 80, height: 80 }} />
+          <Stack alignItems='flex-start' direction='column' spacing={0.5}>
+            <PersonaliaText smallText={''} text={`${employee.firstName} ${employee.lastName}`} />
+            <PersonaliaText smallText={''} text={employee.email} />
+          </Stack>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 };
 
@@ -138,16 +161,7 @@ const TaskCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
     </Paper>
   );
 };
-const TaskInfoCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
-  return (
-    <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' }, minWidth: '200px' }}>
-      <Stack alignItems='flex-start' direction='column' spacing={1}>
-        <PersonaliaText smallText={'gjelder'} text={`${employeeTask.employee.firstName} ${employeeTask.employee.lastName}`} />
-        <PersonaliaText smallText={'ansvarlig'} text={<ResponsibleSelector employeeTask={employeeTask} />} />
-      </Stack>
-    </Paper>
-  );
-};
+
 const CompletedCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
   return (
     <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
@@ -191,8 +205,9 @@ const ActionCard = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
         >
           {employeeTask.completed ? 'Ikke fullfør oppgave' : 'Fullfør oppgave'}
         </Button>
+        <EditResponsibleButton employeeTask={employeeTask} fullWidth={true} />
         <Link href={`/ansatt/${employeeTask.employee.id}?process=${employeeTask.task.phase.processTemplate.slug}`} passHref>
-          <Button fullWidth variant='contained'>
+          <Button fullWidth variant='text'>
             Til ansattside
           </Button>
         </Link>

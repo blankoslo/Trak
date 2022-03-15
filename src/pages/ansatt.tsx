@@ -44,9 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                   AND: [
                     {
                       ...(my && {
-                        employee: {
-                          hrManagerId: parseInt(session?.user?.id) || null,
-                        },
+                        responsibleId: parseInt(session?.user?.id) || null,
                       }),
                     },
                     {
@@ -94,9 +92,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                       employeeTask: {
                         where: {
                           responsibleId: parseInt(session.user.id),
+                          completed: false,
                         },
                         select: {
                           id: true,
+                          task: {
+                            select: {
+                              phase: {
+                                select: {
+                                  processTemplate: {
+                                    select: {
+                                      slug: true,
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                          },
                         },
                       },
                       id: true,
@@ -133,6 +145,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     });
   }
+
   const processTemplateWithEmployeeFlatten = processTemplateQuery.map((processTemplate) => {
     const tempEmployeeList = [];
     collect(processTemplate.phases, tempEmployeeList);
@@ -163,6 +176,10 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
       pathname: '/',
       query: { ...router.query, mine: selectedOption === selectedOptionEnum.Mine },
     });
+  };
+
+  const getNrOfTasks = (employeeTasks, slug) => {
+    return employeeTasks.filter((eTask) => eTask.task.phase.processTemplate.slug === slug).length;
   };
 
   return (
@@ -209,7 +226,7 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
                           id={employee.id}
                           imageUrl={employee.imageUrl}
                           lastName={employee.lastName}
-                          nrOfMyTasks={employee.employeeTask.length}
+                          nrOfMyTasks={getNrOfTasks(employee.employeeTask, processTemplate.slug)}
                           processTemplate={processTemplate.slug}
                           role={employee.profession.title}
                         />
