@@ -390,7 +390,7 @@ export const Task = ({ employeeTask, employeeId }) => {
   );
 };
 
-const EditResponsibleButton = ({ employeeTask }) => {
+export const EditResponsibleButton = ({ employeeTask, fullWidth = false }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const closeModal = () => setIsModalOpen(false);
   return (
@@ -398,6 +398,7 @@ const EditResponsibleButton = ({ employeeTask }) => {
       <Button
         aria-label='Åpne endre oppgaveansvarlig modal'
         disabled={employeeTask.completed}
+        fullWidth={fullWidth}
         onClick={() => setIsModalOpen(true)}
         type='button'
         variant='contained'
