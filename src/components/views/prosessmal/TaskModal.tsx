@@ -251,31 +251,6 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           }}
           sx={{ marginTop: 2 }}
         />
-        {/* <TextField
-          errors={errors}
-          inputProps={{ 'aria-label': 'Rediger oppggavebeskrivelse' }}
-          label={
-            <>
-              Oppgavebeskrivelse{' '}
-              <Tooltip
-                title={
-                  <>
-                    Dette feltet støtter{' '}
-                    <a href='https://www.markdownguide.org/cheat-sheet/' rel='noreferrer noopener' target='_blank'>
-                      markdown
-                    </a>
-                  </>
-                }
-              >
-                <HelpIcon fontSize='small' />
-              </Tooltip>
-            </>
-          }
-          multiline
-          name='description'
-          register={register}
-          rows={4}
-        /> */}
         <Stack spacing={1}>
           <Typography variant='body1'>Beskrivelse</Typography>
           <MarkdownEditor control={control} name='description' />
