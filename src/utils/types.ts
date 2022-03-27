@@ -15,6 +15,7 @@ export type IEmployee = {
   title?: string;
   email: string;
   birthDate: Date;
+  gender: string;
   dateOfEmployment?: Date;
   terminationDate?: Date;
   imageUrl?: string;

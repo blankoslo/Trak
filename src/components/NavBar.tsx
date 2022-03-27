@@ -1,5 +1,6 @@
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import GroupsIcon from '@mui/icons-material/Groups';
 import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NightlightIcon from '@mui/icons-material/Nightlight';
@@ -138,6 +139,16 @@ const NavBar = () => {
                     variant='text'
                   >
                     Hjem
+                  </Button>
+                </Link>
+                <Link href='/oversikt' passHref>
+                  <Button
+                    className={router.asPath === '/oversikt' ? classes.activeLink : null}
+                    color='inherit'
+                    startIcon={<GroupsIcon color='primary' />}
+                    variant='text'
+                  >
+                    Ansatt oversikt
                   </Button>
                 </Link>
                 <Link href='/prosessmal' passHref>
