@@ -45,12 +45,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           title: true,
         },
       },
-      employeeSettings: {
-        select: {
-          slack: true,
-          notificationSettings: true,
-        },
-      },
+      employeeSettings: true,
     },
   });
 
@@ -60,6 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Settings: NextPage = ({ employee }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  console.log(employee)
   return (
     <Container maxWidth='md' sx={{ paddingTop: { xs: 2, md: 7 }, paddingBottom: 8 }}>
       <Stack

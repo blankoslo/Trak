@@ -44,10 +44,15 @@ model Employee {
 }
 
 model EmployeeSettings {
-  employeeId           Int                @id
-  slack                Boolean            @default(true)
-  notificationSettings NotificationType[]
-  employee             Employee           @relation("settings", fields: [employeeId], references: [id])
+  employeeId           Int     @id
+  slack                Boolean @default(true)
+  delegate             Boolean @default(true)
+  deadline             Boolean @default(true)
+  week_before_deadline Boolean @default(true)
+  termination          Boolean @default(true)
+  hired                Boolean @default(true)
+
+  employee Employee @relation("settings", fields: [employeeId], references: [id])
 }
 
 model EmployeeTask {
@@ -128,14 +133,6 @@ model Task {
   tags             Tag[]
 }
 
-enum NotificationType {
-  DELEGATE
-  DEADLINE
-  WEEK_BEFORE_DEADLINE
-  TERMINATION
-  HIRED
-}
-
 enum gender {
   male
   female
@@ -146,5 +143,4 @@ enum ResponsibleType {
   HR_MANAGER
   PROJECT_MANAGER
   OTHER
-
 }
