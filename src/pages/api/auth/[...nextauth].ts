@@ -24,24 +24,7 @@ export default NextAuth({
           },
         });
 
-        if (user && profile.email_verified) {
-          await trakClient.employeeSettings.upsert({
-            where: {
-              employeeId: user.id,
-            },
-            update: {},
-            create: {
-              employeeId: user.id,
-              slack: true,
-              deadline: true,
-              delegate: true,
-              hired: true,
-              termination: true,
-              week_before_deadline: true,
-            },
-          });
-          return true;
-        }
+        return Boolean(user && profile.email_verified);
       } catch (err) {
         // eslint-disable-next-line
         console.log(err);
