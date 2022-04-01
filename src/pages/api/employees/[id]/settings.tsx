@@ -19,17 +19,14 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 
 const PUT = async (req, res, id) => {
   const {
-    body: { slack, notificationSettings },
+    body: { data },
   } = req;
   try {
     const employeeSettings = await trakClient.employeeSettings.update({
       where: {
         employeeId: toInteger(id),
       },
-      data: {
-        slack: slack,
-        notificationSettings: notificationSettings,
-      },
+      data: data,
     });
     if (!employeeSettings) {
       throw new Error('Ansattinnstillinger mangler i bodyen');

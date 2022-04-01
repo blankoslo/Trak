@@ -198,6 +198,10 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
         <Toggle defaultChecked={1} onToggle={switchPage} options={['Oppgaver', 'Ansatte']} />
         <MineAlleToggle selectedOption={selectedOption} />
       </Stack>
+      <Stack alignItems='center' direction='row' justifyContent='center' spacing={2}>
+        <Typography>Vis ansatte basert på </Typography>
+        <Toggle defaultChecked={1} onToggle={() => null} options={['Oppgaver', 'Personalansvar']} />
+      </Stack>
       <SearchField
         defaultValue={router.query.search}
         onChange={(e) => {
