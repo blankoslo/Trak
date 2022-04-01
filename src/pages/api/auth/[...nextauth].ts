@@ -1,7 +1,6 @@
 import { trakClient } from 'lib/prisma';
 import NextAuth from 'next-auth';
 import GoogleProviders from 'next-auth/providers/google';
-import { NotificationTypeEnum } from 'utils/types';
 
 export default NextAuth({
   providers: [
@@ -33,13 +32,12 @@ export default NextAuth({
             update: {},
             create: {
               employeeId: user.id,
-              notificationSettings: [
-                NotificationTypeEnum.DELEGATE,
-                NotificationTypeEnum.DEADLINE,
-                NotificationTypeEnum.WEEK_BEFORE_DEADLINE,
-                NotificationTypeEnum.HIRED,
-                NotificationTypeEnum.TERMINATION,
-              ],
+              slack: true,
+              deadline: true,
+              delegate: true,
+              hired: true,
+              termination: true,
+              week_before_deadline: true,
             },
           });
           return true;
