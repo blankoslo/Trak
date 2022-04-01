@@ -73,8 +73,12 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             email: true,
             employeeSettings: {
               select: {
+                deadline: true,
+                delegate: true,
+                hired: true,
                 slack: true,
-                notificationSettings: true,
+                termination: true,
+                week_before_deadline: true,
               },
             },
           },
@@ -123,8 +127,12 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
         employeeSettings: {
           select: {
+            deadline: true,
+            delegate: true,
+            hired: true,
             slack: true,
-            notificationSettings: true,
+            termination: true,
+            week_before_deadline: true,
           },
         },
       },
@@ -202,11 +210,11 @@ const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmploy
       createEmployeeTasks(employee, phase);
     }
   });
-  const employeeWantsNewEmployeeNotificiation = employee.hrManager.employeeSettings?.notificationSettings?.includes('HIRED');
+  const employeeWantsNewEmployeeNotificiation = employee.hrManager?.employeeSettings?.hired;
   if (employeeWantsNewEmployeeNotificiation) {
     const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i onboarding`;
     if (sendNotification) {
-      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager?.employeeSettings?.slack && employee.hrManager.email);
     }
   }
 };
@@ -218,11 +226,11 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
       createEmployeeTasks(employee, phase);
     }
   });
-  const employeeWantsEmployeeQuittingNotification = employee.hrManager.employeeSettings?.notificationSettings?.includes('TERMINATION');
+  const employeeWantsEmployeeQuittingNotification = employee.hrManager?.employeeSettings?.termination;
   if (employeeWantsEmployeeQuittingNotification) {
     const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i offboarding`;
     if (sendNotification) {
-      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager.employeeSettings.slack && employee.hrManager.email);
+      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager?.employeeSettings?.slack && employee.hrManager.email);
     }
   }
 };
@@ -327,9 +335,8 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
     const today = new Date();
     const nextWeek = new Date().setDate(today.getDate() + 7);
     responsibleEmployees?.forEach((employee) => {
-      const notificationSettings = employee?.employeeSettings?.notificationSettings;
-      const employeeWantsPhaseEndsTodayNotification = notificationSettings?.includes('DEADLINE');
-      const employeeWantsPhaseEndsNextWeekNotification = notificationSettings?.includes('WEEK_BEFORE_DEADLINE');
+      const employeeWantsPhaseEndsTodayNotification = employee.employeeSettings?.deadline;
+      const employeeWantsPhaseEndsNextWeekNotification = employee.employeeSettings?.week_before_deadline;
       if (!employeeWantsPhaseEndsTodayNotification && !employeeWantsPhaseEndsNextWeekNotification) {
         return;
       }
@@ -343,7 +350,7 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
           notificationText = `Du har oppgaver som utgår om en uke`;
         }
         if (notificationText) {
-          await notificationSender(employee.id, notificationText, employee.employeeSettings.slack && employee.email);
+          await notificationSender(employee.id, notificationText, employee.employeeSettings?.slack && employee.email);
         }
       });
     });

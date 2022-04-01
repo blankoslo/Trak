@@ -48,7 +48,7 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
           dueDate: employeeTask.dueDate,
           responsibleId: formData.responsible?.id,
         });
-        const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.notificationSettings?.includes('DELEGATE');
+        const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.delegate;
         const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${employeeTask.id}`;
         if (employeeWantsDelegateNotifications) {
           await axios.post('/api/notification', {

@@ -1,7 +1,6 @@
 import { trakClient } from 'lib/prisma';
 import NextAuth from 'next-auth';
 import GoogleProviders from 'next-auth/providers/google';
-import { NotificationTypeEnum } from 'utils/types';
 
 export default NextAuth({
   providers: [
@@ -25,25 +24,7 @@ export default NextAuth({
           },
         });
 
-        if (user && profile.email_verified) {
-          await trakClient.employeeSettings.upsert({
-            where: {
-              employeeId: user.id,
-            },
-            update: {},
-            create: {
-              employeeId: user.id,
-              notificationSettings: [
-                NotificationTypeEnum.DELEGATE,
-                NotificationTypeEnum.DEADLINE,
-                NotificationTypeEnum.WEEK_BEFORE_DEADLINE,
-                NotificationTypeEnum.HIRED,
-                NotificationTypeEnum.TERMINATION,
-              ],
-            },
-          });
-          return true;
-        }
+        return Boolean(user && profile.email_verified);
       } catch (err) {
         // eslint-disable-next-line
         console.log(err);

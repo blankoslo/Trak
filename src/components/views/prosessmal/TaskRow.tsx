@@ -74,7 +74,7 @@ const TaskRow = ({ task, phase }: TaskProps) => {
     <TableRow className={classes.hideLastBorder} key={task.id}>
       <TableCell style={{ width: '25rem' }}>{task.title}</TableCell>
       <TableCell style={{ width: '55rem' }} sx={{ display: { md: 'table-cell', xs: 'none' } }}>
-        {markdownToTxt(task.description)}
+        {markdownToTxt(task?.description || '')}
       </TableCell>
       <TableCell style={{ width: '55rem' }} sx={{ display: { lg: 'table-cell', xs: 'none' } }}>
         {task.professions.length === 3 ? 'Alle' : task.professions[0]?.title}

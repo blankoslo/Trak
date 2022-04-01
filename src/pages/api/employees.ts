@@ -24,12 +24,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         lastName: true,
         email: true,
         imageUrl: true,
-        employeeSettings: {
-          select: {
-            slack: true,
-            notificationSettings: true,
-          },
-        },
+        employeeSettings: true,
       },
       orderBy: [
         {

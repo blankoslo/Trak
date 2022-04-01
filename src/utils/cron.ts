@@ -1,5 +1,6 @@
 import addDays from 'date-fns/addDays';
 import { trakClient } from 'lib/prisma';
+import flatten from 'lodash/flatten';
 import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 
 const updateTask = async (blankEmployees) => {
@@ -54,19 +55,10 @@ const updateTask = async (blankEmployees) => {
       const blankEmployeeData = blankEmployees.find((blankEmployee) => blankEmployee.id === employee.id);
       if (blankEmployeeData) {
         await updateOrDeleteTask(employee, blankEmployeeData);
-      } else {
-        // await deleteNonExistantUser(employee);
       }
     }),
   );
 };
-// eslint-disable-next-line
-const deleteNonExistantUser = async (employee) =>
-  await trakClient.employee.delete({
-    where: {
-      id: employee.id,
-    },
-  });
 
 const updateOrDeleteTask = async (employee, blankEmployeeData) =>
   await trakClient.$transaction([
@@ -105,46 +97,59 @@ const updateOrDeleteTask = async (employee, blankEmployeeData) =>
 
 const addEmployees = async (blankEmployees, includeHrManager = true) => {
   await trakClient.$transaction(
-    blankEmployees.map((employee) => {
-      const data = {
-        firstName: employee.first_name,
-        lastName: employee.last_name,
-        email: employee.email,
-        birthDate: employee.birth_date,
-        dateOfEmployment: employee.date_of_employment,
-        terminationDate: employee.termination_date,
-        gender: employee.gender,
-        imageUrl: employee.image_url,
-        ...(employee.hr_manager &&
-          includeHrManager && {
-            hrManager: {
-              connect: {
-                id: employee.hr_manager,
+    flatten(
+      blankEmployees.map((employee) => {
+        const data = {
+          firstName: employee.first_name,
+          lastName: employee.last_name,
+          email: employee.email,
+          birthDate: employee.birth_date,
+          dateOfEmployment: employee.date_of_employment,
+          terminationDate: employee.termination_date,
+          gender: employee.gender,
+          imageUrl: employee.image_url,
+          ...(employee.hr_manager &&
+            includeHrManager && {
+              hrManager: {
+                connect: {
+                  id: employee.hr_manager,
+                },
+              },
+            }),
+          profession: {
+            connectOrCreate: {
+              where: {
+                title: employee.role,
+              },
+              create: {
+                title: employee.role,
               },
             },
-          }),
-        profession: {
-          connectOrCreate: {
-            where: {
-              title: employee.role,
-            },
-            create: {
-              title: employee.role,
-            },
           },
-        },
-      };
-      return trakClient.employee.upsert({
-        where: {
-          id: employee.id,
-        },
-        update: data,
-        create: {
-          id: employee.id,
-          ...data,
-        },
-      });
-    }),
+        };
+        return [
+          trakClient.employee.upsert({
+            where: {
+              id: employee.id,
+            },
+            update: data,
+            create: {
+              id: employee.id,
+              ...data,
+            },
+          }),
+          trakClient.employeeSettings.upsert({
+            where: {
+              employeeId: employee.id,
+            },
+            update: {},
+            create: {
+              employeeId: employee.id,
+            },
+          }),
+        ];
+      }),
+    ),
   );
 };
 

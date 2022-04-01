@@ -182,7 +182,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           formData.month >= 0 && {
             dueDate: formatISO(new Date().setMonth(formData.month, formData.day)),
           }),
-        description: formData.description.text,
+        description: formData.description?.text,
         dueDateDayOffset: dueDateDayOffset,
         responsible: formData.responsibleType === ResponsibleType.OTHER ? formData.responsible : null,
       },

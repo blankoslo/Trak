@@ -30,8 +30,12 @@ export type IEmployee = {
 
 export type IEmployeeSettings = {
   employeeId?: number;
-  slack?: boolean;
-  notificationSettings: ('DELEGATE' | 'DEADLINE' | 'WEEK_BEFORE_DEADLINE' | 'TERMINATION' | 'HIRED')[];
+  slack: boolean;
+  delegate: boolean;
+  deadline: boolean;
+  week_before_deadline: boolean;
+  termination: boolean;
+  hired: boolean;
 };
 
 export enum NotificationType {
