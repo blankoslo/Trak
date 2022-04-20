@@ -47,8 +47,11 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         const myExpiredTasks = await getExpiredTasks(id);
         const myUpcomingTasks = await getUpcomingTasks(id);
 
-        const wrappedMessage = createWrappedMessage(myCompletedTasks, myExpiredTasks, myUpcomingTasks);
-        await slackMessager(employee_data.email, wrappedMessage);
+        const shouldSendMessage = myCompletedTasks > 0 || myExpiredTasks > 0 || myUpcomingTasks > 0;
+        if (shouldSendMessage) {
+          const wrappedMessage = createWrappedMessage(myCompletedTasks, myExpiredTasks, myUpcomingTasks);
+          await slackMessager(employee_data.email, wrappedMessage);
+        }
       });
 
       res.status(HttpStatusCode.OK).end();
