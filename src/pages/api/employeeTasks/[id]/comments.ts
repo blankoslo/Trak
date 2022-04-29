@@ -11,15 +11,15 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     } = req;
 
     try {
-      const newComment = await trakClient.comment.create({
+      const newComment = await trakClient.employee_task_comments.create({
         data: {
-          text: text,
-          createdById: user.id,
-          employeeTaskId: id.toString(),
+          text: text.toString(),
+          created_by_id: user.id,
+          employee_task_id: id.toString(),
         },
         include: {
-          createdByEmployee: true,
-          employeeTask: true,
+          created_by: true,
+          employee_task: true,
         },
       });
       res.status(HttpStatusCode.OK).json(newComment);
@@ -35,13 +35,13 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       query: { id },
     } = req;
     try {
-      const comments = await trakClient.comment.findMany({
+      const comments = await trakClient.employee_task_comments.findMany({
         where: {
-          employeeTaskId: id.toString(),
+          employee_task_id: id.toString(),
         },
         include: {
-          createdByEmployee: true,
-          employeeTask: {
+          created_by: true,
+          employee_task: {
             select: {
               task: {
                 select: {
@@ -52,7 +52,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
           },
         },
         orderBy: {
-          createdAt: 'asc',
+          created_at: 'asc',
         },
       });
       res.json(comments);

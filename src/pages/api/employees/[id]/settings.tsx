@@ -22,9 +22,9 @@ const PUT = async (req, res, id) => {
     body: { data },
   } = req;
   try {
-    const employeeSettings = await trakClient.employeeSettings.update({
+    const employeeSettings = await trakClient.employee_settings.update({
       where: {
-        employeeId: toInteger(id),
+        employee_id: toInteger(id),
       },
       data: data,
     });

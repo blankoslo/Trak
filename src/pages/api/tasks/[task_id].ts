@@ -2,7 +2,7 @@ import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ITag, ResponsibleType } from 'utils/types';
+import { ResponsibleType } from 'utils/types';
 
 export const config = {
   api: {
@@ -34,29 +34,22 @@ const GET = async (res, task_id) => {
         id: true,
         title: true,
         description: true,
-        phaseId: true,
+        phase_id: true,
         link: true,
-        responsibleType: true,
-        dueDate: true,
-        dueDateDayOffset: true,
-        tags: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
+        responsible_type: true,
+        due_date: true,
+        due_date_day_offset: true,
         professions: {
           select: {
-            id: true,
-            title: true,
+            profession: true,
           },
         },
         responsible: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            imageUrl: true,
+            first_name: true,
+            last_name: true,
+            image_url: true,
           },
         },
       },
@@ -87,7 +80,7 @@ const PUT = async (req, res, task_id) => {
         id: task_id.toString(),
       },
       select: {
-        responsibleId: true,
+        responsible_id: true,
       },
     });
     const updatedTask = await trakClient.task.update({
@@ -99,15 +92,15 @@ const PUT = async (req, res, task_id) => {
         description: data.description,
         link: data.link,
         global: global,
-        dueDate: data.dueDate,
-        responsibleType: data.responsibleType,
-        dueDateDayOffset: data.dueDateDayOffset,
+        due_date: data.due_date,
+        responsible_type: data.responsible_type,
+        due_date_day_offset: data.due_date_day_offset,
         phase: {
           connect: {
             id: phaseId,
           },
         },
-        ...(data.responsible && data.responsibleType === ResponsibleType.OTHER
+        ...(data.responsible && data.responsible_type === ResponsibleType.OTHER
           ? {
               responsible: {
                 connect: {
@@ -115,22 +108,11 @@ const PUT = async (req, res, task_id) => {
                 },
               },
             }
-          : Boolean(getTask.responsibleId) && {
+          : Boolean(getTask.responsible_id) && {
               responsible: {
                 disconnect: true,
               },
             }),
-        tags: {
-          set: [],
-          connectOrCreate: data.tags?.map((tag: ITag) => ({
-            where: {
-              id: tag.id,
-            },
-            create: {
-              title: tag.title,
-            },
-          })),
-        },
         professions: {
           set: [],
           connect: data.professions.map((profession) => ({ id: profession.id })),

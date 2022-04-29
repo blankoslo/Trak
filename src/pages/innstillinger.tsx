@@ -24,22 +24,22 @@ import { prismaDateToFormatedDate } from 'utils/utils';
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
-  const employeeQuery = await trakClient.employee.findUnique({
+  const employeeQuery = await trakClient.employees.findUnique({
     where: {
       id: parseInt(session?.user?.id) || null,
     },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
-      imageUrl: true,
+      first_name: true,
+      last_name: true,
+      image_url: true,
       email: true,
-      birthDate: true,
-      dateOfEmployment: true,
-      hrManager: {
+      birth_date: true,
+      date_of_employment: true,
+      hr_manager: {
         select: {
-          firstName: true,
-          lastName: true,
+          first_name: true,
+          last_name: true,
         },
       },
       profession: {
@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           title: true,
         },
       },
-      employeeSettings: true,
+      employee_settings: true,
     },
   });
 
@@ -97,15 +97,15 @@ const PersonaliaPaper = ({ employee }) => {
           </a>
         </Typography>
         <Stack alignItems='center' direction='row' spacing={1}>
-          <Avatar firstName={employee.firstName} image={employee.imageUrl} lastName={employee.lastName} sx={{ width: 80, height: 80 }} />
+          <Avatar firstName={employee.first_name} image={employee.image_url} lastName={employee.last_name} sx={{ width: 80, height: 80 }} />
           <Stack alignItems='flex-start' direction='column' spacing={0.5}>
-            <PersonaliaText smallText={''} text={`${employee.firstName} ${employee.lastName}`} />
+            <PersonaliaText smallText={''} text={`${employee.first_name} ${employee.last_name}`} />
             <PersonaliaText smallText={''} text={employee.email} />
           </Stack>
         </Stack>
         <PersonaliaText smallText={'rolle'} text={employee.profession.title} />
-        <PersonaliaText smallText={'startet'} text={prismaDateToFormatedDate(employee.dateOfEmployment)} />
-        {employee.hrManager && <PersonaliaText smallText={'ansvarlig'} text={`${employee.hrManager.firstName} ${employee.hrManager.lastName}`} />}
+        <PersonaliaText smallText={'startet'} text={prismaDateToFormatedDate(employee.date_of_employment)} />
+        {employee.hr_manager && <PersonaliaText smallText={'ansvarlig'} text={`${employee.hr_manager.first_name} ${employee.hr_manager.last_name}`} />}
       </Stack>
     </Paper>
   );
@@ -210,7 +210,7 @@ const NotificationPaper = ({ employee }) => {
         <FormControl>
           <Toggle
             control={control}
-            defaultValue={employee.employeeSettings.slack}
+            defaultValue={employee.employee_settings.slack}
             label='Slack notifikasjoner'
             loading={loading}
             name='slack'
@@ -222,7 +222,7 @@ const NotificationPaper = ({ employee }) => {
           </Typography>
           <Toggle
             control={control}
-            defaultValue={employee.employeeSettings.delegate}
+            defaultValue={employee.employee_settings.delegate}
             label='Delegering av oppgave'
             loading={loading}
             name='delegate'
@@ -230,7 +230,7 @@ const NotificationPaper = ({ employee }) => {
           />
           <Toggle
             control={control}
-            defaultValue={employee.employeeSettings.deadline}
+            defaultValue={employee.employee_settings.deadline}
             label='Oppgave forfaller'
             loading={loading}
             name='deadline'
@@ -238,16 +238,16 @@ const NotificationPaper = ({ employee }) => {
           />
           <Toggle
             control={control}
-            defaultValue={employee.employeeSettings.week_before_deadline}
+            defaultValue={employee.employee_settings.week_before_deadline}
             label='En uke før oppgave(r) forfaller'
             loading={loading}
             name='week_before_deadline'
             onSubmit={onSubmit}
           />
-          <Toggle control={control} defaultValue={employee.employeeSettings.hired} label='Ny ansatt' loading={loading} name='hired' onSubmit={onSubmit} />
+          <Toggle control={control} defaultValue={employee.employee_settings.hired} label='Ny ansatt' loading={loading} name='hired' onSubmit={onSubmit} />
           <Toggle
             control={control}
-            defaultValue={employee.employeeSettings.termination}
+            defaultValue={employee.employee_settings.termination}
             label='Ansatt slutter'
             loading={loading}
             name='termination'

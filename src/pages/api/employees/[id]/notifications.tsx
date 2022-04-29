@@ -13,21 +13,21 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
   } else if (req.method === 'GET') {
     const notification = await trakClient.notification.findMany({
       where: {
-        employeeId: toInteger(id),
+        employee_id: toInteger(id),
         read: false,
       },
       include: {
-        createdByEmployee: {
+        created_by_employee: {
           select: {
-            imageUrl: true,
-            firstName: true,
-            lastName: true,
+            image_url: true,
+            first_name: true,
+            last_name: true,
           },
         },
       },
       orderBy: [
         {
-          createdAt: 'desc',
+          created_at: 'desc',
         },
       ],
     });

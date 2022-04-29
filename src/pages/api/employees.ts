@@ -5,14 +5,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     const today = new Date();
-    const employees = await trakClient.employee.findMany({
+    const employees = await trakClient.employees.findMany({
       where: {
         OR: [
           {
-            terminationDate: null,
+            termination_date: null,
           },
           {
-            terminationDate: {
+            termination_date: {
               gte: today,
             },
           },
@@ -20,18 +20,18 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        first_name: true,
+        last_name: true,
         email: true,
-        imageUrl: true,
-        employeeSettings: true,
+        image_url: true,
+        employee_settings: true,
       },
       orderBy: [
         {
-          firstName: 'asc',
+          first_name: 'asc',
         },
         {
-          lastName: 'asc',
+          last_name: 'asc',
         },
       ],
     });

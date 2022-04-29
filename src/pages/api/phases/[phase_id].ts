@@ -32,8 +32,8 @@ const GET = async (res, phase_id) => {
       select: {
         id: true,
         title: true,
-        dueDateDayOffset: true,
-        dueDate: true,
+        due_date_day_offset: true,
+        due_date: true,
       },
     });
     if (!phase) {
@@ -59,8 +59,8 @@ const PUT = async (req, res, phase_id) => {
       },
       data: {
         title: data.title,
-        dueDateDayOffset: data.dueDateDayOffset,
-        dueDate: data.dueDate,
+        due_date_day_offset: data.due_date_day_offset,
+        due_date: data.due_date,
       },
     });
     res.status(HttpStatusCode.OK).json(updatedPhase);
@@ -77,7 +77,7 @@ const DELETE = async (res, phase_id) => {
   try {
     await trakClient.task.updateMany({
       where: {
-        phaseId: phase_id.toString(),
+        phase_id: phase_id.toString(),
       },
       data: {
         active: false,

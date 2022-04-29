@@ -59,9 +59,9 @@ model employees {
   role                       String?
   bio                        String?
   hr_manager_id              Int?                     @map("hr_manager")
-  profession_id              Int?
+  profession_id            String?
   hr_manager                 employees?               @relation("employee_to_employee", fields: [hr_manager_id], references: [id], onUpdate: NoAction)
-  profession                 profession?              @relation(fields: [profession_id], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "employee_profession_id_fkey")
+  profession                 profession?              @relation(fields: [profession_id], references: [slug], onDelete: Restrict, onUpdate: NoAction, map: "employee_profession_id_fkey")
   absence                    absence[]
   employee_role              employee_role[]
   employees                  employees[]              @relation("employee_to_employee")
@@ -111,7 +111,7 @@ model employee_task {
   employee               employees                @relation("tasks", fields: [employee_id], references: [id], onDelete: Cascade)
   responsible            employees                @relation("responsible_employee_tasks", fields: [responsible_id], references: [id], onDelete: Cascade)
   task                   task                     @relation(fields: [task_id], references: [id], onDelete: Cascade)
-  employee_task_comments employee_task_comments[]
+  comments employee_task_comments[]
 }
 
 model employee_task_comments {
@@ -120,7 +120,7 @@ model employee_task_comments {
   created_at       DateTime      @default(now())
   created_by_id    Int
   employee_task_id String
-  employees        employees     @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  created_by        employees     @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   employee_task    employee_task @relation(fields: [employee_task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
@@ -195,17 +195,17 @@ model process_template {
 }
 
 model profession {
-  id              Int               @id
+  slug            String            @id
   title           String            @unique
   employees       employees[]
-  profession_task profession_task[]
+  tasks profession_task[]
 }
 
 model profession_task {
-  profession_id Int
-  task_id       String
-  profession    profession @relation(fields: [profession_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  task          task       @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profession_id String
+  task_id         String
+  profession      profession @relation(fields: [profession_id], references: [slug], onDelete: Cascade, onUpdate: NoAction)
+  task            task       @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([profession_id, task_id])
 }
@@ -301,9 +301,9 @@ model task {
   due_date            DateTime?
   responsible_type    responsible_type  @default(HR_MANAGER)
   phase               phase?            @relation(fields: [phase_id], references: [id], onUpdate: NoAction)
-  employees           employees?        @relation(fields: [responsible_id], references: [id], onUpdate: NoAction)
+  responsible           employees?        @relation(fields: [responsible_id], references: [id], onUpdate: NoAction)
   employee_task       employee_task[]
-  profession_task     profession_task[]
+  professions     profession_task[]
 }
 
 model time_entry {

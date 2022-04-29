@@ -10,7 +10,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     } = req;
 
     try {
-      await trakClient.comment.delete({
+      await trakClient.employee_task_comments.delete({
         where: {
           id: commentId.toString(),
         },
@@ -29,13 +29,13 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       query: { commentId },
     } = req;
     try {
-      const updatedComment = await trakClient.comment.update({
+      const updatedComment = await trakClient.employee_task_comments.update({
         where: {
           id: commentId.toString(),
         },
         data: {
           text: data.text,
-          createdAt: data.createdAt,
+          created_at: data.created_at,
         },
       });
       res.status(HttpStatusCode.OK).json(updatedComment);
