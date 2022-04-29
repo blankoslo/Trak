@@ -70,8 +70,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [completed, setCompleted] = useState<boolean>(data.completed);
   const showSnackbar = useSnackbar();
-  const daysBeforeDueDate = differenceInCalendarDays(new Date(data.dueDate), new Date());
-
+  const daysBeforeDueDate = differenceInCalendarDays(new Date(data.due_date), new Date());
   const hasExpired = daysBeforeDueDate < 0;
 
   const router = useRouter();
@@ -126,24 +125,29 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
         />
       )}
       <TableCell sx={{ textAlign: { sm: 'right' } }}>
-        <Link href={`/ansatt/${data.employee.id}?process=${data.task.phase.processTemplateId}`} passHref>
+        <Link href={`/ansatt/${data.employee.id}?process=${data.task.phase.process_template_id}`} passHref>
           <ButtonBase className={classNames(classes.avatarRoot, classes.onClick)} focusRipple>
-            <Avatar className={classes.avatar} firstName={data.employee.firstName} image={data.employee.imageUrl} lastName={data.employee.lastName} />
+            <Avatar className={classes.avatar} firstName={data.employee.first_name} image={data.employee.image_url} lastName={data.employee.last_name} />
             <Typography
               noWrap
               sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}
-            >{`${data.employee.firstName} ${data.employee.lastName[0]}.`}</Typography>
+            >{`${data.employee.first_name} ${data.employee.last_name[0]}.`}</Typography>
           </ButtonBase>
         </Link>
       </TableCell>
       {displayResponsible && (
         <TableCell sx={{ textAlign: { sm: 'right' }, display: { md: 'table-cell', xs: 'none' } }}>
           <div className={classes.avatarRoot}>
-            <Avatar className={classes.avatar} firstName={data.responsible.firstName} image={data.responsible.imageUrl} lastName={data.responsible.lastName} />
+            <Avatar
+              className={classes.avatar}
+              firstName={data.responsible.first_name}
+              image={data.responsible.image_url}
+              lastName={data.responsible.last_name}
+            />
             <Typography
               noWrap
               sx={{ color: hasExpired ? 'error.main' : 'text.primary' }}
-            >{`${data.responsible.firstName} ${data.responsible.lastName[0]}.`}</Typography>
+            >{`${data.responsible.first_name} ${data.responsible.last_name[0]}.`}</Typography>
           </div>
         </TableCell>
       )}
@@ -152,7 +156,7 @@ const TaskRow = ({ data, displayResponsible }: { data: IEmployeeTask; displayRes
           {daysBeforeDueDate === 0 && 'I dag'}
           {daysBeforeDueDate === 1 && 'I morgen'}
           {daysBeforeDueDate > 1 && daysBeforeDueDate <= 7 && `Om ${daysBeforeDueDate} dager`}
-          {(daysBeforeDueDate > 7 || daysBeforeDueDate < 0) && format(new Date(data.dueDate), 'dd.MMM.yy')}
+          {(daysBeforeDueDate > 7 || daysBeforeDueDate < 0) && format(new Date(data.due_date), 'dd.MMM.yy')}
         </Box>
       </TableCell>
     </TableRow>

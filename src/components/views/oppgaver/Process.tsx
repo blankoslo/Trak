@@ -28,7 +28,6 @@ type ProcessProps = {
 const Process = ({ title, tasks, displayResponsible }: ProcessProps) => {
   const classes = useStyles();
   const [showProcess, setShowProcess] = useState(true);
-
   return (
     <Stack className={classes.root} spacing={1}>
       <Stack direction={'row'}>

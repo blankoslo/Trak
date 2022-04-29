@@ -160,8 +160,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         collect(el.phases, result);
       } else if (el.tasks) {
         collect(el.tasks, result);
-      } else if (el.employeeTask) {
-        collect(el.employeeTask, result);
+      } else if (el.employee_task) {
+        collect(el.employee_task, result);
       } else {
         result.push(el);
       }

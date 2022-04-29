@@ -1,35 +1,35 @@
 export type IComment = {
   id: string;
   text: string;
-  createdAt: Date;
-  createdByEmployee: IEmployee;
-  createdById: number;
-  employeeTask: IEmployeeTask;
-  employeeTaskId: string;
+  created_at: Date;
+  created_by_employee: IEmployee;
+  created_by_id: number;
+  employee_task: IEmployeeTask;
+  employee_task_id: string;
 };
 
 export type IEmployee = {
   id: number;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   title?: string;
   email: string;
-  birthDate: Date;
-  dateOfEmployment?: Date;
-  terminationDate?: Date;
-  imageUrl?: string;
+  birth_date: Date;
+  date_of_employment?: Date;
+  termination_date?: Date;
+  image_url?: string;
   profession: IProfession;
-  professionId?: string;
-  hrManager: IEmployee;
-  hrManagerId?: number;
+  profession_id?: string;
+  hr_manager: IEmployee;
+  hr_manager_id?: number;
   employees: IEmployee[];
-  employeeSettings: IEmployeeSettings;
-  employeeTask: IEmployeeTask[];
+  employee_settings: IEmployeeSettings;
+  employee_task: IEmployeeTask[];
   notifications?: INotification[];
 };
 
 export type IEmployeeSettings = {
-  employeeId?: number;
+  employee_id?: number;
   slack: boolean;
   delegate: boolean;
   deadline: boolean;
@@ -58,22 +58,22 @@ export type IEmployeeTask = {
   id: string;
   completed: boolean;
   task?: ITask;
-  taskId?: string;
+  task_id?: string;
   employee?: IEmployee;
   responsible?: IEmployee;
-  employeeId?: number;
-  responsibleId?: number;
-  dueDate: Date;
-  completedBy?: IEmployee;
-  completedById?: number;
-  completedDate?: Date;
+  employee_id?: number;
+  responsible_id?: number;
+  due_date: Date;
+  completed_by?: IEmployee;
+  completed_by_id?: number;
+  completed_date?: Date;
   comment: IComment[];
 };
 
 export type INotification = {
   id: string;
-  employeeId: number;
-  createdAt: Date;
+  employee_id: number;
+  created_at: Date;
   read: boolean;
   description: string;
   employee: IEmployee;
@@ -82,11 +82,11 @@ export type INotification = {
 export type IPhase = {
   id: string;
   title: string;
-  processTemplateId: string;
-  processTemplate?: IProcessTemplate;
+  process_template_id: string;
+  process_template?: IProcessTemplate;
   tasks?: ITask[];
-  dueDate?: Date;
-  dueDateDayOffset?: number;
+  due_date?: Date;
+  due_date_day_offset?: number;
 };
 
 export type IProcessTemplate = {
@@ -113,16 +113,16 @@ export type ITask = {
   description: string;
   link?: string;
   global: boolean;
-  phaseId: string;
+  phase_id: string;
   phase: IPhase;
-  responsibleType: ResponsibleType;
+  responsible_type: ResponsibleType;
   professions?: IProfession[];
   tags?: ITag[];
-  employeeTask: IEmployeeTask[];
+  employee_task: IEmployeeTask[];
   responsible?: IEmployee;
-  responsibleId?: number;
-  dueDateDayOffset?: number;
-  dueDate?: Date;
+  responsible_id?: number;
+  due_date_day_offset?: number;
+  due_date?: Date;
 };
 
 export enum Offset {
