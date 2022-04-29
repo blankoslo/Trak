@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
   const threeMonthsFromNow = addMonths(new Date(), 3);
 
-  const processTemplateQuery = await trakClient.processTemplate.findMany({
+  const processTemplateQuery = await trakClient.process_template.findMany({
     select: {
       slug: true,
       title: true,
@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         select: {
           tasks: {
             select: {
-              employeeTask: {
+              employee_task: {
                 where: {
                   AND: [
                     {
@@ -62,13 +62,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                             employee: {
                               OR: [
                                 {
-                                  firstName: {
+                                  first_name: {
                                     mode: 'insensitive',
                                     contains: search.toString(),
                                   },
                                 },
                                 {
-                                  lastName: {
+                                  last_name: {
                                     mode: 'insensitive',
                                     contains: search.toString(),
                                   },
@@ -80,13 +80,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                             responsible: {
                               OR: [
                                 {
-                                  firstName: {
+                                  first_name: {
                                     mode: 'insensitive',
                                     contains: search.toString(),
                                   },
                                 },
                                 {
-                                  lastName: {
+                                  last_name: {
                                     mode: 'insensitive',
                                     contains: search.toString(),
                                   },
@@ -103,7 +103,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                       },
                     },
                     {
-                      dueDate: {
+                      due_date: {
                         lte: threeMonthsFromNow,
                       },
                     },
@@ -111,22 +111,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 },
                 select: {
                   id: true,
-                  dueDate: true,
+                  due_date: true,
 
                   responsible: {
                     select: {
-                      firstName: true,
-                      lastName: true,
-                      imageUrl: true,
+                      first_name: true,
+                      last_name: true,
+                      image_url: true,
                       id: true,
                     },
                   },
                   employee: {
                     select: {
-                      imageUrl: true,
+                      image_url: true,
                       id: true,
-                      firstName: true,
-                      lastName: true,
+                      first_name: true,
+                      last_name: true,
                     },
                   },
                   task: {
@@ -135,8 +135,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                       link: true,
                       phase: {
                         select: {
-                          processTemplateId: true,
-                          processTemplate: {
+                          process_template_id: true,
+                          process_template: {
                             select: {
                               title: true,
                             },
@@ -172,7 +172,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     collect(processTemplate.phases, tempEmployeeList);
     return {
       ...processTemplate,
-      tasks: orderBy(tempEmployeeList, ['dueDate', 'employee.firstName', 'employee.lastName'], ['asc', 'asc', 'asc']),
+      tasks: orderBy(tempEmployeeList, ['due_date', 'employee.first_name', 'employee.last_name'], ['asc', 'asc', 'asc']),
     };
   });
 
@@ -180,18 +180,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const selectedOption = my ? selectedOptionEnum.Mine : selectedOptionEnum.Alle;
 
-  const employeesWithoutHrManagerQuery = await trakClient.employee.findMany({
+  const employeesWithoutHrManagerQuery = await trakClient.employees.findMany({
     where: {
-      hrManagerId: null,
-      terminationDate: null,
+      hr_manager: null,
+      termination_date: null,
     },
     select: {
-      firstName: true,
-      lastName: true,
+      first_name: true,
+      last_name: true,
     },
   });
 
-  const employeesWithoutHrManager = employeesWithoutHrManagerQuery.map((employee) => `- ${employee.firstName} ${employee.lastName}`);
+  const employeesWithoutHrManager = employeesWithoutHrManagerQuery.map((employee) => `- ${employee.first_name} ${employee.last_name}`);
   const employeesWithoutHrManagerList = employeesWithoutHrManager.join('\n');
   const employeesWithoutHrManagerLength = employeesWithoutHrManager.length;
   return { props: { processTemplates, selectedOption, employeesWithoutHrManagerLength, employeesWithoutHrManagerList } };

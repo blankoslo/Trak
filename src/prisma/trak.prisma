@@ -58,7 +58,7 @@ model employees {
   emoji                      String?                  @db.VarChar(10)
   role                       String?
   bio                        String?
-  hr_manager_id              Int?
+  hr_manager_id              Int?                     @map("hr_manager")
   profession_id              Int?
   hr_manager                 employees?               @relation("employee_to_employee", fields: [hr_manager_id], references: [id], onUpdate: NoAction)
   profession                 profession?              @relation(fields: [profession_id], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "employee_profession_id_fkey")
