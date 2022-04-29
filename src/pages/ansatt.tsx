@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const session = await getSession(context);
 
-  const processTemplateQuery = await trakClient.processTemplate.findMany({
+  const processTemplateQuery = await trakClient.process_template.findMany({
     select: {
       slug: true,
       title: true,
@@ -39,12 +39,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         select: {
           tasks: {
             select: {
-              employeeTask: {
+              employee_task: {
                 where: {
                   AND: [
                     {
                       ...(my && {
-                        responsibleId: parseInt(session?.user?.id) || null,
+                        responsible_id: parseInt(session?.user?.id) || null,
                       }),
                     },
                     {
@@ -52,13 +52,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                         employee: {
                           OR: [
                             {
-                              firstName: {
+                              first_name: {
                                 mode: 'insensitive',
                                 contains: search.toString(),
                               },
                             },
                             {
-                              lastName: {
+                              last_name: {
                                 mode: 'insensitive',
                                 contains: search.toString(),
                               },
@@ -77,21 +77,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 orderBy: [
                   {
                     employee: {
-                      firstName: 'asc',
+                      first_name: 'asc',
                     },
                   },
                   {
                     employee: {
-                      lastName: 'asc',
+                      last_name: 'asc',
                     },
                   },
                 ],
                 select: {
                   employee: {
                     select: {
-                      employeeTask: {
+                      employee_tasks: {
                         where: {
-                          responsibleId: parseInt(session.user.id),
+                          responsible_id: parseInt(session.user.id),
                           completed: false,
                         },
                         select: {
@@ -100,7 +100,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                             select: {
                               phase: {
                                 select: {
-                                  processTemplate: {
+                                  process_template: {
                                     select: {
                                       slug: true,
                                     },
@@ -112,10 +112,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                         },
                       },
                       id: true,
-                      firstName: true,
-                      lastName: true,
+                      first_name: true,
+                      last_name: true,
                       gender: true,
-                      imageUrl: true,
+                      image_url: true,
                       profession: {
                         select: {
                           title: true,
@@ -138,19 +138,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         collect(el.phases, result);
       } else if (el.tasks) {
         collect(el.tasks, result);
-      } else if (el.employeeTask) {
-        collect(el.employeeTask, result);
+      } else if (el.employee_task) {
+        collect(el.employee_task, result);
       } else {
         result.push(el.employee);
       }
     });
   }
 
-  const processTemplateWithEmployeeFlatten = processTemplateQuery.map((processTemplate) => {
+  const processTemplateWithEmployeeFlatten = processTemplateQuery.map((process_template) => {
     const tempEmployeeList = [];
-    collect(processTemplate.phases, tempEmployeeList);
+    collect(process_template.phases, tempEmployeeList);
     return {
-      ...processTemplate,
+      ...process_template,
       employees: uniqBy(tempEmployeeList, 'id'),
     };
   });
@@ -179,7 +179,7 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
   };
 
   const getNrOfTasks = (employeeTasks, slug) => {
-    return employeeTasks.filter((eTask) => eTask.task.phase.processTemplate.slug === slug).length;
+    return employeeTasks.filter((eTask) => eTask.task.phase.process_template.slug === slug).length;
   };
 
   return (
@@ -210,24 +210,24 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
       />
       <Stack direction='column' spacing={1}>
         <Grid container rowSpacing={4}>
-          {processTemplates.map((processTemplate) => {
+          {processTemplates.map((process_template) => {
             return (
-              <Grid item key={processTemplate.title} sm={gridLayout[processTemplate.title]} xs={12}>
-                <Typography variant='h3'>{capitalize(processTemplate.title)}</Typography>
-                {!processTemplate.employees.length ? (
+              <Grid item key={process_template.title} sm={gridLayout[process_template.title]} xs={12}>
+                <Typography variant='h3'>{capitalize(process_template.title)}</Typography>
+                {!process_template.employees.length ? (
                   <Typography>Ingen ansatte i denne prosessen </Typography>
                 ) : (
                   <Grid alignItems='center' container justifyContent='center' spacing={2}>
-                    {processTemplate.employees.map((employee) => (
+                    {process_template.employees.map((employee) => (
                       <Grid item key={employee.id} lg={4} sm={6} xs={12}>
                         <EmployeeCard
-                          firstName={employee.firstName}
+                          firstName={employee.first_name}
                           gender={employee.gender}
                           id={employee.id}
-                          imageUrl={employee.imageUrl}
-                          lastName={employee.lastName}
-                          nrOfMyTasks={getNrOfTasks(employee.employeeTask, processTemplate.slug)}
-                          processTemplate={processTemplate.slug}
+                          imageUrl={employee.image_url}
+                          lastName={employee.last_name}
+                          nrOfMyTasks={getNrOfTasks(employee.employee_tasks, process_template.slug)}
+                          processTemplate={process_template.slug}
                           role={employee.profession.title}
                         />
                       </Grid>

@@ -18,7 +18,7 @@ export default NextAuth({
     //eslint-disabe-next-line
     async signIn({ profile }) {
       try {
-        const user = await trakClient.employee.findUnique({
+        const user = await trakClient.employees.findUnique({
           where: {
             email: profile.email,
           },
@@ -33,7 +33,7 @@ export default NextAuth({
     },
     async session({ session }) {
       try {
-        const user_id = await trakClient.employee.findUnique({
+        const user_id = await trakClient.employees.findUnique({
           where: {
             email: session.user.email,
           },

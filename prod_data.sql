@@ -7,6 +7,13 @@ INSERT INTO public."profession" (slug, title) VALUES ('designer', 'Designer');
 INSERT INTO public."profession" (slug, title) VALUES ('annet', 'Annet');
 INSERT INTO public."profession" (slug, title) VALUES ('teknolog', 'Teknolog');
 
+UPDATE employees 
+    SET profession_id=
+    CASE
+        WHEN role = 'Designer' THEN 'designer'
+        WHEN role = 'Annet' THEN 'annet'
+        WHEN role = 'Teknolog' THEN 'teknolog'
+    END;
 -- Data for Name: ProcessTemplate; Type: TABLE DATA; Schema: public; Owner: ciybepooplmzfy
 --
 

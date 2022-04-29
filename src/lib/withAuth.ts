@@ -15,7 +15,7 @@ const withAuth = (handler) => {
       const token = await getToken({ req, secret });
 
       if (token) {
-        const user = await trakClient.employee.findUnique({
+        const user = await trakClient.employees.findUnique({
           where: {
             email: token.email,
           },
