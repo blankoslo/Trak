@@ -25,7 +25,7 @@ const CommentEditor = ({ onSubmit, control, cancel, cancelText, confirmText, upd
   const theme = useTheme();
 
   const formatedEmployees: IEmployee[] = employees?.map((e: IEmployee) => {
-    return { id: e.id, display: `${e.firstName} ${e.lastName}` };
+    return { id: e.id, display: `${e.first_name} ${e.last_name}` };
   });
 
   return (

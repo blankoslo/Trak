@@ -14,33 +14,33 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Ikke mandag' });
         return;
       }
-      const employeeTasks = await trakClient.employeeTask.findMany({
+      const employeeTasks = await trakClient.employee_task.findMany({
         where: {
           completed: {
             equals: false,
           },
         },
         select: {
-          responsibleId: true,
-          completedById: true,
+          responsible_id: true,
+          completed_by_id: true,
         },
       });
-      const responsible_employee_ids = await compact(await uniq(await flatten(await employeeTasks.map((e) => [e.responsibleId, e.completedById]))));
+      const responsible_employee_ids = await compact(await uniq(await flatten(await employeeTasks.map((e) => [e.responsible_id, e.completed_by_id]))));
       await responsible_employee_ids.map(async (id) => {
-        const employee_data = await trakClient.employee.findFirst({
+        const employee_data = await trakClient.employees.findFirst({
           where: {
             id: id,
           },
           select: {
             email: true,
-            employeeSettings: {
+            employee_settings: {
               select: {
                 slack: true,
               },
             },
           },
         });
-        if (!employee_data.employeeSettings?.slack) {
+        if (!employee_data.employee_settings?.slack) {
           return;
         }
         const myCompletedTasks = await getMyCompletedTasks(id);
@@ -64,21 +64,21 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 });
 
 const getMyCompletedTasks = async (id: number) =>
-  await trakClient.employeeTask.count({
+  await trakClient.employee_task.count({
     where: {
-      completedById: id,
+      completed_by_id: id,
       completed: true,
-      completedDate: {
+      completed_date: {
         gte: sub(getToday(), { weeks: 1 }),
       },
     },
   });
 
 const getExpiredTasks = async (id: number) =>
-  await trakClient.employeeTask.count({
+  await trakClient.employee_task.count({
     where: {
-      responsibleId: id,
-      dueDate: {
+      responsible_id: id,
+      due_date: {
         lt: getToday(),
       },
       completed: {
@@ -88,10 +88,10 @@ const getExpiredTasks = async (id: number) =>
   });
 
 const getUpcomingTasks = async (id: number) =>
-  await trakClient.employeeTask.count({
+  await trakClient.employee_task.count({
     where: {
-      responsibleId: id,
-      dueDate: {
+      responsible_id: id,
+      due_date: {
         gte: getToday(),
         lt: add(getToday(), { weeks: 1 }),
       },

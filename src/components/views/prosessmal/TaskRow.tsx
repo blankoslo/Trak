@@ -41,18 +41,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Responsible = ({ task }: { task: ITask }) => {
   const classes = useStyles();
 
-  switch (task.responsibleType) {
+  switch (task.responsible_type) {
     case ResponsibleType.OTHER:
       if (task.responsible) {
         return (
           <div className={classes.flexCenter}>
             <Avatar
               className={classes.avatarSize}
-              firstName={task.responsible.firstName}
-              image={task.responsible.imageUrl}
-              lastName={task.responsible.lastName}
+              firstName={task.responsible.first_name}
+              image={task.responsible.image_url}
+              lastName={task.responsible.last_name}
             />
-            {`${task.responsible.firstName} ${task.responsible.lastName}`}
+            {`${task.responsible.first_name} ${task.responsible.last_name}`}
           </div>
         );
       }

@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     skipDuplicates: true,
   });
 
-  const processTemplates = await trakClient.process_template.findMany({
+  const processTemplatesQuery = await trakClient.process_template.findMany({
     orderBy: {
       title: 'asc',
     },
@@ -61,8 +61,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
               responsible_type: true,
               link: true,
               professions: {
-                select: {
-                  profession: true,
+                include: {
+                  profession: {
+                    select: {
+                      title: true,
+                      slug: true,
+                    },
+                  },
                 },
               },
               responsible: {
@@ -77,6 +82,20 @@ export const getServerSideProps: GetServerSideProps = async () => {
         },
       },
     },
+  });
+
+  const processTemplates = processTemplatesQuery.map((processTemplate) => {
+    return {
+      ...processTemplate,
+      phases: processTemplate.phases.map((phase) => {
+        return {
+          ...phase,
+          tasks: phase.tasks.map((task) => {
+            return { ...task, professions: task.professions.map((profession) => profession.profession) };
+          }),
+        };
+      }),
+    };
   });
 
   return { props: { processTemplates } };
@@ -131,7 +150,6 @@ const ProcessTemplate = ({ processTemplates }: InferGetServerSidePropsType<typeo
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [selectedProcessTemplate, setSelectedProcessTemplate] = useState(0);
   const [process_template, setProcessTemplate] = useState(processTemplates[selectedProcessTemplate]);
-
   useEffect(() => {
     setProcessTemplate(processTemplates[selectedProcessTemplate]);
   }, [selectedProcessTemplate]);
@@ -150,12 +168,12 @@ const ProcessTemplate = ({ processTemplates }: InferGetServerSidePropsType<typeo
         </Box>
         <DataProvider>
           {process_template?.phases.map((phase: IPhase) => (
-            <Phase key={phase.id} phase={phase} process_template={process_template} />
+            <Phase key={phase.id} phase={phase} processTemplate={process_template} />
           ))}
         </DataProvider>
         <AddButton onClick={() => setModalIsOpen(true)} text='Legg til fase' />
         <div style={{ marginBottom: '24px' }} />
-        {modalIsOpen && <PhaseModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} process_template={process_template} />}
+        {modalIsOpen && <PhaseModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} processTemplate={process_template} />}
       </Container>
     </>
   );

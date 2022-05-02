@@ -8,7 +8,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     const professions = await trakClient.profession.findMany({
       select: {
         title: true,
-        id: true,
+        slug: true,
       },
     });
     res.json(professions);

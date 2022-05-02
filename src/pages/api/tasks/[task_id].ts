@@ -2,7 +2,7 @@ import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ResponsibleType } from 'utils/types';
+import { IProfession, ResponsibleType } from 'utils/types';
 
 export const config = {
   api: {
@@ -26,7 +26,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 });
 const GET = async (res, task_id) => {
   try {
-    const task = await trakClient.task.findUnique({
+    const taskQuery = await trakClient.task.findUnique({
       where: {
         id: task_id.toString(),
       },
@@ -41,7 +41,12 @@ const GET = async (res, task_id) => {
         due_date_day_offset: true,
         professions: {
           select: {
-            profession: true,
+            profession: {
+              select: {
+                title: true,
+                slug: true,
+              },
+            },
           },
         },
         responsible: {
@@ -54,6 +59,7 @@ const GET = async (res, task_id) => {
         },
       },
     });
+    const task = { ...taskQuery, professions: taskQuery.professions.map((profession) => profession.profession) };
     if (!task) {
       throw new Error('Fant ikke oppgave');
     } else {
@@ -69,7 +75,7 @@ const GET = async (res, task_id) => {
 };
 const PUT = async (req, res, task_id) => {
   const {
-    body: { data, phaseId, global },
+    body: { data, phase_id, global },
   } = req;
   if (!data.responsible && data.responsibleType === ResponsibleType.OTHER) {
     res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Må sende med en personalansvarlig når man velger 'annen' ansvarlig" });
@@ -97,7 +103,7 @@ const PUT = async (req, res, task_id) => {
         due_date_day_offset: data.due_date_day_offset,
         phase: {
           connect: {
-            id: phaseId,
+            id: phase_id,
           },
         },
         ...(data.responsible && data.responsible_type === ResponsibleType.OTHER
@@ -113,9 +119,14 @@ const PUT = async (req, res, task_id) => {
                 disconnect: true,
               },
             }),
+
         professions: {
-          set: [],
-          connect: data.professions.map((profession) => ({ id: profession.id })),
+          deleteMany: {
+            task_id: task_id.toString(),
+          },
+          createMany: {
+            data: data.professions.map((profession: IProfession) => ({ profession_id: profession.slug })),
+          },
         },
       },
     });

@@ -57,8 +57,8 @@ export const toggleCheckBox = async (
   await axios
     .put(`/api/employeeTasks/${employeeTask.id}`, {
       completed: !completed,
-      dueDate: employeeTask.dueDate,
-      responsibleId: employeeTask.responsible.id,
+      due_date: employeeTask.due_date,
+      responsible_id: employeeTask.responsible.id,
     })
     .then(() => {
       showSnackbar(`Oppgave markert som ${completed ? 'ikke' : ''} fullført`, 'success');

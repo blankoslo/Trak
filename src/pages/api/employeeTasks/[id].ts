@@ -34,7 +34,7 @@ const GET = async (res, id) => {
         completed_by: true,
         completed_by_id: true,
         completed_date: true,
-        employee_task_comments: {
+        comments: {
           include: {
             created_by: true,
           },

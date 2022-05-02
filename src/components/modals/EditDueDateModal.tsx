@@ -39,12 +39,12 @@ const EditDueDateModal = ({ employeeTask, isModalOpen, closeModal }: EditDueDate
       setIsSaving(true);
       await axios.put(`/api/employeeTasks/${employeeTask.id}`, {
         completed: employeeTask.completed,
-        dueDate: new Date(formData.dueDate),
-        responsibleId: employeeTask.responsible.id,
+        due_date: new Date(formData.due_date),
+        responsible_id: employeeTask.responsible.id,
       });
 
       router
-        .push({ pathname: `/ansatt/${employeeTask.employeeId}`, query: { process: employeeTask.task.phase.processTemplate.slug } }, undefined, {
+        .push({ pathname: `/ansatt/${employeeTask.employee_id}`, query: { process: employeeTask.task.phase.process_template.slug } }, undefined, {
           shallow: false,
           scroll: false,
         })
@@ -63,11 +63,11 @@ const EditDueDateModal = ({ employeeTask, isModalOpen, closeModal }: EditDueDate
   return (
     <Modal buttonGroup={buttonGroup} header={'Endre forfallsdato'} loading={isSaving} onClose={closeModal} onSubmit={onSubmit} open={isModalOpen}>
       <TextField
-        defaultValue={format(new Date(employeeTask.dueDate), 'yyyy-MM-dd')}
+        defaultValue={format(new Date(employeeTask.due_date), 'yyyy-MM-dd')}
         errors={errors}
         inputProps={{ 'aria-label': 'Skriv inn forfallsdato' }}
         label='Forfallsdato'
-        name='dueDate'
+        name='due_date'
         register={register}
         rules={{ required: 'Du må skrive inn en gyldig dato' }}
         type='date'

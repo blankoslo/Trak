@@ -46,20 +46,20 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
   };
 
   const onSubmit = handleSubmit(async (formData) => {
-    await axios.put(`/api/employeeTasks/${comment.employeeTaskId}/comments/${comment.id}`, {
+    await axios.put(`/api/employeeTasks/${comment.employee_task_id}/comments/${comment.id}`, {
       data: { ...comment, text: formData.comment },
     });
-    mutate(`/api/employeeTasks/${comment.employeeTaskId}/comments`);
+    mutate(`/api/employeeTasks/${comment.employee_task_id}/comments`);
     const trueMentions = mentions.filter((mention) => formData.comment.includes(mention.display));
     const uniqueMentions = uniqBy(trueMentions, 'id');
-    const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${comment.employeeTaskId}`;
+    const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${comment.employee_task_id}`;
     uniqueMentions.forEach((mention) => {
       axios.post('/api/notification', {
-        description: `Du er nevnt i "[${comment.employeeTask.task.title}](${taskURL})"`,
-        slack_description: `Du er nevnt i "<${taskURL}|${comment.employeeTask.task.title}>" av ${user.data.user.name}`,
-        employeeId: mention.id,
+        description: `Du er nevnt i "[${comment.employee_task.task.title}](${taskURL})"`,
+        slack_description: `Du er nevnt i "<${taskURL}|${comment.employee_task.task.title}>" av ${user.data.user.name}`,
+        employee_id: mention.id,
         email: mention.email,
-        createdBy: user.data.user.id,
+        created_by: user.data.user,
       });
     });
     setDisplayEditComment(false);
@@ -67,11 +67,10 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
   });
 
   const deleteComment = async () => {
-    await axios.delete(`/api/employeeTasks/${comment.employeeTaskId}/comments/${comment.id}`);
+    await axios.delete(`/api/employeeTasks/${comment.employee_task_id}/comments/${comment.id}`);
 
-    mutate(`/api/employeeTasks/${comment.employeeTaskId}/comments`);
+    mutate(`/api/employeeTasks/${comment.employee_task_id}/comments`);
   };
-
   const editComment = () => {
     setDisplayEditComment(true);
   };
@@ -86,19 +85,19 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
     />
   ) : (
     <Stack flexDirection={'row'} gap='16px' sx={{ marginBottom: 1 }} {...args}>
-      <Avatar firstName={comment.createdByEmployee.firstName} image={comment.createdByEmployee.imageUrl} lastName={comment.createdByEmployee.lastName} />
+      <Avatar firstName={comment.created_by.first_name} image={comment.created_by.image_url} lastName={comment.created_by.last_name} />
       <Stack spacing={1} sx={{ width: '100%' }}>
         <Stack direction='row' justifyContent={'space-between'}>
           <Typography color='primary.main' variant='body2'>
-            {comment.createdByEmployee.firstName}
+            {comment.created_by.first_name}
           </Typography>
           <Typography color='primary.main' variant='body2'>
-            {format(new Date(comment.createdAt), 'dd.MM.yyyy')}
+            {format(new Date(comment.created_at), 'dd.MM.yyyy')}
           </Typography>
         </Stack>
         <ReactMarkdown>{comment.text}</ReactMarkdown>
       </Stack>
-      {parseInt(user.data.user.id) === comment.createdById && (
+      {parseInt(user.data.user.id) === comment.created_by_id && (
         <>
           <IconButton color='inherit' onClick={handleClick} sx={{ padding: '4px', width: 'fit-content', height: 'fit-content' }}>
             <MoreVertIcon />

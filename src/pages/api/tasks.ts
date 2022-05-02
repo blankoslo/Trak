@@ -13,6 +13,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     if (!data.responsible && data.responsible_type === ResponsibleType.OTHER) {
       res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Må sende med en personalansvarlig når man velger 'annen' ansvarlig" });
     }
+
     const newTask = await trakClient.task.create({
       data: {
         title: data.title,
@@ -27,6 +28,15 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             id: phase_id,
           },
         },
+        professions: {
+          create: data.professions.map((profession: IProfession) => ({
+            profession: {
+              connect: {
+                slug: profession.slug,
+              },
+            },
+          })),
+        },
         ...(data.responsible &&
           data.responsible_type === ResponsibleType.OTHER && {
             responsible: {
@@ -35,9 +45,6 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
               },
             },
           }),
-        professions: {
-          connect: data.professions.map((profession: IProfession) => ({ profession_id: profession.id })),
-        },
       },
       include: {
         professions: true,

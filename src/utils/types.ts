@@ -2,7 +2,7 @@ export type IComment = {
   id: string;
   text: string;
   created_at: Date;
-  created_by_employee: IEmployee;
+  created_by: IEmployee;
   created_by_id: number;
   employee_task: IEmployeeTask;
   employee_task_id: string;
@@ -96,13 +96,7 @@ export type IProcessTemplate = {
 };
 
 export type IProfession = {
-  id: string;
-  title: string;
-  tasks?: ITask[];
-};
-
-export type ITag = {
-  id: string;
+  slug: string;
   title: string;
   tasks?: ITask[];
 };
@@ -117,7 +111,6 @@ export type ITask = {
   phase: IPhase;
   responsible_type: ResponsibleType;
   professions?: IProfession[];
-  tags?: ITag[];
   employee_task: IEmployeeTask[];
   responsible?: IEmployee;
   responsible_id?: number;

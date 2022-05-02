@@ -14,7 +14,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           employee_id: employee_id,
           description: description,
           ...(created_by && {
-            created_by: created_by.id,
+            created_by: parseInt(created_by.id),
           }),
         },
       });

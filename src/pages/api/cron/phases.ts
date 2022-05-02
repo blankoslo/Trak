@@ -4,7 +4,6 @@ import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import { groupBy } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 import { syncTrakDatabase } from 'utils/cron';
 import { IEmployee, IEmployeeTask, IPhase, ResponsibleType } from 'utils/types';
 import { Process } from 'utils/types';
@@ -21,24 +20,19 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 
     await syncTrakDatabase();
 
-    const phases = await trakClient.phase.findMany({
+    const phasesQuery = await trakClient.phase.findMany({
       where: {
         active: true,
       },
       orderBy: {
-        dueDate: 'asc',
+        due_date: 'asc',
       },
       select: {
         id: true,
         title: true,
-        dueDate: true,
-        dueDateDayOffset: true,
-        processTemplateId: true,
-        processTemplate: {
-          select: {
-            slug: true,
-          },
-        },
+        due_date: true,
+        due_date_day_offset: true,
+        process_template_id: true,
         tasks: {
           where: {
             global: true,
@@ -46,32 +40,38 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
           },
           select: {
             id: true,
-            dueDate: true,
-            dueDateDayOffset: true,
-            responsibleType: true,
-            responsibleId: true,
+            due_date: true,
+            due_date_day_offset: true,
+            responsible_type: true,
+            responsible_id: true,
             professions: {
               select: {
-                id: true,
+                profession_id: true,
               },
             },
           },
         },
       },
     });
-    const employees = await trakClient.employee.findMany({
+
+    const phases = phasesQuery.map((phase) => ({
+      ...phase,
+      tasks: phase.tasks.map((task) => ({ ...task, professions: task.professions.map((profession) => profession.profession_id) })),
+    }));
+
+    const employees = await trakClient.employees.findMany({
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
-        terminationDate: true,
-        dateOfEmployment: true,
-        professionId: true,
-        hrManagerId: true,
-        hrManager: {
+        first_name: true,
+        last_name: true,
+        termination_date: true,
+        date_of_employment: true,
+        profession_id: true,
+        hr_manager_id: true,
+        hr_manager: {
           select: {
             email: true,
-            employeeSettings: {
+            employee_settings: {
               select: {
                 deadline: true,
                 delegate: true,
@@ -83,21 +83,21 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             },
           },
         },
-        employeeTask: {
+        employee_tasks: {
           select: {
             id: true,
             completed: true,
-            dueDate: true,
+            due_date: true,
             task: {
               select: {
-                responsibleType: true,
+                responsible_type: true,
                 phase: {
                   select: {
                     id: true,
                     title: true,
-                    dueDate: true,
-                    processTemplate: true,
-                    processTemplateId: true,
+                    due_date: true,
+                    process_template: true,
+                    process_template_id: true,
                   },
                 },
               },
@@ -106,9 +106,9 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
       },
     });
-    const responsibleEmployees = await trakClient.employee.findMany({
+    const responsibleEmployees = await trakClient.employees.findMany({
       where: {
-        responsibleEmployeeTask: {
+        responsible_tasks: {
           some: {
             completed: false,
           },
@@ -117,15 +117,15 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       select: {
         id: true,
         email: true,
-        responsibleEmployeeTask: {
+        responsible_tasks: {
           where: {
             completed: false,
           },
           select: {
-            dueDate: true,
+            due_date: true,
           },
         },
-        employeeSettings: {
+        employee_settings: {
           select: {
             deadline: true,
             delegate: true,
@@ -150,19 +150,19 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
 const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | any, sendNotification: boolean) => {
-  const lopendePhases = phases.filter((phase) => phase.processTemplate.slug === Process.LOPENDE);
+  const lopendePhases = phases.filter((phase) => phase.process_template_id === Process.LOPENDE);
   const today = new Date();
   employees.forEach((employee) => {
-    if (!employee.hrManagerId) {
+    if (!employee.hr_manager_id) {
       return;
     }
-    if (!employee.terminationDate) {
+    if (!employee.termination_date) {
       lopendeEmployeeTaskCreator(employee, lopendePhases, today);
     }
-    if (employee.dateOfEmployment && !employeeHasProcessTask(employee, Process.ONBOARDING)) {
+    if (employee.date_of_employment && !employeeHasProcessTask(employee, Process.ONBOARDING)) {
       onboardingEmployeeTaskCreator(phases, employee, sendNotification);
     }
-    if (employee.terminationDate && !employeeHasProcessTask(employee, Process.OFFBOARDING)) {
+    if (employee.termination_date && !employeeHasProcessTask(employee, Process.OFFBOARDING)) {
       offboardingEmployeeTaskCreator(phases, employee, sendNotification);
     }
   });
@@ -170,7 +170,7 @@ const employeeTaskCreator = (phases: IPhase[] | any, employees: IEmployee[] | an
 
 const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[], today: Date) => {
   const comingPhases = lopendePhases.filter((phase) => {
-    const dueDate = subDays(phase.dueDate, 7);
+    const dueDate = subDays(phase.due_date, 7);
     if (getMonth(dueDate) === getMonth(today)) {
       return getDate(dueDate) > getDate(today);
     }
@@ -182,73 +182,73 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
   }
 
   const nextPhase = comingPhases?.reduce((phaseA, phaseB) => {
-    if (getMonth(phaseA.dueDate) === getMonth(phaseB.dueDate)) {
-      return getDate(phaseA.dueDate) > getDate(phaseB.dueDate) ? phaseB : phaseA;
+    if (getMonth(phaseA.due_date) === getMonth(phaseB.due_date)) {
+      return getDate(phaseA.due_date) > getDate(phaseB.due_date) ? phaseB : phaseA;
     }
 
-    return phaseA.dueDate.getMonth() > phaseB.dueDate.getMonth() ? phaseB : phaseA;
+    return phaseA.due_date.getMonth() > phaseB.due_date.getMonth() ? phaseB : phaseA;
   });
   const index = lopendePhases.findIndex((phase) => phase.id === nextPhase.id);
   const currentPhaseIndex = index === 0 ? lopendePhases.length - 1 : index - 1;
   const currentPhase = lopendePhases[currentPhaseIndex];
-  const hasTasksInNextPhase = employee.employeeTask.some(
-    (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.dueDate) === getYear(today),
+  const hasTasksInNextPhase = employee.employee_task?.some(
+    (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.due_date) === getYear(today),
   );
 
-  const hasStarted = compareAsc(employee.dateOfEmployment, new Date()) <= 0;
+  const hasStarted = compareAsc(employee.date_of_employment, new Date()) <= 0;
 
   if (!hasTasksInNextPhase && hasStarted) {
-    nextPhase.dueDate = setYear(nextPhase.dueDate, getYear(today));
+    nextPhase.due_date = setYear(nextPhase.due_date, getYear(today));
     createEmployeeTasks(employee, nextPhase, currentPhase);
   }
 };
 
 const onboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee, sendNotification: boolean) => {
   phases.forEach((phase) => {
-    if (phase.processTemplate.slug === Process.ONBOARDING) {
-      phase.dueDate = addDays(employee.dateOfEmployment, phase.dueDateDayOffset);
+    if (phase.process_template_id === Process.ONBOARDING) {
+      phase.due_date = addDays(employee.date_of_employment, phase.due_date_day_offset);
       createEmployeeTasks(employee, phase);
     }
   });
-  const employeeWantsNewEmployeeNotificiation = employee.hrManager?.employeeSettings?.hired;
+  const employeeWantsNewEmployeeNotificiation = employee.hr_manager?.employee_settings?.hired;
   if (employeeWantsNewEmployeeNotificiation) {
-    const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i onboarding`;
+    const notificationText = `${employee.first_name} ${employee.last_name} har fått opprettet oppgaver i onboarding`;
     if (sendNotification) {
-      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager?.employeeSettings?.slack && employee.hrManager.email);
+      await notificationSender(employee.hr_manager_id, notificationText, employee.hr_manager?.employee_settings?.slack && employee.hr_manager.email);
     }
   }
 };
 
 const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmployee, sendNotification: boolean) => {
   phases.forEach((phase) => {
-    if (phase.processTemplate.slug === Process.OFFBOARDING) {
-      phase.dueDate = addDays(employee.terminationDate, phase.dueDateDayOffset);
+    if (phase.process_template_id === Process.OFFBOARDING) {
+      phase.due_date = addDays(employee.termination_date, phase.due_date_day_offset);
       createEmployeeTasks(employee, phase);
     }
   });
-  const employeeWantsEmployeeQuittingNotification = employee.hrManager?.employeeSettings?.termination;
+  const employeeWantsEmployeeQuittingNotification = employee.hr_manager?.employee_settings?.termination;
   if (employeeWantsEmployeeQuittingNotification) {
-    const notificationText = `${employee.firstName} ${employee.lastName} har fått opprettet oppgaver i offboarding`;
+    const notificationText = `${employee.first_name} ${employee.last_name} har fått opprettet oppgaver i offboarding`;
     if (sendNotification) {
-      await notificationSender(employee.hrManagerId, notificationText, employee.hrManager?.employeeSettings?.slack && employee.hrManager.email);
+      await notificationSender(employee.hr_manager_id, notificationText, employee.hr_manager?.employee_settings?.slack && employee.hr_manager.email);
     }
   }
 };
 
 const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
-  employee.employeeTask.some((employeeTask) => employeeTask.task.phase.processTemplate.slug === processTitle);
+  employee.employee_task?.some((employeeTask) => employeeTask.task.phase.process_template.slug === processTitle);
 
 const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase) => {
-  if (phase.processTemplateId !== Process.LOPENDE) {
+  if (phase.process_template_id !== Process.LOPENDE) {
     return;
   }
 
-  const projectsCount = await new BlankClient().staffing.groupBy({
+  const projectsCount = await trakClient.staffing.groupBy({
     where: {
       employee: employee.id,
       date: {
-        gte: setYear(addDays(lastPhase.dueDate, 1), getYear(new Date())),
-        lte: setYear(phase.dueDate, getYear(new Date())),
+        gte: setYear(addDays(lastPhase.due_date, 1), getYear(new Date())),
+        lte: setYear(phase.due_date, getYear(new Date())),
       },
       projects: {
         active: true,
@@ -271,7 +271,7 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
   if (!employeeIsOnProject) {
     return;
   }
-  const projectManager = await new BlankClient().projects.findFirst({
+  const projectManager = await trakClient.projects.findFirst({
     where: {
       id: projectsCount[0].project,
     },
@@ -280,11 +280,11 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
     },
   });
   if (!projectManager?.responsible) {
-    return employee.hrManagerId;
+    return employee.hr_manager_id;
   }
   const employeeIsProjectManager = projectManager.responsible === employee.id;
   if (employeeIsProjectManager) {
-    return employee.hrManagerId;
+    return employee.hr_manager_id;
   }
   return projectManager.responsible;
 };
@@ -292,25 +292,26 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, lastPhase
   const projectManager = getProjectManager(employee, phase, lastPhase);
   const data = await Promise.all(
     phase?.tasks.map(async (task) => {
-      if (task.professions.map(({ id }) => id).includes(employee.professionId)) {
+      // @ts-ignore
+      if (task.professions.includes(employee.profession_id)) {
         let taskDueDate = null;
-        if (task.dueDate) {
-          taskDueDate = task.dueDate;
-        } else if (task.dueDateDayOffset) {
-          if (phase.processTemplateId === Process.OFFBOARDING) {
-            taskDueDate = addDays(employee.terminationDate, task.dueDateDayOffset);
-          } else if (phase.processTemplateId === Process.ONBOARDING) {
-            taskDueDate = addDays(employee.dateOfEmployment, task.dueDateDayOffset);
+        if (task.due_date) {
+          taskDueDate = task.due_date;
+        } else if (task.due_date_day_offset) {
+          if (phase.process_template_id === Process.OFFBOARDING) {
+            taskDueDate = addDays(employee.termination_date, task.due_date_day_offset);
+          } else if (phase.process_template_id === Process.ONBOARDING) {
+            taskDueDate = addDays(employee.date_of_employment, task.due_date_day_offset);
           }
         }
         const responsible = (async () => {
-          switch (task.responsibleType) {
+          switch (task.responsible_type) {
             case ResponsibleType.OTHER:
-              return task.responsibleId;
+              return task.responsible_id;
             case ResponsibleType.PROJECT_MANAGER:
               return projectManager;
             default:
-              return employee.hrManagerId;
+              return employee.hr_manager_id;
           }
         })();
         const responsibleId = await responsible;
@@ -318,15 +319,15 @@ const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, lastPhase
           return;
         }
         return {
-          employeeId: employee.id,
-          responsibleId: responsibleId,
-          dueDate: taskDueDate || phase.dueDate,
-          taskId: task.id,
+          employee_id: employee.id,
+          responsible_id: responsibleId,
+          due_date: taskDueDate || phase.due_date,
+          task_id: task.id,
         };
       }
     }),
   );
-  await trakClient.employeeTask.createMany({ data: data, skipDuplicates: true });
+  await trakClient.employee_task.createMany({ data: data, skipDuplicates: true });
 };
 
 /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
@@ -335,12 +336,12 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
     const today = new Date();
     const nextWeek = new Date().setDate(today.getDate() + 7);
     responsibleEmployees?.forEach((employee) => {
-      const employeeWantsPhaseEndsTodayNotification = employee.employeeSettings?.deadline;
-      const employeeWantsPhaseEndsNextWeekNotification = employee.employeeSettings?.week_before_deadline;
+      const employeeWantsPhaseEndsTodayNotification = employee.employee_settings?.deadline;
+      const employeeWantsPhaseEndsNextWeekNotification = employee.employee_settings?.week_before_deadline;
       if (!employeeWantsPhaseEndsTodayNotification && !employeeWantsPhaseEndsNextWeekNotification) {
         return;
       }
-      const dates = Object.keys(groupBy(employee.responsibleEmployeeTask, 'dueDate'));
+      const dates = Object.keys(groupBy(employee.responsibleEmployeeTask, 'due_date'));
       dates.forEach(async (d) => {
         const date = new Date(d);
         let notificationText = undefined;
@@ -350,7 +351,7 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
           notificationText = `Du har oppgaver som utgår om en uke`;
         }
         if (notificationText) {
-          await notificationSender(employee.id, notificationText, employee.employeeSettings?.slack && employee.email);
+          await notificationSender(employee.id, notificationText, employee.employee_settings?.slack && employee.email);
         }
       });
     });
@@ -363,7 +364,7 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
 const notificationSender = async (employeeId: number, description: string, email: string = undefined) => {
   await trakClient.notification.create({
     data: {
-      employeeId: employeeId,
+      employee_id: employeeId,
       description: description,
     },
   });

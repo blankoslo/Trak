@@ -1,7 +1,5 @@
 import Edit from '@mui/icons-material/Edit';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
@@ -9,7 +7,6 @@ import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
-import ChipSkeleton from 'components/ChipSkeleton';
 import Comments from 'components/Comments';
 import EmployeeSelector from 'components/form/EmployeeSelector';
 import Markdown from 'components/Markdown';
@@ -78,20 +75,20 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
         setLoading(true);
         await axios.put(`/api/employeeTasks/${employeeTask.id}`, {
           completed: employeeTask.completed,
-          dueDate: employeeTask.dueDate,
-          responsibleId: formData.responsible?.id,
+          due_date: employeeTask.due_date,
+          responsible_id: formData.responsible?.id,
         });
-        const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.delegate;
+        const employeeWantsDelegateNotifications = formData.responsible.employee_settings?.delegate;
         const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${employeeTask.id}`;
         if (employeeWantsDelegateNotifications) {
           await axios.post('/api/notification', {
             description: `Oppgave delegert: "[${employeeTask.task.title}](${taskURL})"`,
-            slack_description: `Oppgave "<${taskURL}|${employeeTask.task.title}>" er delegert til deg av ${user.firstName} ${user.lastName}`,
-            employeeId: formData.responsible?.id,
-            ...(formData.responsible.employeeSettings?.slack && {
+            slack_description: `Oppgave "<${taskURL}|${employeeTask.task.title}>" er delegert til deg av ${user.first_name} ${user.last_name}`,
+            employee_id: formData.responsible?.id,
+            ...(formData.responsible.employee_settings?.slack && {
               email: formData.responsible.email,
             }),
-            createdBy: user,
+            created_by: user,
           });
         }
 
@@ -127,7 +124,7 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
           </form>
         ) : (
           <Stack alignItems='flex-end' direction='row'>
-            <Typography>{`${employeeTask?.responsible.firstName} ${employeeTask?.responsible.lastName}`}</Typography>
+            <Typography>{`${employeeTask?.responsible.first_name} ${employeeTask?.responsible.last_name}`}</Typography>
             <IconButton aria-label='Deleger oppgave' color='primary' onClick={() => setHasSelectedNewResponsible(true)} role='button' size='small'>
               <Edit />
             </IconButton>
@@ -171,7 +168,9 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           <Typography variant='body1'>
             <b>Gjelder:</b>
           </Typography>
-          <Typography variant='body1'>{data ? `${data.employee.firstName} ${data?.employee.lastName}` : <Skeleton className={classes.skeleton} />}</Typography>
+          <Typography variant='body1'>
+            {data ? `${data.employee.first_name} ${data?.employee.last_name}` : <Skeleton className={classes.skeleton} />}
+          </Typography>
           <Typography variant='body1'>
             <b>Fase:</b>
           </Typography>
@@ -179,29 +178,18 @@ const InfoModal = ({ employee_task_id, modalIsOpen, closeModal }: InfoModalProps
           <Typography variant='body1'>
             <b>Forfallsdato:</b>
           </Typography>
-          <Typography variant='body1'>{data ? format(new Date(data?.dueDate), 'dd.MM.yyyy') : <Skeleton className={classes.skeleton} />}</Typography>
-          {data?.completedBy && data?.completedDate && (
+          <Typography variant='body1'>{data ? format(new Date(data?.due_date), 'dd.MM.yyyy') : <Skeleton className={classes.skeleton} />}</Typography>
+          {data?.completed_by && data?.completed_date && (
             <>
               <Typography variant='body1'>
                 <b>Fullført av:</b>{' '}
               </Typography>
               <Typography variant='body1'>
-                {data.completedBy.firstName} {data.employeeTask?.completedBy.lastName} den {format(new Date(data.completedDate), 'dd.MM.yyyy')}
+                {data.completed_by.first_name} {data.employee_task?.completed_by.last_name} den {format(new Date(data.completed_date), 'dd.MM.yyyy')}
               </Typography>
             </>
           )}
         </div>
-        <Box className={classes.gutterBottom}>
-          {data ? (
-            <>
-              {data?.task.tags.map((tag) => {
-                return <Chip className={classes.chip} color='primary' key={tag.id} label={tag.title} size='small' />;
-              })}
-            </>
-          ) : (
-            <ChipSkeleton chipsAmount={5} />
-          )}
-        </Box>
         <Markdown text={data?.task.description} />
         <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
           Kommentarer:

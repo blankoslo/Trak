@@ -31,9 +31,9 @@ const ToggleButtonGroupComponent = ({ professions, value = [], setValue }: Toggl
       </Button>
       {professions.map((profession) => (
         <Button
-          color={value.length === 1 && value[0].id === profession.id ? 'secondary' : 'primary'}
-          id={profession.id}
-          key={profession.id}
+          color={value.length === 1 && value[0].slug === profession.slug ? 'secondary' : 'primary'}
+          id={profession.slug}
+          key={profession.slug}
           onClick={() => setValue([profession])}
           type='button'
         >

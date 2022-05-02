@@ -57,21 +57,21 @@ export const EmployeeSelectorComponent = ({
   errors,
   required,
   value = {
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     id: null,
     email: undefined,
-    birthDate: null,
+    birth_date: null,
     profession: undefined,
-    hrManager: undefined,
+    hr_manager: undefined,
     employees: undefined,
-    employeeTask: undefined,
-    employeeSettings: undefined,
+    employee_task: undefined,
+    employee_settings: undefined,
   },
 }: EmployeeSelectorComponentProps) => {
   return (
     <Autocomplete
-      getOptionLabel={(employee: IEmployee) => `${employee.firstName} ${employee.lastName}`.trim()}
+      getOptionLabel={(employee: IEmployee) => `${employee.first_name} ${employee.last_name}`.trim()}
       loading={!employees.length}
       noOptionsText={'Ingen ansatte funnet'}
       onChange={(_, employee) => setValue(employee)}

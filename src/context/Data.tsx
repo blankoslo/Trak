@@ -19,8 +19,7 @@ function DataProvider(props) {
   const { data: session } = useSession();
 
   const { data: professions } = useSWR(session?.user ? `/api/professions` : null, fetcher);
-  const { data: tags } = useSWR(session?.user ? `/api/tags` : null, fetcher);
   const { data: processTemplates } = useSWR(session?.user ? `/api/processTemplates` : null, fetcher);
-  return <DataContext.Provider value={{ professions: professions, tags: tags, processTemplates: processTemplates }} {...props} />;
+  return <DataContext.Provider value={{ professions: professions, processTemplates: processTemplates }} {...props} />;
 }
 export { DataProvider, useData };

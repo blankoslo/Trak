@@ -91,10 +91,10 @@ const NavBar = () => {
               color='inherit'
               onClick={handleClickUserMenu}
             >
-              <Avatar alt={`${user?.firstName} ${user?.lastName}`} src={user?.imageUrl} sx={{ marginRight: 1 }} />
+              <Avatar alt={`${user?.first_name} ${user?.last_name}`} src={user?.image_url} sx={{ marginRight: 1 }} />
 
               <Typography variant='body2'>
-                {user?.firstName} {user?.lastName}
+                {user?.first_name} {user?.last_name}
               </Typography>
               <ArrowDropDownIcon />
             </Button>

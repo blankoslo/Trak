@@ -19,8 +19,7 @@ const Comments = ({ employeeTask }: CommentProps) => {
   const [addComment, setAddComment] = useState(false);
   const { control, handleSubmit, reset } = useForm();
   const scrollRef = useRef(null);
-  const { data: session } = useSession();
-
+  const user = useSession();
   const [mentions, setMentions] = useState<{ id: number; display: string; email: string }[]>([]);
 
   const updateMentions = (id, display, email) => {
@@ -38,10 +37,10 @@ const Comments = ({ employeeTask }: CommentProps) => {
     uniqueMentions.forEach((mention) => {
       axios.post('/api/notification', {
         description: `Du er nevnt i "[${employeeTask.task.title}](${taskURL})"`,
-        slack_description: `Du er nevnt i "<${taskURL}|${employeeTask.task.title}>" av ${session.user.name}`,
-        employeeId: mention.id,
+        slack_description: `Du er nevnt i "<${taskURL}|${employeeTask.task.title}>" av ${user.data.user.name}`,
+        employee_id: mention.id,
         email: mention.email,
-        createdBy: session.user.id,
+        created_by: user.data.user,
       });
     });
 

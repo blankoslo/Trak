@@ -112,7 +112,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 select: {
                   id: true,
                   due_date: true,
-
+                  responsible_id: true,
                   responsible: {
                     select: {
                       first_name: true,

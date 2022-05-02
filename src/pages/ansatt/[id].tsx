@@ -38,16 +38,16 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id } = query;
   const parsedId = typeof id === 'string' && parseInt(id);
 
-  const employeeQuery = await trakClient.employee.findUnique({
+  const employeeQuery = await trakClient.employees.findUnique({
     where: {
       id: parsedId,
     },
     include: {
       profession: true,
-      employeeTask: {
+      employee_tasks: {
         orderBy: [
           {
-            dueDate: 'asc',
+            due_date: 'asc',
           },
           {
             responsible: {
@@ -65,10 +65,10 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
             {
               task: {
                 phase: {
-                  processTemplateId: Process.LOPENDE,
+                  process_template_id: Process.LOPENDE,
                 },
               },
-              dueDate: {
+              due_date: {
                 gte: startOfYear(new Date()),
               },
             },
@@ -77,10 +77,10 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
                 phase: {
                   OR: [
                     {
-                      processTemplateId: Process.ONBOARDING,
+                      process_template_id: Process.ONBOARDING,
                     },
                     {
-                      processTemplateId: Process.OFFBOARDING,
+                      process_template_id: Process.OFFBOARDING,
                     },
                   ],
                 },
@@ -89,26 +89,26 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           ],
         },
         include: {
-          completedBy: {
+          completed_by: {
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
+              first_name: true,
+              last_name: true,
             },
           },
           responsible: {
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
-              imageUrl: true,
+              first_name: true,
+              last_name: true,
+              image_url: true,
             },
           },
           task: {
             include: {
               phase: {
                 include: {
-                  processTemplate: true,
+                  process_template: true,
                 },
               },
             },
@@ -118,8 +118,8 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
   });
   const employee = JSON.parse(safeJsonStringify(employeeQuery));
-  const tasks = chain(employee.employeeTask)
-    .groupBy('task.phase.processTemplate.slug')
+  const tasks = chain(employee.employee_tasks)
+    .groupBy('task.phase.process_template_id')
     .map((value, key) => ({ title: key, tasks: value }))
     .value()
     .map((process) => {
@@ -132,7 +132,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       };
     });
 
-  const processTemplates = await trakClient.processTemplate.findMany({
+  const processTemplates = await trakClient.process_template.findMany({
     select: {
       slug: true,
       title: true,
@@ -144,7 +144,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 const Employee = ({ employee, tasks, processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { process } = router.query;
-
   const getTitle = (slug) => {
     return processTemplates.find((processTemplate) => processTemplate.slug === slug).title;
   };
@@ -154,7 +153,7 @@ const Employee = ({ employee, tasks, processTemplates }: InferGetServerSideProps
   return (
     <>
       <Head>
-        <title>{`${employee.firstName} ${employee.lastName}`}</title>
+        <title>{`${employee.first_name} ${employee.last_name}`}</title>
       </Head>
       <Container maxWidth='md' sx={{ paddingTop: '30px', marginBottom: 12 }}>
         <Box
@@ -166,15 +165,15 @@ const Employee = ({ employee, tasks, processTemplates }: InferGetServerSideProps
             paddingBottom: '30px',
           }}
         >
-          <MuiAvatar alt={`${employee.firstName} ${employee.lastName}`} src={employee.imageUrl} sx={{ width: 132, height: 132 }} />
+          <MuiAvatar alt={`${employee.first_name} ${employee.last_name}`} src={employee.image_url} sx={{ width: 132, height: 132 }} />
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <Typography variant='h3'>{`${employee.firstName} ${employee.lastName}`}</Typography>
-            <Typography>{`${hasStarted ? 'Begynte' : 'Begynner'} ${prismaDateToFormatedDate(employee.dateOfEmployment)}`}</Typography>
+            <Typography variant='h3'>{`${employee.first_name} ${employee.last_name}`}</Typography>
+            <Typography>{`${hasStarted ? 'Begynte' : 'Begynner'} ${prismaDateToFormatedDate(employee.date_of_employment)}`}</Typography>
             <Typography>{employee.profession.title}</Typography>
           </Box>
         </Box>
@@ -237,13 +236,13 @@ export const Task = ({ employeeTask, employeeId }) => {
     e.stopPropagation();
     await toggleCheckBox(employeeTask, completed, setCompleted, showSnackbar);
     isLoading(false);
-    router.push({ pathname: `/ansatt/${employeeId}`, query: { process: employeeTask.task.phase.processTemplate.slug } }, undefined, {
+    router.push({ pathname: `/ansatt/${employeeId}`, query: { process: employeeTask.task.phase.process_template.slug } }, undefined, {
       shallow: false,
       scroll: false,
     });
   };
 
-  const hasExpired = differenceInCalendarDays(new Date(employeeTask.dueDate), new Date()) < 0;
+  const hasExpired = differenceInCalendarDays(new Date(employeeTask.due_date), new Date()) < 0;
 
   return (
     <>
@@ -293,8 +292,8 @@ export const Task = ({ employeeTask, employeeId }) => {
               >
                 <Box>
                   <Typography>{employeeTask.task.title}</Typography>
-                  <DateFormater date={employeeTask.dueDate} />
-                  <Typography>{`${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
+                  <DateFormater date={employeeTask.due_date} />
+                  <Typography>{`${employeeTask.responsible.first_name} ${employeeTask.responsible.last_name}`}</Typography>
                 </Box>
                 {employeeTask?.task?.link && (
                   <a href={`${validator.isEmail(employeeTask.task.link) ? 'mailto:' : ''}${employeeTask.task.link}`} rel='noopener noreferrer' target='_blank'>
@@ -346,11 +345,11 @@ export const Task = ({ employeeTask, employeeId }) => {
                   gap: '12px',
                 }}
               >
-                <DateFormater date={employeeTask.dueDate} />
+                <DateFormater date={employeeTask.due_date} />
                 <Avatar
-                  firstName={employeeTask.responsible.firstName}
-                  image={employeeTask.responsible.imageUrl}
-                  lastName={employeeTask.responsible.lastName}
+                  firstName={employeeTask.responsible.first_name}
+                  image={employeeTask.responsible.image_url}
+                  lastName={employeeTask.responsible.last_name}
                 ></Avatar>
               </Box>
             </Box>
@@ -364,11 +363,11 @@ export const Task = ({ employeeTask, employeeId }) => {
           {employeeTask.completedById && (
             <>
               <Typography variant='body2'>{`Fullført den ${prismaDateToFormatedDate(employeeTask.completedDate)}`}</Typography>
-              <Typography gutterBottom variant='body2'>{`av ${employeeTask.completedBy.firstName} ${employeeTask.completedBy.lastName}`}</Typography>
+              <Typography gutterBottom variant='body2'>{`av ${employeeTask.completedBy.first_name} ${employeeTask.completedBy.last_name}`}</Typography>
             </>
           )}
-          <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.firstName} ${employeeTask.responsible.lastName}`}</Typography>
-          <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.processTemplate.title}`}</Typography>
+          <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.first_name} ${employeeTask.responsible.last_name}`}</Typography>
+          <Typography variant='body2'>{`Prosess: ${employeeTask.task.phase.process_template.title}`}</Typography>
           <Typography gutterBottom variant='body2'>{`Fase: ${employeeTask.task.phase.title}`}</Typography>
           <Markdown text={employeeTask?.task.description} />
           <Typography gutterBottom sx={{ fontWeight: 'bold' }}>

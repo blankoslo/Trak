@@ -85,11 +85,11 @@ const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
               {data.map((notification) => (
                 <>
                   <NotificationCard
-                    createdBy={notification.createdByEmployee}
+                    createdBy={notification.created_by_employee}
                     description={notification.description}
                     key={notification.id}
                     read={notification.read}
-                    time={notification.createdAt}
+                    time={notification.created_at}
                   />
                   <Divider />
                 </>
