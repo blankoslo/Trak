@@ -1,7 +1,6 @@
 ![Trak](./public/trak_logo.svg)
 
-[![dev-build-and-deploy](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml/badge.svg?branch=dev)](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml)
-[![main-build-and-deploy](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml)
+[![dev-build-and-deploy](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml/badge.svg)](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml)
 ![CI](https://img.shields.io/github/license/Zenjjim/Trak)
 
 ![Jokes Card](https://readme-jokes.vercel.app/api)
@@ -30,15 +29,15 @@ yarn
 
 Then create a `.env`-file in root and fill with secrets:
 ```
-DATABASE_URL=SUPER_SECRET_SECRET
+TRAK_DB_URL=postgres://postgres:password@localhost:5432/postgres
 
-CRON_SECRET=SUPER_SECRET_SECRET
-JWT_SECRET=SUPER_SECRET_SECRET
+CRON_SECRET=xxx
+JWT_SECRET=xxx
 
-SLACK_TOKEN=xoxb-SUPER_SECRET_SECRET
+SLACK_TOKEN=xoxb-xxx
 
-GOOGLE_ID=SUPER_SECRET_SECRET
-GOOGLE_SECRET=SUPER_SECRET_SECRET
+GOOGLE_ID=xxx.apps.googleusercontent.com
+GOOGLE_SECRET=xxx
 ```
 
 > Google tokens can be created at [google console](https://console.cloud.google.com/) under _APIs & Services_ > _Credentials_ > _OAuth 2.0 Client IDs_
@@ -48,20 +47,18 @@ GOOGLE_SECRET=SUPER_SECRET_SECRET
 (Optional) If using Docker:
 
 ```
-yarn createdb
+yarn fresh
 ```
 
 Database setup:
 
+Seed test or prod database:
 ```
-npx prisma generate
-yarn push
+pg_dump -d "postgres://xxx" > test_seed.sql
 ```
 
-(Optional) Add dummydata:
-
 ```
-yarn loaddata
+yarn fixtures
 ```
 
 Finally starting the server:
