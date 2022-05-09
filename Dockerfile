@@ -15,7 +15,7 @@ COPY src/prisma ./src/prisma/
 RUN apt-get -qy update && apt-get -qy install openssl
 
 # install dependencies
-RUN yarn install --production
+RUN yarn install
 
 COPY . .
 
