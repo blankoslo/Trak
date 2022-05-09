@@ -11,8 +11,7 @@ on:
 jobs:
   build-and-deploy:
     name: Setup, Build, and Deploy
-    environment:
-      name: ${{ github.ref }}
+    environment: ${{ github.ref_name }}
     env:
       CLOUD_RUN_PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
       CLOUD_RUN_REGION: europe-west1
