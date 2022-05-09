@@ -1,14 +1,13 @@
 import addDays from 'date-fns/addDays';
 import { trakClient } from 'lib/prisma';
-import { PrismaClient as BlankClient } from 'prisma/generated/blank';
 
 const updateTask = async (blankEmployees) => {
   const blankEmployeeStartEndDate = blankEmployees.map((employee) => ({
     id: employee.id,
-    dateOfEmployment: employee.date_of_employment,
-    terminationDate: employee.termination_date,
+    date_of_employment: employee.date_of_employment,
+    termination_date: employee.termination_date,
   }));
-  const updatedTrakEmployee = await trakClient.employee.findMany({
+  const updatedTrakEmployee = await trakClient.employees.findMany({
     where: {
       NOT: {
         OR: blankEmployeeStartEndDate,
@@ -16,11 +15,11 @@ const updateTask = async (blankEmployees) => {
     },
     select: {
       id: true,
-      employeeTask: {
+      employee_tasks: {
         where: {
           task: {
             phase: {
-              processTemplate: {
+              process_template: {
                 OR: [{ slug: 'onboarding' }, { slug: 'offboarding' }],
               },
             },
@@ -28,14 +27,14 @@ const updateTask = async (blankEmployees) => {
         },
         select: {
           id: true,
-          dueDate: true,
+          due_date: true,
           task: {
             select: {
-              dueDateDayOffset: true,
+              due_date_day_offset: true,
               phase: {
                 select: {
-                  dueDateDayOffset: true,
-                  processTemplate: {
+                  due_date_day_offset: true,
+                  process_template: {
                     select: {
                       slug: true,
                     },
@@ -52,95 +51,49 @@ const updateTask = async (blankEmployees) => {
   await Promise.all(
     updatedTrakEmployee.map(async (employee) => {
       const blankEmployeeData = blankEmployees.find((blankEmployee) => blankEmployee.id === employee.id);
-      await trakClient.$transaction([
-        ...employee.employeeTask.map((task) => {
-          const onboardingDateRefrence = task.task.phase.processTemplate.slug === 'onboarding' && blankEmployeeData.date_of_employment;
-          const offboardingDateRefrence = task.task.phase.processTemplate.slug === 'offboarding' && blankEmployeeData.termination_date;
-          const refrenceDate = onboardingDateRefrence || offboardingDateRefrence || undefined;
-          if (!refrenceDate) {
-            return trakClient.employeeTask.delete({
-              where: {
-                id: task.id,
-              },
-            });
-          }
-          const taskOffset = task.task.dueDateDayOffset || task.task.phase.dueDateDayOffset;
-          const newDueDate = addDays(refrenceDate, taskOffset);
-          return trakClient.employeeTask.update({
-            where: {
-              id: task.id,
-            },
-            data: {
-              dueDate: newDueDate,
-            },
-          });
-        }),
-        trakClient.employee.update({
-          where: {
-            id: employee.id,
-          },
-          data: {
-            dateOfEmployment: blankEmployeeData.date_of_employment,
-            terminationDate: blankEmployeeData.termination_date,
-          },
-        }),
-      ]);
+      if (blankEmployeeData) {
+        await updateOrDeleteTask(employee, blankEmployeeData);
+      }
     }),
   );
 };
 
-const addEmployees = async (blankEmployees, includeHrManager = true) => {
-  await trakClient.$transaction(
-    blankEmployees.map((employee) => {
-      const data = {
-        firstName: employee.first_name,
-        lastName: employee.last_name,
-        email: employee.email,
-        birthDate: employee.birth_date,
-        dateOfEmployment: employee.date_of_employment,
-        terminationDate: employee.termination_date,
-        imageUrl: employee.image_url,
-        ...(employee.hr_manager &&
-          includeHrManager && {
-            hrManager: {
-              connect: {
-                id: employee.hr_manager,
-              },
-            },
-          }),
-        profession: {
-          connectOrCreate: {
-            where: {
-              title: employee.role,
-            },
-            create: {
-              title: employee.role,
-            },
+const updateOrDeleteTask = async (employee, blankEmployeeData) =>
+  await trakClient.$transaction([
+    ...employee.employeeTask.map((task) => {
+      const onboardingDateRefrence = task.task.phase.process_template_id === 'onboarding' && blankEmployeeData.date_of_employment;
+      const offboardingDateRefrence = task.task.phase.process_template_id === 'offboarding' && blankEmployeeData.termination_date;
+      const refrenceDate = onboardingDateRefrence || offboardingDateRefrence || undefined;
+      if (!refrenceDate) {
+        return trakClient.employee_task.delete({
+          where: {
+            id: task.id,
           },
-        },
-      };
-      return trakClient.employee.upsert({
+        });
+      }
+      const taskOffset = task.task.dueDateDayOffset || task.task.phase.dueDateDayOffset;
+      const newDueDate = addDays(refrenceDate, taskOffset);
+      return trakClient.employee_task.update({
         where: {
-          id: employee.id,
+          id: task.id,
         },
-        update: data,
-        create: {
-          id: employee.id,
-          ...data,
+        data: {
+          due_date: newDueDate,
         },
       });
     }),
-  );
-};
-
+    trakClient.employees.update({
+      where: {
+        id: employee.id,
+      },
+      data: {
+        date_of_employment: blankEmployeeData.date_of_employment,
+        termination_date: blankEmployeeData.termination_date,
+      },
+    }),
+  ]);
 export async function syncTrakDatabase() {
-  const blankClient = new BlankClient();
-
-  // Note: Feels like this is a bit of a odd one, but when we are inserting for the first time we can't set the HR-manager because
-  // some of the employees have not been added yet, therefore this either needs to be run twice or some other smart solution ;)
-  const isInitialInsert = (await trakClient.employee.count()) === 0;
-
-  const blankEmployees = await blankClient.employees.findMany({
+  const blankEmployees = await trakClient.employees.findMany({
     select: {
       id: true,
       first_name: true,
@@ -149,6 +102,7 @@ export async function syncTrakDatabase() {
       email: true,
       birth_date: true,
       date_of_employment: true,
+      gender: true,
       image_url: true,
       role: true,
       hr_manager: true,
@@ -158,9 +112,6 @@ export async function syncTrakDatabase() {
       id: 'asc',
     },
   });
-  if (isInitialInsert) {
-    await addEmployees(blankEmployees, false);
-  }
+
   await updateTask(blankEmployees);
-  await addEmployees(blankEmployees);
 }

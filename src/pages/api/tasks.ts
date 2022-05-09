@@ -2,46 +2,49 @@ import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { IProfession, ITag } from 'utils/types';
+import { IProfession, ResponsibleType } from 'utils/types';
 
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const {
-      body: { data, phaseId, global },
+      body: { data, phase_id, global },
     } = req;
+
+    if (!data.responsible && data.responsible_type === ResponsibleType.OTHER) {
+      res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Må sende med en personalansvarlig når man velger 'annen' ansvarlig" });
+    }
+
     const newTask = await trakClient.task.create({
       data: {
         title: data.title,
         description: data.description,
         link: data.link,
         global: global,
-        dueDate: data.dueDate,
-        dueDateDayOffset: data.dueDateDayOffset,
+        due_date: data.due_date,
+        due_date_day_offset: data.due_date_day_offset,
+        responsible_type: data.responsible_type,
         phase: {
           connect: {
-            id: phaseId,
+            id: phase_id,
           },
         },
-        ...(data.responsible && {
-          responsible: {
-            connect: {
-              id: parseInt(data.responsible.id),
-            },
-          },
-        }),
-        tags: {
-          connectOrCreate: data.tags?.map((tag: ITag) => ({
-            where: {
-              id: tag.id,
-            },
-            create: {
-              title: tag.title,
+        professions: {
+          create: data.professions.map((profession: IProfession) => ({
+            profession: {
+              connect: {
+                slug: profession.slug,
+              },
             },
           })),
         },
-        professions: {
-          connect: data.professions.map((profession: IProfession) => ({ id: profession.id })),
-        },
+        ...(data.responsible &&
+          data.responsible_type === ResponsibleType.OTHER && {
+            responsible: {
+              connect: {
+                id: parseInt(data.responsible.id),
+              },
+            },
+          }),
       },
       include: {
         professions: true,

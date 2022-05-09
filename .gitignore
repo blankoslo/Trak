@@ -120,4 +120,4 @@ dist
 
 **/generated
 
-**/schema.prisma
+test_seed.sql

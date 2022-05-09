@@ -23,34 +23,34 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 });
 const GET = async (res, id) => {
   try {
-    const employeeTask = await trakClient.employeeTask.findUnique({
+    const employeeTask = await trakClient.employee_task.findUnique({
       where: {
         id: id.toString(),
       },
       select: {
         id: true,
         completed: true,
-        dueDate: true,
-        completedBy: true,
-        completedById: true,
-        completedDate: true,
+        due_date: true,
+        completed_by: true,
+        completed_by_id: true,
+        completed_date: true,
         comments: {
           include: {
-            createdByEmployee: true,
+            created_by: true,
           },
         },
         employee: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            first_name: true,
+            last_name: true,
           },
         },
         responsible: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            first_name: true,
+            last_name: true,
           },
         },
         task: {
@@ -59,17 +59,11 @@ const GET = async (res, id) => {
             title: true,
             description: true,
             global: true,
-            tags: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
             phase: {
               select: {
                 id: true,
                 title: true,
-                processTemplate: {
+                process_template: {
                   select: {
                     slug: true,
                     title: true,
@@ -97,49 +91,49 @@ const GET = async (res, id) => {
 export type employeeTaskUpdateData = {
   body: {
     completed: boolean;
-    dueDate: Date;
-    responsibleId: number;
+    due_date: Date;
+    responsible_id: number;
   };
 };
 
 const PUT = async (req, res, id, user) => {
   const {
-    body: { completed, dueDate, responsibleId },
+    body: { completed, due_date, responsible_id },
   }: employeeTaskUpdateData = req;
   try {
-    const employeeTask = await trakClient.employeeTask.findUnique({
+    const employeeTask = await trakClient.employee_task.findUnique({
       where: {
         id: id.toString(),
       },
     });
 
-    const updatedEmployeeTask = await trakClient.employeeTask.update({
+    const updatedEmployeeTask = await trakClient.employee_task.update({
       where: {
         id: id.toString(),
       },
       data: {
         completed: completed,
-        dueDate: dueDate,
+        due_date: due_date,
         responsible: {
           connect: {
-            id: responsibleId,
+            id: responsible_id,
           },
         },
-        ...(responsibleId === employeeTask.responsibleId && {
+        ...(responsible_id === employeeTask.responsible_id && {
           ...(completed
             ? {
-                completedBy: {
+                completed_by: {
                   connect: {
                     id: user.id,
                   },
                 },
-                completedDate: new Date(),
+                completed_date: new Date(),
               }
             : {
-                completedBy: {
+                completed_by: {
                   disconnect: true,
                 },
-                completedDate: null,
+                completed_date: null,
               }),
         }),
       },

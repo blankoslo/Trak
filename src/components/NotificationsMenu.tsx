@@ -78,18 +78,18 @@ const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
                 <Box display='flex' justifyContent='space-between' p={1} width='100%'>
                   <Typography variant='body1'>Varsler</Typography>
                   <Button onClick={markAsRead} size='small' sx={{ padding: 0 }}>
-                    Mark alle som lest
+                    Merk alle som lest
                   </Button>
                 </Box>
               </MenuItem>
               {data.map((notification) => (
                 <>
                   <NotificationCard
-                    createdBy={notification.createdByEmployee}
+                    createdBy={notification.created_by_employee}
                     description={notification.description}
                     key={notification.id}
                     read={notification.read}
-                    time={notification.createdAt}
+                    time={notification.created_at}
                   />
                   <Divider />
                 </>

@@ -14,7 +14,7 @@ import Head from 'next/head';
 import { Fragment, useEffect, useState } from 'react';
 import { IPhase } from 'utils/types';
 export const getServerSideProps: GetServerSideProps = async () => {
-  await trakClient.processTemplate.createMany({
+  await trakClient.process_template.createMany({
     data: [
       { title: 'Onboarding', slug: 'onboarding' },
       { title: 'Løpende', slug: 'lopende' },
@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     skipDuplicates: true,
   });
 
-  const processTemplates = await trakClient.processTemplate.findMany({
+  const processTemplatesQuery = await trakClient.process_template.findMany({
     orderBy: {
       title: 'asc',
     },
@@ -31,10 +31,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
       phases: {
         orderBy: [
           {
-            dueDateDayOffset: 'asc',
+            due_date_day_offset: 'asc',
           },
           {
-            dueDate: 'asc',
+            due_date: 'asc',
           },
         ],
         where: {
@@ -45,10 +45,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
         select: {
           id: true,
           title: true,
-          processTemplateId: true,
+          process_template_id: true,
           tasks: {
             orderBy: {
-              createdAt: 'asc',
+              created_at: 'asc',
             },
             where: {
               global: true,
@@ -58,13 +58,23 @@ export const getServerSideProps: GetServerSideProps = async () => {
               id: true,
               title: true,
               description: true,
+              responsible_type: true,
               link: true,
-              professions: true,
+              professions: {
+                include: {
+                  profession: {
+                    select: {
+                      title: true,
+                      slug: true,
+                    },
+                  },
+                },
+              },
               responsible: {
                 select: {
-                  firstName: true,
-                  lastName: true,
-                  imageUrl: true,
+                  first_name: true,
+                  last_name: true,
+                  image_url: true,
                 },
               },
             },
@@ -72,6 +82,20 @@ export const getServerSideProps: GetServerSideProps = async () => {
         },
       },
     },
+  });
+
+  const processTemplates = processTemplatesQuery.map((processTemplate) => {
+    return {
+      ...processTemplate,
+      phases: processTemplate.phases.map((phase) => {
+        return {
+          ...phase,
+          tasks: phase.tasks.map((task) => {
+            return { ...task, professions: task.professions.map((profession) => profession.profession) };
+          }),
+        };
+      }),
+    };
   });
 
   return { props: { processTemplates } };
@@ -125,8 +149,7 @@ const ProcessTemplateSelector = ({ active, onClick }) => {
 const ProcessTemplate = ({ processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [selectedProcessTemplate, setSelectedProcessTemplate] = useState(0);
-  const [processTemplate, setProcessTemplate] = useState(processTemplates[selectedProcessTemplate]);
-
+  const [process_template, setProcessTemplate] = useState(processTemplates[selectedProcessTemplate]);
   useEffect(() => {
     setProcessTemplate(processTemplates[selectedProcessTemplate]);
   }, [selectedProcessTemplate]);
@@ -137,20 +160,20 @@ const ProcessTemplate = ({ processTemplates }: InferGetServerSidePropsType<typeo
   return (
     <>
       <Head>
-        <title>Prosessmal {processTemplate && `- ${processTemplate.title}`}</title>
+        <title>Prosessmal {process_template && `- ${process_template.title}`}</title>
       </Head>
       <Container maxWidth='lg' sx={{ marginTop: '16px' }}>
         <Box display='flex' justifyContent='flex-end' mb={4}>
           <ProcessTemplateSelector active={selectedProcessTemplate} onClick={setSelectedProcessTemplate} />
         </Box>
         <DataProvider>
-          {processTemplate?.phases.map((phase: IPhase) => (
-            <Phase key={phase.id} phase={phase} processTemplate={processTemplate} />
+          {process_template?.phases.map((phase: IPhase) => (
+            <Phase key={phase.id} phase={phase} processTemplate={process_template} />
           ))}
         </DataProvider>
         <AddButton onClick={() => setModalIsOpen(true)} text='Legg til fase' />
         <div style={{ marginBottom: '24px' }} />
-        {modalIsOpen && <PhaseModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} processTemplate={processTemplate} />}
+        {modalIsOpen && <PhaseModal closeModal={() => setModalIsOpen(false)} modalIsOpen={modalIsOpen} processTemplate={process_template} />}
       </Container>
     </>
   );

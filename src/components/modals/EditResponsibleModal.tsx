@@ -45,24 +45,26 @@ const EditResponsibleModal = ({ employeeTask, isModalOpen, closeModal }: EditRes
         setIsSaving(true);
         await axios.put(`/api/employeeTasks/${employeeTask.id}`, {
           completed: employeeTask.completed,
-          dueDate: employeeTask.dueDate,
-          responsibleId: formData.responsible?.id,
+          due_date: employeeTask.due_date,
+          responsible_id: formData.responsible?.id,
         });
-        const employeeWantsDelegateNotifications = formData.responsible.employeeSettings?.notificationSettings?.includes('DELEGATE');
+        const employeeWantsDelegateNotifications = formData.responsible.employee_settings?.delegate;
+        const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${employeeTask.id}`;
         if (employeeWantsDelegateNotifications) {
           await axios.post('/api/notification', {
-            description: `Oppgave delegert: "${employeeTask.task.title}"`,
-            employeeId: formData.responsible?.id,
-            ...(formData.responsible.employeeSettings?.slack && {
+            description: `Oppgave delegert: "[${employeeTask.task.title}](${taskURL})"`,
+            slack_description: `Oppgave "<${taskURL}|${employeeTask.task.title}>" er delegert til deg av ${user.first_name} ${user.last_name}`,
+            employee_id: formData.responsible?.id,
+            ...(formData.responsible.employee_settings?.slack && {
               email: formData.responsible.email,
             }),
-            createdBy: user.id,
+            created_by: user,
           });
         }
-
         router
-          .push({
-            pathname: router.asPath,
+          .push({ pathname: router.pathname, query: router.query }, undefined, {
+            shallow: false,
+            scroll: false,
           })
           .finally(() => {
             closeModal();

@@ -3,6 +3,7 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Avatar from 'components/Avatar';
+import Markdown from 'components/Markdown';
 import format from 'date-fns/format';
 import Image from 'next/image';
 import { IEmployee } from 'utils/types';
@@ -20,24 +21,22 @@ const NotificationCard = ({ time, description, createdBy, read }: NotificationCa
     <Grid container padding={1} spacing={1} sx={{ backgroundColor: read ? 'background.default' : 'background.paper' }}>
       <Grid item xs={2}>
         {createdBy ? (
-          <Avatar firstName={createdBy.firstName} image={createdBy.imageUrl} lastName={createdBy.lastName} />
+          <Avatar firstName={createdBy.first_name} image={createdBy.image_url} lastName={createdBy.last_name} />
         ) : (
-          <Image alt='T' height={62} src={createdBy?.imageUrl || '/trakLogo.png'} width={32} />
+          <Image alt='T' height={62} src={createdBy?.image_url || '/trakLogo.png'} width={32} />
         )}
       </Grid>
       <Grid item xs={10}>
         <Stack direction='column'>
           <Box display='flex' justifyContent={'space-between'}>
             <Typography color={'primary.main'} variant='body2'>
-              {createdBy ? createdBy.firstName : 'TRAK'}
+              {createdBy ? createdBy.first_name : 'TRAK'}
             </Typography>
             <Typography color={'primary.main'} variant='body2'>
               {createdToday ? format(new Date(time), 'HH:mm') : format(new Date(time), 'dd/MM')}
             </Typography>
           </Box>
-          <Typography sx={{ maxWidth: '80%' }} variant='body2'>
-            {description}
-          </Typography>
+          <Markdown text={description} />
         </Stack>
       </Grid>
     </Grid>

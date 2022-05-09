@@ -31,8 +31,8 @@ export type PhaseModalProps = {
 export type PhaseData = {
   title: string;
   offset: Offset;
-  dueDateDayOffset: number;
-  dueDate: string;
+  due_date_day_offset: number;
+  due_date: string;
   day: number;
   month: number;
 };
@@ -69,11 +69,11 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
     defaultValues: useMemo(
       () => ({
         title: phase?.title,
-        dueDateDayOffset: phase?.dueDateDayOffset,
+        due_date_day_offset: phase?.due_date_day_offset,
         offset: phase?.offset,
-        dueDate: phase?.dueDate,
-        day: new Date(phase?.dueDate).getDate(),
-        month: new Date(phase?.dueDate).getMonth() + 1,
+        due_date: phase?.due_date,
+        day: new Date(phase?.due_date).getDate(),
+        month: new Date(phase?.due_date).getMonth() + 1,
       }),
       [phase],
     ),
@@ -87,28 +87,28 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
   useEffect(() => {
     if (phase_id) {
       axios.get(`/api/phases/${phase_id}`).then((res) => {
-        const dueDate = new Date(res.data.dueDate);
+        const due_date = new Date(res.data.due_date);
         setPhase({
           ...res.data,
-          dueDate: format(new Date(res.data.dueDate), 'yyyy-MM-dd'),
-          offset: res.data.dueDateDayOffset <= 0 ? Offset.Before : Offset.After,
-          dueDateDayOffset: Math.abs(res.data.dueDateDayOffset),
-          day: dueDate?.getDate() || -1,
-          month: dueDate?.getMonth() || -1,
+          due_date: format(new Date(res.data.due_date), 'yyyy-MM-dd'),
+          offset: res.data.due_date_day_offset <= 0 ? Offset.Before : Offset.After,
+          due_date_day_offset: Math.abs(res.data.due_date_day_offset),
+          day: due_date?.getDate() || -1,
+          month: due_date?.getMonth() || -1,
         });
       });
     }
   }, [phase_id]);
 
   useEffect(() => {
-    const dueDate = new Date(phase?.dueDate);
+    const due_date = new Date(phase?.due_date);
     reset({
       title: phase?.title,
-      dueDateDayOffset: phase?.dueDateDayOffset,
+      due_date_day_offset: phase?.due_date_day_offset,
       offset: phase?.offset,
-      dueDate: phase?.dueDate,
-      day: dueDate?.getDate() || new Date().getDate(),
-      month: dueDate?.getMonth() || new Date().getMonth(),
+      due_date: phase?.due_date,
+      day: due_date?.getDate() || new Date().getDate(),
+      month: due_date?.getMonth() || new Date().getMonth(),
     });
   }, [phase]);
 
@@ -117,14 +117,14 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
   };
 
   const onSubmit = handleSubmit((formData: PhaseData) => {
-    const dueDate = processTemplate.slug === Process.LOPENDE ? formatISO(new Date().setMonth(formData.month, formData.day)) : null;
+    const due_date = processTemplate.slug === Process.LOPENDE ? formatISO(new Date().setMonth(formData.month, formData.day)) : null;
     const data = {
       data: {
         ...formData,
-        dueDate: dueDate,
-        dueDateDayOffset: formData.offset === Offset.Before ? -Math.abs(formData.dueDateDayOffset) : Math.abs(formData.dueDateDayOffset),
+        due_date: due_date,
+        due_date_day_offset: formData.offset === Offset.Before ? -Math.abs(formData.due_date_day_offset) : Math.abs(formData.due_date_day_offset),
       },
-      processTemplateId: processTemplate.slug,
+      process_template_id: processTemplate.slug,
     };
     if (phase_id) {
       axiosPhaseModal(axios.put(`/api/phases/${phase_id}`, data), 'Fasen ble oppdatert');
@@ -210,7 +210,7 @@ const PhaseModal = ({ processTemplate, modalIsOpen, closeModal, phase_id = undef
                     </Tooltip>
                   </>
                 }
-                name='dueDateDayOffset'
+                name='due_date_day_offset'
                 placeholder='Antall dager'
                 register={register}
                 required

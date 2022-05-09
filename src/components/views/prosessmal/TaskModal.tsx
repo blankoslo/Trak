@@ -1,8 +1,13 @@
 import HelpIcon from '@mui/icons-material/Help';
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import Select from '@mui/material/Select';
 import { Theme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
@@ -11,9 +16,9 @@ import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import BeforeToogle from 'components/form/BeforeToggle';
 import EmployeeSelector from 'components/form/EmployeeSelector';
-import TagSelector from 'components/form/TagSelector';
 import TextField from 'components/form/TextField';
 import ToggleButtonGroup from 'components/form/ToggleButtonGroup';
+import MarkdownEditor from 'components/MarkdownEditor';
 import Modal from 'components/Modal';
 import { useData } from 'context/Data';
 import useProgressbar from 'context/Progressbar';
@@ -25,7 +30,7 @@ import { capitalize } from 'lodash';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { IEmployee, IPhase, ITag, Offset, Process } from 'utils/types';
+import { IEmployee, IPhase, Offset, Process, ResponsibleType } from 'utils/types';
 import { axiosBuilder, getMonths } from 'utils/utils';
 import validator from 'validator';
 
@@ -38,12 +43,13 @@ export type TaskModalProps = {
 
 export type TaskData = {
   title: string;
-  description?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  description?: any; // Any because markdownEditor does not return a string but an object of the actualt markdown text and html
   professions?: string[];
   responsible?: IEmployee;
-  tags?: ITag[];
-  dueDate?: Date;
-  dueDateDayOffset?: number | null;
+  due_date?: Date;
+  due_date_day_offset?: number | null;
+  responsible_type: ResponsibleType;
   offset: Offset;
   link: string;
   day: number;
@@ -77,7 +83,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     return false;
   };
 
-  const { professions, tags } = useData();
+  const { professions } = useData();
   const [task, setTask] = useState<TaskData | undefined>(undefined);
   const {
     register,
@@ -85,6 +91,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     formState: { errors },
     control,
     reset,
+    resetField,
     watch,
   } = useForm<TaskData>({
     reValidateMode: 'onChange',
@@ -94,20 +101,21 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         description: task?.description,
         link: task?.link,
         professions: task?.professions,
-        tags: task?.tags,
         responsible: task?.responsible,
-        dueDate: task?.dueDate,
-        dueDateDayOffset: task?.dueDateDayOffset,
+        responsible_type: task?.responsible_type,
+        due_date: task?.due_date,
+        due_date_day_offset: task?.due_date_day_offset,
         offset: task?.offset,
-        day: new Date(phase?.dueDate).getDate(),
-        month: new Date(phase?.dueDate).getMonth() + 1,
+        day: new Date(phase?.due_date).getDate(),
+        month: new Date(phase?.due_date).getMonth() + 1,
       }),
       [task],
     ),
   });
-
+  // "HR_MANAGER"
   // @ts-ignore
   const watchSelectedMonth: number = watch('month');
+  const watchShowTaskResponsible = watch('responsible_type');
 
   const daysInMonth = useMemo(() => {
     return getDaysInMonth(new Date(2021, watchSelectedMonth));
@@ -116,14 +124,14 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
   useEffect(() => {
     if (task_id) {
       axios.get(`/api/tasks/${task_id}`).then((res) => {
-        const dueDate = new Date(res.data.dueDate);
+        const due_date = new Date(res.data.due_date);
         const task = {
           ...res.data,
-          dueDate: res.data.dueDate ? format(new Date(res.data.dueDate), 'yyyy-MM-dd') : null,
-          offset: res.data.dueDateDayOffset <= 0 ? Offset.Before : Offset.After,
-          dueDateDayOffset: Math.abs(res.data.dueDateDayOffset) || null,
-          day: dueDate?.getDate() || -1,
-          month: dueDate?.getMonth() || -1,
+          due_date: res.data.due_date ? format(new Date(res.data.due_date), 'yyyy-MM-dd') : null,
+          offset: res.data.due_date_day_offset <= 0 ? Offset.Before : Offset.After,
+          due_date_day_offset: Math.abs(res.data.due_date_day_offset) || null,
+          day: due_date?.getDate() || -1,
+          month: due_date?.getMonth() || -1,
         };
         setTask(task);
       });
@@ -131,18 +139,18 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
   }, [task_id]);
 
   useEffect(() => {
-    const dueDate = new Date(task?.dueDate);
+    const due_date = new Date(task?.due_date);
     reset({
       title: task?.title,
       description: task?.description,
       link: task?.link,
       professions: task?.professions,
-      tags: task?.tags,
       responsible: task?.responsible,
-      dueDate: task?.dueDate,
-      dueDateDayOffset: task?.dueDateDayOffset,
-      day: dueDate.getDate() || -1,
-      month: dueDate.getMonth() || -1,
+      responsible_type: task?.responsible_type,
+      due_date: task?.due_date,
+      due_date_day_offset: task?.due_date_day_offset,
+      day: due_date.getDate() || -1,
+      month: due_date.getMonth() || -1,
     });
   }, [task]);
 
@@ -150,24 +158,31 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
     axiosBuilder(axiosFunc, text, router, showProgressbar, showSnackbar, closeModal);
   };
 
+  useEffect(() => {
+    if (watchShowTaskResponsible !== ResponsibleType.OTHER) {
+      resetField('responsible');
+    }
+  }, [watchShowTaskResponsible]);
+
   const onSubmit = handleSubmit((formData: TaskData) => {
-    const dueDateDayOffset = !formData.dueDateDayOffset
+    const due_date_day_offset = !formData.due_date_day_offset
       ? null
       : formData.offset === Offset.Before
-      ? -Math.abs(formData.dueDateDayOffset)
-      : Math.abs(formData.dueDateDayOffset);
-
+      ? -Math.abs(formData.due_date_day_offset)
+      : Math.abs(formData.due_date_day_offset);
     const data = {
       data: {
         ...formData,
-        ...(phase.processTemplateId === Process.LOPENDE &&
+        ...(phase.process_template_id === Process.LOPENDE &&
           formData.day >= 0 &&
           formData.month >= 0 && {
-            dueDate: formatISO(new Date().setMonth(formData.month, formData.day)),
+            due_date: formatISO(new Date().setMonth(formData.month, formData.day)),
           }),
-        dueDateDayOffset: dueDateDayOffset,
+        description: formData.description?.text,
+        due_date_day_offset: due_date_day_offset,
+        responsible: formData.responsible_type === ResponsibleType.OTHER ? formData.responsible : null,
       },
-      phaseId: phase.id,
+      phase_id: phase.id,
       global: true,
     };
     if (task_id) {
@@ -223,39 +238,19 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
         <TextField
           errors={errors}
           inputProps={{ 'aria-label': 'Rediger oppgavetittel' }}
-          label='Oppgavetittel'
+          label='Tittel'
           name='title'
           register={register}
           required
           rules={{
             required: 'Oppgavetittel er påkrevd',
           }}
+          sx={{ marginTop: 2 }}
         />
-        <TextField
-          errors={errors}
-          inputProps={{ 'aria-label': 'Rediger oppggavebeskrivelse' }}
-          label={
-            <>
-              Oppgavebeskrivelse{' '}
-              <Tooltip
-                title={
-                  <>
-                    Dette feltet støtter{' '}
-                    <a href='https://www.markdownguide.org/cheat-sheet/' rel='noreferrer noopener' target='_blank'>
-                      markdown
-                    </a>
-                  </>
-                }
-              >
-                <HelpIcon fontSize='small' />
-              </Tooltip>
-            </>
-          }
-          multiline
-          name='description'
-          register={register}
-          rows={4}
-        />
+        <Stack spacing={1}>
+          <Typography variant='body1'>Beskrivelse</Typography>
+          <MarkdownEditor control={control} name='description' />
+        </Stack>
         <TextField
           errors={errors}
           inputProps={{ 'aria-label': 'Rediger hurtiglink' }}
@@ -274,13 +269,33 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
           }}
         />
         <ToggleButtonGroup control={control} name={'professions'} professions={professions} />
-        <TagSelector control={control} label='Tags' name='tags' options={tags} />
-        <EmployeeSelector control={control} label='Oppgaveansvarlig' name='responsible' />
-        {phase.processTemplateId === 'lopende' && (
+        <FormControl>
+          <Typography variant='body1'>Oppgaveansvarlig</Typography>
+          <Controller
+            control={control}
+            defaultValue={ResponsibleType.HR_MANAGER}
+            name='responsible_type'
+            render={({ field }) => {
+              return (
+                <RadioGroup {...field} row>
+                  <FormControlLabel control={<Radio />} label='Personalansvarlig' value={ResponsibleType.HR_MANAGER} />
+                  {phase.process_template_id === 'lopende' && (
+                    <FormControlLabel control={<Radio />} label='Oppdragsansvarlig' value={ResponsibleType.PROJECT_MANAGER} />
+                  )}
+                  <FormControlLabel control={<Radio />} label='Annen' value={ResponsibleType.OTHER} />
+                </RadioGroup>
+              );
+            }}
+          />
+        </FormControl>
+        {watchShowTaskResponsible === ResponsibleType.OTHER && (
+          <EmployeeSelector control={control} errors={errors} label='Oppgaveansvarlig' name='responsible' required />
+        )}
+        {phase.process_template_id === 'lopende' && (
           <Box>
             <Typography variant='body1'>
               Overskriv forfallsdato
-              <Tooltip title='Overskriv forfallsdatoen satt for fasen for hvilken årlig dato skal oppgven forfalle?'>
+              <Tooltip title='Overskriv forfallsdatoen satt for fasen for hvilken årlig dato skal oppgaven forfalle'>
                 <HelpIcon fontSize='small' />
               </Tooltip>
             </Typography>
@@ -337,7 +352,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
             </Box>
           </Box>
         )}
-        {(phase.processTemplateId === Process.OFFBOARDING || phase.processTemplateId === Process.ONBOARDING) && (
+        {(phase.process_template_id === Process.OFFBOARDING || phase.process_template_id === Process.ONBOARDING) && (
           <div>
             <Box alignItems='center' display='flex'>
               <TextField
@@ -346,7 +361,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
                 inputProps={{
                   min: 0,
                   'aria-label': `Antall dager før/etter oppgaven skal forfalle basert på ${
-                    phase.processTemplateId === Process.ONBOARDING ? 'ansettelsdato' : 'termineringsdato'
+                    phase.process_template_id === Process.ONBOARDING ? 'ansettelsdato' : 'termineringsdato'
                   } `,
                 }}
                 label={
@@ -354,14 +369,14 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
                     Overskriv forfallsdato
                     <Tooltip
                       title={`Dette feltet vil overskride forfallsdatoen fra fasen. Forfallsdatoen vil være når oppgaven skal forfalle basert på ${
-                        phase.processTemplateId === Process.ONBOARDING ? `ansettelsdato` : `termineringsdato`
+                        phase.process_template_id === Process.ONBOARDING ? `ansettelsdato` : `termineringsdato`
                       } `}
                     >
                       <HelpIcon fontSize='small' />
                     </Tooltip>
                   </>
                 }
-                name='dueDateDayOffset'
+                name='due_date_day_offset'
                 placeholder='Antall dager'
                 register={register}
                 rules={{
@@ -373,7 +388,7 @@ const TaskModal = ({ phase, modalIsOpen, closeModal, task_id = undefined }: Task
                 type='number'
               />
               <BeforeToogle control={control} name='offset' />
-              <Typography variant='body1'>{phase.processTemplateId === Process.ONBOARDING ? 'ansettelsesdato' : 'termineringsdato'}</Typography>
+              <Typography variant='body1'>{phase.process_template_id === Process.ONBOARDING ? 'ansettelsesdato' : 'termineringsdato'}</Typography>
             </Box>
           </div>
         )}

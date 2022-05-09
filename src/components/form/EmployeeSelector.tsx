@@ -12,9 +12,11 @@ export type EmployeeSelectorProps = {
   name: string;
   label: string;
   required?: boolean;
+  // eslint-disable-next-line
+  errors?: any;
 };
 
-export const EmployeeSelector = ({ control, name, label, required = false }: EmployeeSelectorProps) => {
+export const EmployeeSelector = ({ control, errors = {}, name, label, required = false }: EmployeeSelectorProps) => {
   const { data: session } = useSession();
   const { data: employees } = useSWR(session?.user ? `/api/employees` : null, fetcher);
   return (
@@ -22,9 +24,17 @@ export const EmployeeSelector = ({ control, name, label, required = false }: Emp
       control={control}
       name={name}
       render={({ field: { onChange, value } }) => (
-        <EmployeeSelectorComponent employees={employees ?? []} label={label} required={required} setValue={onChange} value={value} />
+        <EmployeeSelectorComponent
+          employees={employees ?? []}
+          errors={errors}
+          label={label}
+          name={name}
+          required={required}
+          setValue={onChange}
+          value={value}
+        />
       )}
-      rules={{ required: required }}
+      rules={{ required: 'Du må velge en oppgaveansvarlig' }}
     />
   );
 };
@@ -35,28 +45,33 @@ export type EmployeeSelectorComponentProps = {
   label: string;
   value: IEmployee;
   required: boolean;
+  name: string;
+  // eslint-disable-next-line
+  errors: any;
 };
 export const EmployeeSelectorComponent = ({
   employees,
   setValue,
   label,
+  name,
+  errors,
   required,
   value = {
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     id: null,
     email: undefined,
-    birthDate: null,
+    birth_date: null,
     profession: undefined,
-    hrManager: undefined,
+    hr_manager: undefined,
     employees: undefined,
-    employeeTask: undefined,
-    employeeSettings: undefined,
+    employee_task: undefined,
+    employee_settings: undefined,
   },
 }: EmployeeSelectorComponentProps) => {
   return (
     <Autocomplete
-      getOptionLabel={(employee: IEmployee) => `${employee.firstName} ${employee.lastName}`.trim()}
+      getOptionLabel={(employee: IEmployee) => `${employee.first_name} ${employee.last_name}`.trim()}
       loading={!employees.length}
       noOptionsText={'Ingen ansatte funnet'}
       onChange={(_, employee) => setValue(employee)}
@@ -75,7 +90,9 @@ export const EmployeeSelectorComponent = ({
               </>
             ),
           }}
+          error={Boolean(errors[name])}
           fullWidth
+          helperText={errors[name]?.message}
           label={label}
           required={required}
           variant='standard'

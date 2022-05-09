@@ -8,7 +8,7 @@ import Avatar from 'components/Avatar';
 import TaskModal from 'components/views/prosessmal/TaskModal';
 import markdownToTxt from 'markdown-to-txt';
 import { useState } from 'react';
-import { IPhase, ITask } from 'utils/types';
+import { IPhase, ITask, ResponsibleType } from 'utils/types';
 export type TaskProps = {
   task: ITask;
   phase: IPhase;
@@ -37,6 +37,33 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: theme.spacing(1),
   },
 }));
+
+const Responsible = ({ task }: { task: ITask }) => {
+  const classes = useStyles();
+
+  switch (task.responsible_type) {
+    case ResponsibleType.OTHER:
+      if (task.responsible) {
+        return (
+          <div className={classes.flexCenter}>
+            <Avatar
+              className={classes.avatarSize}
+              firstName={task.responsible.first_name}
+              image={task.responsible.image_url}
+              lastName={task.responsible.last_name}
+            />
+            {`${task.responsible.first_name} ${task.responsible.last_name}`}
+          </div>
+        );
+      }
+      return;
+    case ResponsibleType.HR_MANAGER:
+      return <>Personalansvarlig</>;
+    case ResponsibleType.PROJECT_MANAGER:
+      return <>Oppdragsansvarlig</>;
+    default:
+  }
+};
 const TaskRow = ({ task, phase }: TaskProps) => {
   const classes = useStyles();
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -47,23 +74,13 @@ const TaskRow = ({ task, phase }: TaskProps) => {
     <TableRow className={classes.hideLastBorder} key={task.id}>
       <TableCell style={{ width: '25rem' }}>{task.title}</TableCell>
       <TableCell style={{ width: '55rem' }} sx={{ display: { md: 'table-cell', xs: 'none' } }}>
-        {markdownToTxt(task.description)}
+        {markdownToTxt(task?.description || '')}
       </TableCell>
       <TableCell style={{ width: '55rem' }} sx={{ display: { lg: 'table-cell', xs: 'none' } }}>
         {task.professions.length === 3 ? 'Alle' : task.professions[0]?.title}
       </TableCell>
       <TableCell style={{ width: '20rem' }} sx={{ display: { sm: 'table-cell', xs: 'none' } }}>
-        {task.responsible && (
-          <div className={classes.flexCenter}>
-            <Avatar
-              className={classes.avatarSize}
-              firstName={task.responsible.firstName}
-              image={task.responsible.imageUrl}
-              lastName={task.responsible.lastName}
-            />
-            {`${task.responsible.firstName} ${task.responsible.lastName}`}
-          </div>
-        )}
+        <Responsible task={task} />
       </TableCell>
       <TableCell style={{ width: '10rem' }}>
         <IconButton

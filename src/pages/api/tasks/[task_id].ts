@@ -2,7 +2,7 @@ import HttpStatusCode from 'http-status-typed';
 import { trakClient } from 'lib/prisma';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ITag } from 'utils/types';
+import { IProfession, ResponsibleType } from 'utils/types';
 
 export const config = {
   api: {
@@ -26,7 +26,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 });
 const GET = async (res, task_id) => {
   try {
-    const task = await trakClient.task.findUnique({
+    const taskQuery = await trakClient.task.findUnique({
       where: {
         id: task_id.toString(),
       },
@@ -34,32 +34,32 @@ const GET = async (res, task_id) => {
         id: true,
         title: true,
         description: true,
-        phaseId: true,
+        phase_id: true,
         link: true,
-        dueDate: true,
-        dueDateDayOffset: true,
-        tags: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
+        responsible_type: true,
+        due_date: true,
+        due_date_day_offset: true,
         professions: {
           select: {
-            id: true,
-            title: true,
+            profession: {
+              select: {
+                title: true,
+                slug: true,
+              },
+            },
           },
         },
         responsible: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            imageUrl: true,
+            first_name: true,
+            last_name: true,
+            image_url: true,
           },
         },
       },
     });
+    const task = { ...taskQuery, professions: taskQuery.professions.map((profession) => profession.profession) };
     if (!task) {
       throw new Error('Fant ikke oppgave');
     } else {
@@ -75,15 +75,18 @@ const GET = async (res, task_id) => {
 };
 const PUT = async (req, res, task_id) => {
   const {
-    body: { data, phaseId, global },
+    body: { data, phase_id, global },
   } = req;
+  if (!data.responsible && data.responsibleType === ResponsibleType.OTHER) {
+    res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Må sende med en personalansvarlig når man velger 'annen' ansvarlig" });
+  }
   try {
     const getTask = await trakClient.task.findUnique({
       where: {
         id: task_id.toString(),
       },
       select: {
-        responsibleId: true,
+        responsible_id: true,
       },
     });
     const updatedTask = await trakClient.task.update({
@@ -95,14 +98,15 @@ const PUT = async (req, res, task_id) => {
         description: data.description,
         link: data.link,
         global: global,
-        dueDate: data.dueDate,
-        dueDateDayOffset: data.dueDateDayOffset,
+        due_date: data.due_date,
+        responsible_type: data.responsible_type,
+        due_date_day_offset: data.due_date_day_offset,
         phase: {
           connect: {
-            id: phaseId,
+            id: phase_id,
           },
         },
-        ...(data.responsible
+        ...(data.responsible && data.responsible_type === ResponsibleType.OTHER
           ? {
               responsible: {
                 connect: {
@@ -110,25 +114,19 @@ const PUT = async (req, res, task_id) => {
                 },
               },
             }
-          : Boolean(getTask.responsibleId) && {
+          : Boolean(getTask.responsible_id) && {
               responsible: {
                 disconnect: true,
               },
             }),
-        tags: {
-          set: [],
-          connectOrCreate: data.tags?.map((tag: ITag) => ({
-            where: {
-              id: tag.id,
-            },
-            create: {
-              title: tag.title,
-            },
-          })),
-        },
+
         professions: {
-          set: [],
-          connect: data.professions.map((profession) => ({ id: profession.id })),
+          deleteMany: {
+            task_id: task_id.toString(),
+          },
+          createMany: {
+            data: data.professions.map((profession: IProfession) => ({ profession_id: profession.slug })),
+          },
         },
       },
     });

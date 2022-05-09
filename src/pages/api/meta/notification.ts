@@ -7,7 +7,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     const unreadNotifications = await trakClient.notification.count({
       where: {
         read: false,
-        employeeId: user.id,
+        employee_id: user.id,
       },
     });
     res.status(HttpStatusCode.OK).json({ unreadNotifications: unreadNotifications });

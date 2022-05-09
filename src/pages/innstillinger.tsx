@@ -1,8 +1,8 @@
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
 import LinearProgress from '@mui/material/LinearProgress';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -17,27 +17,29 @@ import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next'
 import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import safeJsonStringify from 'safe-json-stringify';
+import { IEmployeeSettings } from 'utils/types';
 import { prismaDateToFormatedDate } from 'utils/utils';
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
-  const employeeQuery = await trakClient.employee.findUnique({
+  const employeeQuery = await trakClient.employees.findUnique({
     where: {
       id: parseInt(session?.user?.id) || null,
     },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
-      imageUrl: true,
+      first_name: true,
+      last_name: true,
+      image_url: true,
       email: true,
-      birthDate: true,
-      dateOfEmployment: true,
-      hrManager: {
+      birth_date: true,
+      date_of_employment: true,
+      hr_manager: {
         select: {
-          firstName: true,
-          lastName: true,
+          first_name: true,
+          last_name: true,
         },
       },
       profession: {
@@ -45,12 +47,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           title: true,
         },
       },
-      employeeSettings: {
-        select: {
-          slack: true,
-          notificationSettings: true,
-        },
-      },
+      employee_settings: true,
     },
   });
 
@@ -100,15 +97,15 @@ const PersonaliaPaper = ({ employee }) => {
           </a>
         </Typography>
         <Stack alignItems='center' direction='row' spacing={1}>
-          <Avatar firstName={employee.firstName} image={employee.imageUrl} lastName={employee.lastName} sx={{ width: 80, height: 80 }} />
+          <Avatar firstName={employee.first_name} image={employee.image_url} lastName={employee.last_name} sx={{ width: 80, height: 80 }} />
           <Stack alignItems='flex-start' direction='column' spacing={0.5}>
-            <PersonaliaText smallText={''} text={`${employee.firstName} ${employee.lastName}`} />
+            <PersonaliaText smallText={''} text={`${employee.first_name} ${employee.last_name}`} />
             <PersonaliaText smallText={''} text={employee.email} />
           </Stack>
         </Stack>
         <PersonaliaText smallText={'rolle'} text={employee.profession.title} />
-        <PersonaliaText smallText={'startet'} text={prismaDateToFormatedDate(employee.dateOfEmployment)} />
-        {employee.hrManager && <PersonaliaText smallText={'ansvarlig'} text={`${employee.hrManager.firstName} ${employee.hrManager.lastName}`} />}
+        <PersonaliaText smallText={'startet'} text={prismaDateToFormatedDate(employee.date_of_employment)} />
+        {employee.hr_manager && <PersonaliaText smallText={'ansvarlig'} text={`${employee.hr_manager.first_name} ${employee.hr_manager.last_name}`} />}
       </Stack>
     </Paper>
   );
@@ -142,25 +139,53 @@ const UpdateSystemPaper = () => {
   );
 };
 
+type ToggleProps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: any;
+  name: string;
+  defaultValue: boolean;
+  onSubmit: () => void;
+  loading: boolean;
+  label: string;
+};
+
+const Toggle = ({ control, name, defaultValue, onSubmit, loading, label }: ToggleProps) => {
+  return (
+    <FormControlLabel
+      control={
+        <Controller
+          control={control}
+          defaultValue={defaultValue}
+          name={name}
+          render={({ field: { value, onChange } }) => {
+            return (
+              <Switch
+                checked={value}
+                onChange={(e) => {
+                  onChange(e);
+                  onSubmit();
+                }}
+              />
+            );
+          }}
+        />
+      }
+      disabled={loading}
+      label={label}
+    />
+  );
+};
+
 const NotificationPaper = ({ employee }) => {
+  const { control, handleSubmit } = useForm();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const showSnackbar = useSnackbar();
-  const update = async (e) => {
+
+  const onSubmit = handleSubmit(async (formData: IEmployeeSettings) => {
     setLoading(true);
-    const name = e.target.name;
-    const checked = e.target.checked;
-    const slack = name === 'SLACK' ? checked : employee.employeeSettings.slack;
-    const newNotificationSettings = checked
-      ? [...employee.employeeSettings.notificationSettings, name]
-      : employee.employeeSettings.notificationSettings.filter((e) => e !== name);
-    const notificationSettings = name === 'SLACK' ? employee.employeeSettings.notificationSettings : newNotificationSettings;
-    const updateData = {
-      slack: slack,
-      notificationSettings: notificationSettings,
-    };
     await axios
-      .put(`/api/employees/${employee?.id}/settings`, updateData)
+      .put(`/api/employees/${employee?.id}/settings`, { data: formData })
       .then(() => {
         router.push(
           {
@@ -173,7 +198,7 @@ const NotificationPaper = ({ employee }) => {
         showSnackbar('Innstillinger oppdatert', 'success');
       })
       .catch((err) => showSnackbar(err.response?.data?.message || 'Noe gikk galt', 'error'));
-  };
+  });
 
   return (
     <Paper sx={{ width: { xs: 'auto', sm: 'auto', md: 'fit-content' } }}>
@@ -182,38 +207,53 @@ const NotificationPaper = ({ employee }) => {
         <Typography sx={{ opacity: '0.85' }} variant='body2'>
           kontroller dine slack og trak <br /> relaterte notifikasjoner
         </Typography>
-        <FormGroup>
-          <FormControlLabel
-            control={<Switch checked={employee.employeeSettings.slack} name='SLACK' onChange={update} />}
-            disabled={loading}
+        <FormControl>
+          <Toggle
+            control={control}
+            defaultValue={employee.employee_settings.slack}
             label='Slack notifikasjoner'
+            loading={loading}
+            name='slack'
+            onSubmit={onSubmit}
           />
           <Divider sx={{ marginBottom: 1, backgroundColor: 'text.primary' }} />
           <Typography sx={{ opacity: '0.85' }} variant='body2'>
             kontroller hvilken type <br /> notifikasjoner du ønsker
           </Typography>
-
-          <FormControlLabel
-            control={<Switch checked={employee.employeeSettings.notificationSettings.includes('DELEGATE')} name='DELEGATE' onChange={update} />}
-            disabled={loading}
+          <Toggle
+            control={control}
+            defaultValue={employee.employee_settings.delegate}
             label='Delegering av oppgave'
+            loading={loading}
+            name='delegate'
+            onSubmit={onSubmit}
           />
-          <FormControlLabel
-            control={<Switch checked={employee.employeeSettings.notificationSettings.includes('DEADLINE')} name='DEADLINE' onChange={update} />}
-            disabled={loading}
+          <Toggle
+            control={control}
+            defaultValue={employee.employee_settings.deadline}
             label='Oppgave forfaller'
+            loading={loading}
+            name='deadline'
+            onSubmit={onSubmit}
           />
-          <FormControlLabel
-            control={<Switch checked={employee.employeeSettings.notificationSettings.includes('HIRED')} name='HIRED' onChange={update} />}
-            disabled={loading}
-            label='Ny ansatt'
+          <Toggle
+            control={control}
+            defaultValue={employee.employee_settings.week_before_deadline}
+            label='En uke før oppgave(r) forfaller'
+            loading={loading}
+            name='week_before_deadline'
+            onSubmit={onSubmit}
           />
-          <FormControlLabel
-            control={<Switch checked={employee.employeeSettings.notificationSettings.includes('TERMINATION')} name='TERMINATION' onChange={update} />}
-            disabled={loading}
+          <Toggle control={control} defaultValue={employee.employee_settings.hired} label='Ny ansatt' loading={loading} name='hired' onSubmit={onSubmit} />
+          <Toggle
+            control={control}
+            defaultValue={employee.employee_settings.termination}
             label='Ansatt slutter'
+            loading={loading}
+            name='termination'
+            onSubmit={onSubmit}
           />
-        </FormGroup>
+        </FormControl>
       </Stack>
 
       {loading && <LinearProgress />}
@@ -221,11 +261,11 @@ const NotificationPaper = ({ employee }) => {
   );
 };
 
-const PersonaliaText = ({ smallText, text }) => {
+export const PersonaliaText = ({ smallText, text }) => {
   return (
     <Stack alignItems='flex-end' direction='row' spacing={1}>
       {smallText && <Typography sx={{ opacity: '0.85' }} variant='body2'>{`${smallText}:`}</Typography>}
-      <Typography>{text}</Typography>
+      <Typography noWrap>{text}</Typography>
     </Stack>
   );
 };

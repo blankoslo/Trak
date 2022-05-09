@@ -10,12 +10,35 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     } = req;
 
     try {
-      await trakClient.comment.delete({
+      await trakClient.employee_task_comments.delete({
         where: {
           id: commentId.toString(),
         },
       });
       res.status(HttpStatusCode.OK).json({ message: 'hei' });
+    } catch (err) {
+      if (err) {
+        res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
+      } else {
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ message: 'Noe gikk galt med serveren' });
+      }
+    }
+  } else if (req.method === 'PUT') {
+    const {
+      body: { data },
+      query: { commentId },
+    } = req;
+    try {
+      const updatedComment = await trakClient.employee_task_comments.update({
+        where: {
+          id: commentId.toString(),
+        },
+        data: {
+          text: data.text,
+          created_at: data.created_at,
+        },
+      });
+      res.status(HttpStatusCode.OK).json(updatedComment);
     } catch (err) {
       if (err) {
         res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
