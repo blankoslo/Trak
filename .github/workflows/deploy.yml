@@ -6,16 +6,19 @@ on:
       - dev
       - main
 
-env:
-  CLOUD_RUN_PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
-  CLOUD_RUN_REGION: europe-west1
-  # project-name but it can be anything you want
-  REPO_NAME: ${{ secrets.REPO_NAME }}
-  TRAK_DB_URL: ${{ secrets.TRAK_DB_URL }}
+
 
 jobs:
   build-and-deploy:
     name: Setup, Build, and Deploy
+    environment:
+      name: ${{ github.ref }}
+    env:
+      CLOUD_RUN_PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
+      CLOUD_RUN_REGION: europe-west1
+      # project-name but it can be anything you want
+      REPO_NAME: ${{ secrets.REPO_NAME }}
+      TRAK_DB_URL: ${{ secrets.TRAK_DB_URL }}
     runs-on: ubuntu-latest
     steps:
 
