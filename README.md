@@ -1,6 +1,7 @@
 ![Trak](./public/trak_logo.svg)
 
-![CI](https://github.com/blitz-js/superjson/workflows/CI/badge.svg)
+[![dev-build-and-deploy](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml/badge.svg?branch=dev)](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml)
+[![main-build-and-deploy](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/blankoslo/Trak/actions/workflows/deploy.yml)
 ![CI](https://img.shields.io/github/license/Zenjjim/Trak)
 
 ![Jokes Card](https://readme-jokes.vercel.app/api)
