@@ -18,7 +18,7 @@
 		"dev": "next dev",
 		"dev2": "NODE_OPTIONS=\"--max_old_space_size=4096\" next",
 		"build": "next build",
-		"start": "next start",
+		"start": "next start -p $PORT",
 		"lint": "eslint --fix --max-warnings=0 .",
 		"format": "prettier --write --check --config ./.prettierrc './src/**/*.{js,jsx,ts,tsx,css,md,json}'",
 		"heroku-postbuild": "yarn generate && yarn build",
