@@ -18,6 +18,7 @@ jobs:
       # project-name but it can be anything you want
       REPO_NAME: ${{ secrets.REPO_NAME }}
       TRAK_DB_URL: ${{ secrets.TRAK_DB_URL }}
+      NEXT_PUBLIC_TRAK_URL: ${{ secrets.NEXT_PUBLIC_TRAK_URL }}
     runs-on: ubuntu-latest
     steps:
 
@@ -38,7 +39,7 @@ jobs:
         gcloud --quiet auth configure-docker
     - name: Build and tag image
       run: |-
-        docker build . --tag "gcr.io/$CLOUD_RUN_PROJECT_ID/$REPO_NAME:$GITHUB_SHA"
+        docker build --build-arg TRAK_DB_URL=$TRAK_DB_URL --build-arg NEXT_PUBLIC_TRAK_URL=$NEXT_PUBLIC_TRAK_URL . --tag "gcr.io/$CLOUD_RUN_PROJECT_ID/$REPO_NAME:$GITHUB_SHA"
     - name: Push image to GCR
       run: |-
         docker push gcr.io/$CLOUD_RUN_PROJECT_ID/$REPO_NAME:$GITHUB_SHA
