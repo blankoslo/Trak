@@ -191,7 +191,7 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
   const index = lopendePhases.findIndex((phase) => phase.id === nextPhase.id);
   const currentPhaseIndex = index === 0 ? lopendePhases.length - 1 : index - 1;
   const currentPhase = lopendePhases[currentPhaseIndex];
-  const hasTasksInNextPhase = employee.employee_task?.some(
+  const hasTasksInNextPhase = employee.employee_tasks?.some(
     (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.due_date) === getYear(today),
   );
 
@@ -236,7 +236,7 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
 };
 
 const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
-  employee.employee_task?.some((employeeTask) => employeeTask.task.phase.process_template.slug === processTitle);
+  employee.employee_tasks?.some((employeeTask) => employeeTask.task.phase.process_template.slug === processTitle);
 
 const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase) => {
   if (phase.process_template_id !== Process.LOPENDE) {

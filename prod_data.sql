@@ -1,22 +1,4 @@
 
---
--- Data for Name: Profession; Type: TABLE DATA; Schema: public; Owner: ciybepooplmzfy
---
-
-INSERT INTO public."profession" (slug, title) VALUES ('designer', 'Designer');
-INSERT INTO public."profession" (slug, title) VALUES ('annet', 'Annet');
-INSERT INTO public."profession" (slug, title) VALUES ('teknolog', 'Teknolog');
-
-UPDATE employees 
-    SET profession_id=
-    CASE
-        WHEN role = 'Designer' THEN 'designer'
-        WHEN role = 'Annet' THEN 'annet'
-        WHEN role = 'Teknolog' THEN 'teknolog'
-    END;
--- Data for Name: ProcessTemplate; Type: TABLE DATA; Schema: public; Owner: ciybepooplmzfy
---
-
 INSERT INTO public."process_template" (title, slug) VALUES ('Onboarding', 'onboarding');
 INSERT INTO public."process_template" (title, slug) VALUES ('Løpende', 'lopende');
 INSERT INTO public."process_template" (title, slug) VALUES ('Offboarding', 'offboarding');
@@ -57,6 +39,10 @@ INSERT INTO public."task" VALUES ('234dccee-c46f-4301-ac83-1989147c541a', 'Gjenn
 INSERT INTO public."task" VALUES ('5f0b6f8d-fdc7-4357-b32c-0e554dbc047b', 'Fjerne tilganger og lisenser', 'Figma, Adobe, Sketch, Recruitee, Trello, Google, Slack, 1Password, Github, Jetbrains, [Office 365](https://admin.microsoft.com/adminportal/home?#/users)
 
 Trello: Fjern fra Blank Workspace, og fra boards de evt er gjester i som [Bemanning og salg](https://trello.com/b/tucAkVlt/bemanning-og-salg)', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', 2, '2021-10-18 12:13:46.85', true, NULL, NULL, 'OTHER');
+INSERT INTO public."task" VALUES ('beffd9af-1771-47e3-b299-1e332524748e', 'Be om å forlate Sanpchat-gruppa', NULL, '', true, '5d519ef7-b4d5-4785-aae4-9b472952dfc0', NULL, '2022-05-09 17:35:22.365', true, NULL, NULL, 'HR_MANAGER');
+INSERT INTO public."task" VALUES ('d2a76530-cfb7-4b29-8b2f-ed7345981800', 'Legge til gjestebruker på #blankinvest og Blank Invest-epostliste', '...hvis aktuelt: 
+[Epostliste Blank Invest](https://groups.google.com/a/blank.no/g/invest)
+', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', NULL, '2021-10-18 12:14:42.19', true, NULL, NULL, 'HR_MANAGER');
 INSERT INTO public."task" VALUES ('ab28d283-f5c5-4931-ba98-c0617626ceb8', 'Landet prosjekt', 'Når nyoppstartede har fått prosjekt', '', true, '5672bf7b-9442-498b-aaec-0d5db95f37fa', 33, '2022-02-25 08:48:10.142', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('3ecb268f-0082-4909-90df-255ced0d1109', 'Gjennomføre medarbeidersamtale', '', '', true, '04c5ddaa-1038-4942-827c-311d8230155e', NULL, '2021-09-28 11:09:51.89', true, NULL, NULL, 'HR_MANAGER');
 INSERT INTO public."task" VALUES ('f81ae28a-3e3c-47a2-9e6f-d8a2965727a0', 'Legge til i #tek-team privat i Slack', '', '', true, 'd89c2e4f-cbd4-4d31-a752-16cbc486a33b', NULL, '2022-03-01 12:41:32.634', true, NULL, NULL, 'HR_MANAGER');
@@ -77,7 +63,6 @@ INSERT INTO public."task" VALUES ('0ca13289-fa92-4b63-b459-79a72b748a3c', 'Oppda
 INSERT INTO public."task" VALUES ('d22ac8a8-8e3b-4c19-aadc-02031fa9901f', 'Sjekke om det er utestående ansattutlegg', '', '', true, '5d519ef7-b4d5-4785-aae4-9b472952dfc0', NULL, '2021-10-18 12:10:40.798', true, NULL, NULL, 'HR_MANAGER');
 INSERT INTO public."task" VALUES ('122a9b7f-1081-4304-a0c1-6edb80869aa6', 'Sette sluttdato i Tripletex', '', '', true, 'c449f9db-aa2f-4a27-9b62-46f401b28f5d', NULL, '2021-10-18 12:12:49.118', true, NULL, NULL, 'HR_MANAGER');
 INSERT INTO public."task" VALUES ('f6595f6a-387a-4277-adef-5f61eb360ade', 'Fjerne ansatt fra blank.no', '', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', NULL, '2021-10-18 12:14:00.685', true, NULL, NULL, 'HR_MANAGER');
-INSERT INTO public."task" VALUES ('d2a76530-cfb7-4b29-8b2f-ed7345981800', 'Legge til gjestebruker på #blankinvest', '...hvis aktuelt', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', NULL, '2021-10-18 12:14:42.19', true, NULL, NULL, 'HR_MANAGER');
 INSERT INTO public."task" VALUES ('89dd5aa7-4856-481d-a617-9c5fa6dc15ce', 'Sende sluttoppgjør til regnskap', 'Feriedager, pluss-/minustimer, utkjøp av utstyr, utestående lån, ', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', NULL, '2021-10-18 12:15:32.538', true, NULL, NULL, 'HR_MANAGER');
 INSERT INTO public."task" VALUES ('0b3afbde-589f-4d0c-8456-09037fb7244d', 'Oppsigelses-samtale', 'Ta en prat, høre hva som er årsak til oppsigelse,Hvis aktuelt: er det noe vi eventuelt kan gjøre for å få vedkommende til å bli, avklare eventuelle ønsker ifm offentliggjøring, avklare evt. ønsker el. til siste perioden i blank.', '', true, '2bb97d84-1968-46eb-9fef-4c3bb877ad0f', NULL, '2021-10-18 14:21:32.24', true, NULL, NULL, 'HR_MANAGER');
 INSERT INTO public."task" VALUES ('c691b305-081b-4d07-b501-0876e93d835c', 'Sette sluttdato i ansatteliste', '', '', true, 'c449f9db-aa2f-4a27-9b62-46f401b28f5d', NULL, '2021-10-18 12:12:56.995', false, NULL, NULL, 'HR_MANAGER');
@@ -100,7 +85,6 @@ INSERT INTO public."task" VALUES ('79e19951-ddbc-4bcf-bfba-0fc93f3dbb69', 'Gjenn
 INSERT INTO public."task" VALUES ('3f0a6289-de37-4309-a02f-9183412a52d9', 'Gjennomføre fagsamtale (Teknologi)', '', '', true, 'd677e63a-16dd-4b51-b3d0-c31a2154d12f', 10, '2021-10-18 11:07:31.513', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('de23c75a-e477-4513-bfb1-63abc12f5b79', 'Avklare salg av aksjer - spesielt mtp. konkurranseforbud', '', '', true, '2bb97d84-1968-46eb-9fef-4c3bb877ad0f', 1, '2021-10-18 11:41:42.333', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('4b2937e5-e203-44b0-8126-cdc6a37a846e', 'Informere selskapet om oppsigelsen', '', '', true, '2bb97d84-1968-46eb-9fef-4c3bb877ad0f', 1, '2021-10-18 11:42:34.575', true, NULL, NULL, 'OTHER');
-INSERT INTO public."task" VALUES ('c0c382e9-f601-4cb6-9496-600bf5df3070', 'Legg til i alumniepostliste', '', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', 2, '2021-10-18 12:11:53.513', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('4725b956-d0fb-4e18-8624-cf9e99ea18a3', 'Melde ut av forsikring', '', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', 2, '2021-10-18 12:12:14.457', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('163ec7ee-00a0-43e4-99b1-317b43f61b3f', 'Be om CV', 'Helst konsulent-CV for erfarne', '', true, 'd89c2e4f-cbd4-4d31-a752-16cbc486a33b', 3, '2022-01-03 11:07:09.958', false, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('20ff2e79-a4df-4e51-aa4b-1465104eb8b3', 'Opprette Google-konto', 'Husk å be nyansatt om opprette 2-faktor asap', '', true, 'd89c2e4f-cbd4-4d31-a752-16cbc486a33b', 86, '2022-01-03 11:05:16.787', true, 0, NULL, 'OTHER');
@@ -133,6 +117,7 @@ INSERT INTO public."task" VALUES ('2465e31d-8f4a-4a93-be50-105332e168eb', 'Meld 
 INSERT INTO public."task" VALUES ('42d5f2d8-7e7d-4322-b348-8a4903443026', 'Intro til Blank Bedriftsidrettslag', '', '', true, '5409de8e-83b0-4aa4-82a9-b75223bc57cd', 74, '2022-01-03 15:28:19.255', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('f66b2af9-dbe5-4131-a4e0-67967d28667c', 'Pakk ferdig totebag før oppstart', 'Maskin, telefon, notatblokker, simkort, tusjsett, klistremerker, ballong ', '', true, '23970d67-f9fa-4a04-95f9-8ad6fa3d72a4', 86, '2022-01-03 12:39:01.618', true, -1, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('f0c6d71c-3ac1-4e22-96f2-e9df7b9949b9', 'Bestille Velkommen til Blank kort', 'Bestilles hos Nilzotto Papirtype: Invercote 300g A6', '', true, '23970d67-f9fa-4a04-95f9-8ad6fa3d72a4', 86, '2022-01-03 12:40:00.882', true, NULL, NULL, 'OTHER');
+INSERT INTO public."task" VALUES ('c0c382e9-f601-4cb6-9496-600bf5df3070', 'Legg til i alumniepostliste', '[Alumni epostliste](https://groups.google.com/a/blank.no/g/alumni/members)', '', true, '50a71aad-438a-468d-a704-dcd2122136b0', 2, '2021-10-18 12:11:53.513', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('7ecefa75-dc78-49f0-96c7-d810062aaa9b', 'Legg inn i epostgrupper', 'design@blank.no https://groups.google.com/a/blank.no/forum/?hl=no#!managemembers/designere/members/active ) (Oppstartsansvarlig/Magne)', '', true, '45c98301-987e-43e4-94b2-2f0b062ef6dd', 86, '2022-01-03 12:46:03.006', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('9d258767-22d2-4e75-b649-0cc412c5e217', 'Legg inn i epostgrupper', '', '', true, '45c98301-987e-43e4-94b2-2f0b062ef6dd', 2, '2022-01-03 12:46:20.508', true, NULL, NULL, 'OTHER');
 INSERT INTO public."task" VALUES ('35a3938c-0623-4e4a-a9e3-31ecc5ad0b4f', 'Opprett lisenser og programvare', 'Adobe / Figma', '', true, '45c98301-987e-43e4-94b2-2f0b062ef6dd', 3, '2022-01-03 12:47:09.272', true, NULL, NULL, 'OTHER');
@@ -303,7 +288,6 @@ INSERT INTO public."employee_task" VALUES ('4ab7a417-8f2d-4fe4-8244-8e19503651ad
 INSERT INTO public."employee_task" VALUES ('456032e7-950b-4336-bc35-27ca48d98f25', '9677ec61-0e2f-4356-aded-9254df1cfa35', false, 203, 86, '2022-08-09 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('340df9db-886d-40ba-914b-04e1ec181c85', 'e717a182-101f-48be-a338-a96a6ed4f7ce', false, 203, 86, '2022-08-09 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('ca3f0f25-0258-448b-b33c-38cbf63cf789', '639d862f-4a65-4352-8c2b-621a90b1c159', false, 204, 15, '2022-06-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('249f0b9e-f1b8-4428-90c6-cf790d9d217f', 'c4d1a418-1f6e-4c5c-859c-57ea21ab5f70', false, 204, 33, '2022-06-30 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('eede0dbc-c0eb-4a91-b15a-7701f509fc2e', '56f4595b-8e8b-4dfd-8d25-bdcb94d04ec0', false, 204, 10, '2022-06-30 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('fa791693-2c72-4e9a-9a38-79e6e733d9e0', 'a3cfd3fb-ca4e-4cc8-9856-876de2bd4a74', false, 204, 1, '2022-06-30 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('a1b1029b-8810-45c0-908d-1a708b6319b6', '8dfb4644-e49c-40c1-878c-da0449d239d8', false, 204, 1, '2022-06-30 00:00:00', NULL, NULL);
@@ -323,6 +307,7 @@ INSERT INTO public."employee_task" VALUES ('7827edd1-f583-418c-acac-edc4844f2035
 INSERT INTO public."employee_task" VALUES ('8aa6ea1d-7c97-4a7b-b4a2-de75dfc453c8', 'fb80e06d-a99d-48b0-b2d8-85f950c5c07f', true, 198, 3, '2022-06-10 00:00:00', '2022-03-28 17:54:49.246', 3);
 INSERT INTO public."employee_task" VALUES ('ce2f3f7c-6db9-45b3-a233-a6b351741c7c', '8ed52181-8c05-45ad-91c7-088ed7645664', false, 204, 10, '2022-06-30 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('cd6d9f27-4e6a-4103-9618-6ed17a90e61c', 'b3cf9a5b-1a33-4461-9709-6c73dc697c2f', true, 204, 3, '2022-06-30 00:00:00', '2022-04-07 08:12:10.337', 3);
+INSERT INTO public."employee_task" VALUES ('249f0b9e-f1b8-4428-90c6-cf790d9d217f', 'c4d1a418-1f6e-4c5c-859c-57ea21ab5f70', true, 204, 33, '2022-06-30 00:00:00', '2022-05-09 07:01:48.033', 33);
 INSERT INTO public."employee_task" VALUES ('42296069-541a-41f4-9bc4-29dcf17cbfa0', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 10, 2, '2015-08-02 00:00:00', '2021-10-19 08:07:24.693', 2);
 INSERT INTO public."employee_task" VALUES ('ff4b26da-2be0-4b80-94e1-374ee1ee6336', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 90, 2, '2020-07-02 00:00:00', '2021-10-19 08:07:30.713', 2);
 INSERT INTO public."employee_task" VALUES ('4e17c006-337c-4b5e-b530-5646f6a2dec1', 'e66deaae-d1c5-4d7c-a35d-55edd9ca9178', true, 76, 3, '2019-05-02 00:00:00', '2021-10-19 08:08:32.381', 2);
@@ -575,7 +560,6 @@ INSERT INTO public."employee_task" VALUES ('ccf48160-7e20-4248-8272-a6424030d9eb
 INSERT INTO public."employee_task" VALUES ('ca0d4e37-9952-4afc-8dbf-e24c52d96d8b', 'ed9293d3-8706-4e52-8482-7fa9ebee12d5', true, 196, 86, '2022-02-01 00:00:00', '2022-01-06 08:57:56.115', 86);
 INSERT INTO public."employee_task" VALUES ('fa247ba8-1773-4990-97a4-e7d37446a29d', '3f0a6289-de37-4309-a02f-9183412a52d9', true, 109, 10, '2022-03-31 11:08:46.085', '2022-02-23 07:07:28.303', 10);
 INSERT INTO public."employee_task" VALUES ('633f6c5c-8599-475f-a66d-fb806e5f2306', '8ed52181-8c05-45ad-91c7-088ed7645664', false, 196, 2, '2022-06-01 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('e4aee857-f9de-45c6-b9e1-7f2d5491b605', 'c4d1a418-1f6e-4c5c-859c-57ea21ab5f70', false, 196, 33, '2022-06-01 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('e07333b5-7aee-4297-8acb-7cbf38cd0980', '3f0a6289-de37-4309-a02f-9183412a52d9', true, 77, 10, '2022-03-31 11:08:46.085', '2022-03-14 07:01:12.354', 10);
 INSERT INTO public."employee_task" VALUES ('cd266b90-4da4-4629-aa35-5168f8bf6023', 'a3cfd3fb-ca4e-4cc8-9856-876de2bd4a74', false, 196, 1, '2022-06-01 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('f97191fd-b628-4ba2-bf9b-213767f979b6', '8dfb4644-e49c-40c1-878c-da0449d239d8', false, 196, 1, '2022-06-01 00:00:00', NULL, NULL);
@@ -598,6 +582,7 @@ INSERT INTO public."employee_task" VALUES ('dd2c35c4-8faf-4ed7-a6a5-fd59bc771f55
 INSERT INTO public."employee_task" VALUES ('259fd51b-e40c-4e56-9ff0-417141b42152', '928682d9-4165-4b70-bcc9-93eb3e745909', true, 17, 64, '2022-03-31 11:08:46.085', '2022-03-25 07:11:03.353', 64);
 INSERT INTO public."employee_task" VALUES ('60ed497a-af99-4a30-931d-e09c24f03aab', '3f0a6289-de37-4309-a02f-9183412a52d9', true, 5, 10, '2022-03-31 11:08:46.085', '2022-04-01 12:32:51.846', 10);
 INSERT INTO public."employee_task" VALUES ('69f979e2-0a6d-4bda-9ee0-5c7ac3af63fc', '3f0a6289-de37-4309-a02f-9183412a52d9', true, 57, 10, '2022-03-31 11:08:46.085', '2022-04-22 13:57:40.933', 10);
+INSERT INTO public."employee_task" VALUES ('e4aee857-f9de-45c6-b9e1-7f2d5491b605', 'c4d1a418-1f6e-4c5c-859c-57ea21ab5f70', true, 196, 33, '2022-06-01 00:00:00', '2022-05-09 07:01:46.993', 33);
 INSERT INTO public."employee_task" VALUES ('12a593e4-b514-491c-8a0a-97fcc6a9c4f7', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 88, 2, '2020-07-02 00:00:00', '2021-10-19 08:07:31.869', 2);
 INSERT INTO public."employee_task" VALUES ('6f0cf001-9b24-46e0-b20f-6e9412870efe', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 111, 2, '2021-08-07 00:00:00', '2021-10-19 08:07:32.969', 2);
 INSERT INTO public."employee_task" VALUES ('6d9bf625-c7ba-41fb-b028-13875f488321', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 15, 1, '2015-08-02 00:00:00', '2021-10-19 08:08:14.209', 2);
@@ -646,7 +631,6 @@ INSERT INTO public."employee_task" VALUES ('1e524d85-f074-46d0-8423-4294533b60da
 INSERT INTO public."employee_task" VALUES ('46422023-c1ab-4c16-893d-de98c51fe004', 'de97329b-3579-44bc-bc15-6206b894db7c', true, 204, 33, '2022-03-02 00:00:00', '2022-02-17 14:01:56.744', 33);
 INSERT INTO public."employee_task" VALUES ('e40dc574-590f-416c-8476-803b521d8061', '0b3afbde-589f-4d0c-8456-09037fb7244d', true, 63, 1, '2021-11-30 00:00:00', '2022-02-28 08:44:35.247', 1);
 INSERT INTO public."employee_task" VALUES ('9a182c5a-f4d9-459e-a09f-d2dfddb8b5d2', '928682d9-4165-4b70-bcc9-93eb3e745909', true, 64, 63, '2022-03-31 11:08:46.085', '2022-03-03 11:22:30.395', 2);
-INSERT INTO public."employee_task" VALUES ('c48afc31-38f7-4618-aa44-eeb40877b77e', '928682d9-4165-4b70-bcc9-93eb3e745909', false, 75, 64, '2022-03-31 11:08:46.085', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('a8a60474-c541-48ed-8c91-efcccf187ed6', 'e3c4757f-4700-4627-b259-f76e33209004', true, 204, 86, '2022-03-02 00:00:00', '2022-03-07 08:16:46.915', 86);
 INSERT INTO public."employee_task" VALUES ('bb2d5a33-7d46-4947-9429-dd2cef18bbee', '2511ce8e-74fa-4969-b654-47f003d3a9cc', true, 204, 86, '2022-03-02 00:00:00', '2022-03-07 09:14:58.185', 86);
 INSERT INTO public."employee_task" VALUES ('9ea40094-9e92-4581-881e-09195f591b85', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 204, 86, '2022-03-02 00:00:00', '2022-03-11 08:56:15.903', 86);
@@ -666,7 +650,6 @@ INSERT INTO public."employee_task" VALUES ('3d71a4ee-7916-4037-ad89-ef14fe47afb0
 INSERT INTO public."employee_task" VALUES ('b3954e6d-da48-42b4-8385-06e357a32c99', '6f991a20-3cee-4207-af91-cbdfc42acad4', true, 196, 86, '2022-03-01 00:00:00', '2022-03-01 12:31:10.916', 86);
 INSERT INTO public."employee_task" VALUES ('5e6c2f3a-1b57-4a03-a37e-aed76e76b75c', '5dbec370-00da-40ff-9ee7-367d7b65532c', true, 204, 2, '2022-01-31 00:00:00', '2022-03-01 12:34:27.108', 2);
 INSERT INTO public."employee_task" VALUES ('b081faf8-60ba-48b0-b716-56d88b4989f6', '9677ec61-0e2f-4356-aded-9254df1cfa35', true, 196, 86, '2022-03-01 00:00:00', '2022-03-01 12:31:04.069', 86);
-INSERT INTO public."employee_task" VALUES ('5810ce5a-fa11-408c-9c90-344c101dfc5f', '928682d9-4165-4b70-bcc9-93eb3e745909', false, 38, 64, '2022-03-31 11:08:46.085', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('e58cac12-4b2a-4d9c-bc70-6f50fb6b223d', '5655446a-f08e-4411-b7f0-700a08bad58d', true, 196, 86, '2022-03-01 00:00:00', '2022-03-01 12:30:35.635', 86);
 INSERT INTO public."employee_task" VALUES ('69b200c9-bc82-4da5-b7dc-2027145118ef', '4189de1f-93b9-4624-ae61-29b5b128d805', true, 196, 86, '2022-03-01 00:00:00', '2022-03-01 12:31:08.458', 86);
 INSERT INTO public."employee_task" VALUES ('0ddef441-7ea1-4ce6-8066-ed182c25c6ef', 'faed3225-5a97-49ce-8562-44907f65e91d', true, 196, 86, '2022-03-01 00:00:00', '2022-03-01 12:31:02.497', 86);
@@ -1017,7 +1000,6 @@ INSERT INTO public."employee_task" VALUES ('af47700e-3adb-49ee-85cb-c321bbbfe507
 INSERT INTO public."employee_task" VALUES ('c8a747a0-06f7-4a99-95f4-a06851a0164f', '713ba3ff-a065-4b08-aac8-e2e7a6ae0802', true, 195, 3, '2022-01-01 00:00:00', '2022-01-04 08:44:52.355', 3);
 INSERT INTO public."employee_task" VALUES ('9091bfb0-b847-431b-9734-80dd6de7179d', '35a3938c-0623-4e4a-a9e3-31ecc5ad0b4f', true, 195, 3, '2022-01-01 00:00:00', '2022-01-04 08:45:11.823', 3);
 INSERT INTO public."employee_task" VALUES ('f96e08a1-d4b7-400b-a5c5-5a3c5fa3ba7e', '51398ccc-88b6-4988-bb1c-6c77a98badf1', true, 195, 86, '2022-01-01 00:00:00', '2022-01-06 08:55:19.215', 86);
-INSERT INTO public."employee_task" VALUES ('707bec9f-ddc1-4c95-a402-714b98618b5c', '758e2f3a-fba7-403a-989c-bff78d64fc73', false, 195, 64, '2022-04-01 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('6e49f664-cb12-4739-abf5-28764a4e9578', '639d862f-4a65-4352-8c2b-621a90b1c159', true, 195, 15, '2022-04-01 00:00:00', '2022-01-24 10:48:14.365', 86);
 INSERT INTO public."employee_task" VALUES ('b4b2754b-17e2-4722-9adc-2d6beeb9d864', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', false, 15, 1, '2022-03-31 11:08:46.085', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('b50f763c-d7c0-41b6-882b-03ed4c3a932c', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', false, 80, 57, '2022-03-31 11:08:46.085', NULL, NULL);
@@ -1032,8 +1014,8 @@ INSERT INTO public."employee_task" VALUES ('08a14565-20e3-47f5-88a3-96cdf8bdd5cb
 INSERT INTO public."employee_task" VALUES ('33b3651b-d8b2-4520-a785-37056b7a7079', 'b3cf9a5b-1a33-4461-9709-6c73dc697c2f', true, 195, 3, '2022-04-01 00:00:00', '2022-04-07 08:12:03.035', 3);
 INSERT INTO public."employee_task" VALUES ('7c00035d-2116-4ffc-afbc-b7e75ec309d8', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 5, 81, '2022-03-31 11:08:46.085', '2022-04-21 06:51:49.896', 81);
 INSERT INTO public."employee_task" VALUES ('2ca56c20-a8d6-4eb3-979e-8a0871bf5e73', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 10, 3, '2022-03-31 11:08:46.085', '2022-04-21 10:09:28.901', 3);
+INSERT INTO public."employee_task" VALUES ('707bec9f-ddc1-4c95-a402-714b98618b5c', '758e2f3a-fba7-403a-989c-bff78d64fc73', true, 195, 64, '2022-04-01 00:00:00', '2022-05-06 08:00:55.856', 64);
 INSERT INTO public."employee_task" VALUES ('d316a838-f889-4e72-b344-31e11566a51a', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', false, 17, 38, '2022-03-31 11:08:46.085', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('1013999c-0e08-4f21-8afd-7094c76115d8', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', false, 57, 33, '2022-03-31 11:08:46.085', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('696f3a40-6f0d-4f4a-8060-b3622ed1362c', '20ff2e79-a4df-4e51-aa4b-1465104eb8b3', true, 108, 86, '2021-06-11 00:00:00', '2022-02-28 07:10:33.592', 86);
 INSERT INTO public."employee_task" VALUES ('abf231ce-444e-4f04-905c-a35217e43d81', '3147d975-1611-4448-af45-239a360003b8', true, 106, 3, '2021-03-08 00:00:00', '2022-03-07 16:18:26.145', 3);
 INSERT INTO public."employee_task" VALUES ('096be3c9-e488-48ed-b578-5982b1cffbb1', '5e3df8f5-d5eb-4d63-ab26-83355349b333', true, 106, 3, '2021-03-08 00:00:00', '2022-03-07 16:18:26.775', 3);
@@ -1085,11 +1067,11 @@ INSERT INTO public."employee_task" VALUES ('34579892-cc26-493f-829b-49cecdf02a36
 INSERT INTO public."employee_task" VALUES ('9e99bbf3-9c77-4cde-ab39-ad1e77891b34', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 221, 1, '2022-03-31 11:08:46.085', '2022-03-28 06:59:16.662', 1);
 INSERT INTO public."employee_task" VALUES ('30c02fbf-f1a5-40d7-a82f-781a3576c65e', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 106, 3, '2022-03-31 11:08:46.085', '2022-04-21 11:37:46.935', 3);
 INSERT INTO public."employee_task" VALUES ('f0cffccd-26f8-4747-8c7c-17dea52234f3', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 88, 81, '2022-03-31 11:08:46.085', '2022-04-26 08:03:55.767', 81);
+INSERT INTO public."employee_task" VALUES ('1013999c-0e08-4f21-8afd-7094c76115d8', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 57, 33, '2022-03-31 11:08:46.085', '2022-05-09 07:02:22.627', 33);
 INSERT INTO public."employee_task" VALUES ('c67d3d86-1946-45f6-b810-c81f535d5917', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', false, 75, 63, '2022-03-31 11:08:46.085', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('a2982374-9b86-47d0-a471-fb7d0f75d69b', 'b03d4df2-3ac8-4389-8963-1d68a562b86c', true, 108, 86, '2021-08-10 00:00:00', '2022-02-28 07:10:52.513', 86);
 INSERT INTO public."employee_task" VALUES ('2c9b6201-0ccd-4d9a-8790-ef5ee43a7820', 'f9c1d575-5ecc-4fd5-b363-7d6c7fa2b5cd', true, 107, 86, '2021-06-11 00:00:00', '2022-03-11 08:45:47.008', 86);
 INSERT INTO public."employee_task" VALUES ('a7da7fa2-93af-4cc4-8ef1-2b857733ba26', '96819117-870c-4aac-9180-f24408084dbe', true, 196, 86, '2022-02-22 00:00:00', '2022-02-28 14:59:24.058', 86);
-INSERT INTO public."employee_task" VALUES ('a0964680-41ac-43cc-a3ef-df1cb4650b29', '928682d9-4165-4b70-bcc9-93eb3e745909', false, 195, 64, '2022-03-31 11:08:46.085', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('f5985b55-ec1d-4ef4-a619-af4186677121', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 106, 86, '2021-01-30 00:00:00', '2022-03-07 10:51:20.711', 86);
 INSERT INTO public."employee_task" VALUES ('f3caf69a-28a0-4316-905a-108a0f679661', 'e66deaae-d1c5-4d7c-a35d-55edd9ca9178', true, 106, 86, '2021-01-30 00:00:00', '2022-03-07 10:51:21.367', 86);
 INSERT INTO public."employee_task" VALUES ('5c34c4f9-093f-4907-961d-26193dff7c0b', 'e3c4757f-4700-4627-b259-f76e33209004', true, 106, 86, '2021-01-30 00:00:00', '2022-03-07 10:51:23.489', 86);
@@ -1130,6 +1112,7 @@ INSERT INTO public."employee_task" VALUES ('7f34dbf4-c7bd-48f5-9254-623971cf9870
 INSERT INTO public."employee_task" VALUES ('3eb139ab-ccc0-4b27-a3d6-c765fecea830', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 1, 2, '2022-03-31 11:08:46.085', '2022-03-25 12:12:54.384', 2);
 INSERT INTO public."employee_task" VALUES ('76dd2c9d-3ef1-490a-88b5-c54fbf0580b0', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 3, 1, '2022-03-31 11:08:46.085', '2022-03-28 06:59:09', 1);
 INSERT INTO public."employee_task" VALUES ('0cf7dbbc-e332-4396-bd5c-cad4ca9eb9c9', 'd4a0bba2-4482-48b3-8272-5877dc2606c2', true, 33, 1, '2022-03-31 11:08:46.085', '2022-03-28 06:59:10.173', 1);
+INSERT INTO public."employee_task" VALUES ('a0964680-41ac-43cc-a3ef-df1cb4650b29', '928682d9-4165-4b70-bcc9-93eb3e745909', true, 195, 64, '2022-03-31 11:08:46.085', '2022-05-06 08:00:32.697', 64);
 INSERT INTO public."employee_task" VALUES ('65bf2866-61e5-4732-a7c4-3b0e12c35d7e', '6f991a20-3cee-4207-af91-cbdfc42acad4', true, 106, 86, '2021-03-01 00:00:00', '2022-03-07 10:51:35.189', 86);
 INSERT INTO public."employee_task" VALUES ('b93768d7-2cf3-4fe4-9071-c5acdb23a4be', '4189de1f-93b9-4624-ae61-29b5b128d805', true, 106, 86, '2021-03-01 00:00:00', '2022-03-07 10:51:36.276', 86);
 INSERT INTO public."employee_task" VALUES ('a3573eb0-301b-4289-abcd-ef16e9f4f427', 'faed3225-5a97-49ce-8562-44907f65e91d', true, 106, 86, '2021-03-01 00:00:00', '2022-03-07 10:51:37.096', 86);
@@ -1283,17 +1266,17 @@ INSERT INTO public."employee_task" VALUES ('03375c9d-f4fc-4372-8cdc-4b9efd05f4a2
 INSERT INTO public."employee_task" VALUES ('5fe26b53-5710-4d09-b8ab-38b7bd235fad', '2511ce8e-74fa-4969-b654-47f003d3a9cc', false, 223, 86, '2022-07-02 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('812ca329-b0d6-4ade-98e2-aaf0961f05bf', 'f81ae28a-3e3c-47a2-9e6f-d8a2965727a0', false, 223, 10, '2022-06-02 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('7e7871d9-c261-42fe-9a00-024fb319f2fe', 'f9c1d575-5ecc-4fd5-b363-7d6c7fa2b5cd', false, 223, 86, '2022-06-02 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('c2db2def-d631-49e8-b489-711911202635', '20ff2e79-a4df-4e51-aa4b-1465104eb8b3', false, 223, 86, '2022-06-02 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('5b1a6d22-a812-4e98-b590-7b0b63f95976', 'ed9293d3-8706-4e52-8482-7fa9ebee12d5', false, 223, 86, '2022-06-02 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('fd122660-ac2a-4baa-9b85-daebf4884fce', '5dbec370-00da-40ff-9ee7-367d7b65532c', false, 223, 2, '2022-06-02 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('d93b47d2-df41-4a7b-b6bc-0007c5cc8c04', '54df35ef-b7de-4328-b76d-6eb9e6fe24e2', false, 223, 2, '2022-06-02 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('bb6333c1-eaf5-4803-80a0-222cbb319cbf', '238131dd-9fd7-4efd-be6b-43c3ad21cd08', false, 223, 1, '2022-06-02 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('5945e8d5-9d78-46cf-b7cc-2681ea7b365c', 'f43b2565-8ad9-4634-b893-2415ea862604', false, 223, 86, '2022-06-02 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('9baec29a-b575-4e97-ac0d-0a82571ccbd5', '74904131-3a21-43f8-8623-0c65cc23b031', false, 223, 86, '2022-06-02 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('85c5bd11-50c2-4d10-b533-f556e3a9a042', '8ed52181-8c05-45ad-91c7-088ed7645664', false, 222, 2, '2022-10-30 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('3ee9984a-c921-407e-915a-8878f7236543', 'c4d1a418-1f6e-4c5c-859c-57ea21ab5f70', false, 222, 33, '2022-10-30 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('4b09e37b-06d8-4d92-be43-827d9f89757b', '758e2f3a-fba7-403a-989c-bff78d64fc73', false, 222, 63, '2022-10-30 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('ce1591bf-c6c8-4e3c-856d-a433051313ee', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 6, 81, '2022-06-30 11:01:24.166', '2022-04-26 08:04:11.493', 81);
+INSERT INTO public."employee_task" VALUES ('bb6333c1-eaf5-4803-80a0-222cbb319cbf', '238131dd-9fd7-4efd-be6b-43c3ad21cd08', true, 223, 1, '2022-06-02 00:00:00', '2022-05-02 07:15:17.414', 86);
+INSERT INTO public."employee_task" VALUES ('5b1a6d22-a812-4e98-b590-7b0b63f95976', 'ed9293d3-8706-4e52-8482-7fa9ebee12d5', true, 223, 86, '2022-06-02 00:00:00', '2022-05-02 07:15:42.693', 86);
+INSERT INTO public."employee_task" VALUES ('9baec29a-b575-4e97-ac0d-0a82571ccbd5', '74904131-3a21-43f8-8623-0c65cc23b031', true, 223, 86, '2022-06-02 00:00:00', '2022-05-02 07:15:44.343', 86);
+INSERT INTO public."employee_task" VALUES ('c2db2def-d631-49e8-b489-711911202635', '20ff2e79-a4df-4e51-aa4b-1465104eb8b3', true, 223, 86, '2022-06-02 00:00:00', '2022-05-02 07:16:56.168', 86);
+INSERT INTO public."employee_task" VALUES ('5945e8d5-9d78-46cf-b7cc-2681ea7b365c', 'f43b2565-8ad9-4634-b893-2415ea862604', true, 223, 86, '2022-06-02 00:00:00', '2022-05-02 07:17:00.18', 86);
 INSERT INTO public."employee_task" VALUES ('0a1f002a-7a9a-4bd3-be48-d1dba0d6e762', 'b03d4df2-3ac8-4389-8963-1d68a562b86c', true, 104, 86, '2020-11-16 00:00:00', '2022-03-16 08:39:57.761', 3);
 INSERT INTO public."employee_task" VALUES ('a457b964-12f0-48a1-b200-b3db226453a2', 'e717a182-101f-48be-a338-a96a6ed4f7ce', true, 104, 86, '2020-11-16 00:00:00', '2022-03-16 08:39:58.612', 3);
 INSERT INTO public."employee_task" VALUES ('f472a765-e0e1-4e37-882e-23ae34eae7aa', '5655446a-f08e-4411-b7f0-700a08bad58d', true, 104, 86, '2020-11-16 00:00:00', '2022-03-16 08:39:59.308', 3);
@@ -1307,7 +1290,6 @@ INSERT INTO public."employee_task" VALUES ('9f3583b9-5384-4baa-b926-076a4ed44cf1
 INSERT INTO public."employee_task" VALUES ('7c29194a-851e-4bdf-b1d5-a497fbbcbe0f', 'fadbc2a5-bd45-45bb-ad4f-f61bf639f3e5', true, 104, 86, '2020-11-16 00:00:00', '2022-03-16 08:40:11.316', 3);
 INSERT INTO public."employee_task" VALUES ('1519bd9f-4916-454b-9eed-bae528c910e3', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 5, 2, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('0623dcfc-1187-4700-a31f-898c73e808ca', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 1, 2, '2022-06-30 11:01:24.166', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('26d21a5e-c373-4f0f-90a7-ddb2b5bcac8e', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 195, 64, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('43eac5b5-08bc-44f5-8c90-3f5e81db8351', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 195, 3, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('6af81785-f69d-417d-b07e-ac6814589dda', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 33, 1, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('61c1f570-1608-435e-b684-2f51c124a9f5', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 33, 1, '2022-06-30 11:01:24.166', NULL, NULL);
@@ -1347,6 +1329,7 @@ INSERT INTO public."employee_task" VALUES ('bde8daae-be7c-4f79-b1f2-3b69c8e48394
 INSERT INTO public."employee_task" VALUES ('4f563b16-ffba-4c7a-91de-d9d2bf35a520', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 1, 2, '2022-06-30 11:01:24.166', '2022-04-26 11:58:20.471', 2);
 INSERT INTO public."employee_task" VALUES ('91e02b9d-4aa9-4ae4-9bbc-22cffcfc7afc', '6256a427-473a-4074-a6f1-44c56537c1bc', true, 116, 2, '2022-06-30 11:01:24.166', '2022-04-26 11:58:31.915', 2);
 INSERT INTO public."employee_task" VALUES ('3b304441-4bec-4921-a8f4-2a1e84579f47', '6256a427-473a-4074-a6f1-44c56537c1bc', true, 115, 2, '2022-06-30 11:01:24.166', '2022-04-26 11:58:34.737', 2);
+INSERT INTO public."employee_task" VALUES ('26d21a5e-c373-4f0f-90a7-ddb2b5bcac8e', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 195, 64, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('549d95fb-fe8b-44f9-82a3-4afc5ea6de32', '928682d9-4165-4b70-bcc9-93eb3e745909', false, 104, 64, '2022-03-31 11:08:46.085', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('a63e334b-bf27-439f-8518-bb29d29aa55a', 'f0c6d71c-3ac1-4e22-96f2-e9df7b9949b9', true, 104, 86, '2020-11-09 00:00:00', '2022-03-16 08:39:39.916', 3);
 INSERT INTO public."employee_task" VALUES ('688b58d3-d71f-415c-8acf-30b2d38ae493', 'c609ae61-8732-4741-be99-17bdda058c56', true, 104, 86, '2020-11-09 00:00:00', '2022-03-16 08:39:40.684', 3);
@@ -1357,12 +1340,10 @@ INSERT INTO public."employee_task" VALUES ('0ed81747-4898-438e-b978-fc1832e46e71
 INSERT INTO public."employee_task" VALUES ('47efbc9a-afd8-44f0-a839-383f6acc7677', '35a3938c-0623-4e4a-a9e3-31ecc5ad0b4f', true, 104, 3, '2020-11-16 00:00:00', '2022-03-16 08:39:48.653', 3);
 INSERT INTO public."employee_task" VALUES ('27d36bb8-18a2-4e94-af04-a64695c608c2', '51398ccc-88b6-4988-bb1c-6c77a98badf1', true, 104, 86, '2020-11-16 00:00:00', '2022-03-16 08:39:49.631', 3);
 INSERT INTO public."employee_task" VALUES ('e7ea9b13-7f1a-4ecb-8fa4-192358543b42', '7ecefa75-dc78-49f0-96c7-d810062aaa9b', true, 104, 86, '2020-11-16 00:00:00', '2022-03-16 08:39:50.657', 3);
-INSERT INTO public."employee_task" VALUES ('f8025e6b-cd1b-443c-8661-1553a67d834d', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 196, 33, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('3c26a09a-8991-4e42-a2b9-fbd4e60a36cc', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 196, 2, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('f7dca177-a21c-43e8-9815-7d5d0f311180', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 81, 3, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('7ba3e98b-4d62-4faf-8424-1bc0513d4aa8', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 81, 3, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('66349a84-eb35-4a1a-8d14-079552e2e5a6', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 79, 2, '2022-06-30 11:01:24.166', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('27e44a36-1806-4884-bb1c-2492a1449979', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 57, 33, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('620316c5-6ded-4eb0-9d3b-d42422dcfd59', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 57, 33, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('92cb94c3-b4c8-4a86-81b5-9861fafd6660', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 107, 2, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('469fc230-8d9a-4d10-bd79-e87c8399da15', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 107, 2, '2022-06-30 11:01:24.166', NULL, NULL);
@@ -1393,6 +1374,8 @@ INSERT INTO public."employee_task" VALUES ('74703498-2378-4b9c-b0aa-0c32a60e5f64
 INSERT INTO public."employee_task" VALUES ('c275d6a1-bace-43bc-ac76-8828ed2fb430', '9677ec61-0e2f-4356-aded-9254df1cfa35', false, 222, 86, '2022-08-01 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('3f2f47fb-131f-4309-8b87-12d1810e1da1', 'e717a182-101f-48be-a338-a96a6ed4f7ce', false, 222, 86, '2022-08-01 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('b24e61de-2989-4d03-b758-558565d46b40', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 79, 81, '2022-06-30 11:01:24.166', '2022-04-26 08:04:11.761', 81);
+INSERT INTO public."employee_task" VALUES ('f8025e6b-cd1b-443c-8661-1553a67d834d', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 196, 33, '2022-06-30 11:01:24.166', '2022-05-09 07:02:23.975', 33);
+INSERT INTO public."employee_task" VALUES ('27e44a36-1806-4884-bb1c-2492a1449979', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 57, 33, '2022-06-30 11:01:24.166', '2022-05-09 07:02:26.116', 33);
 INSERT INTO public."employee_task" VALUES ('c6bfebaa-ec39-4a63-8895-3dcfe3456b57', '5081ed0c-f2d2-40dc-b1c7-3a248822ba85', true, 104, 3, '2020-10-17 00:00:00', '2022-03-16 08:39:13.779', 3);
 INSERT INTO public."employee_task" VALUES ('61e23cc5-5efa-4e7c-aaef-48729756d0db', '0ef25fc6-030d-454e-ad2e-e1169265c7a0', true, 104, 33, '2020-10-17 00:00:00', '2022-03-16 08:39:17.08', 3);
 INSERT INTO public."employee_task" VALUES ('44951f86-6be6-4d46-9543-c8222e9652b6', 'ab28d283-f5c5-4931-ba98-c0617626ceb8', true, 104, 33, '2020-10-17 00:00:00', '2022-03-16 08:39:18.143', 3);
@@ -1418,8 +1401,6 @@ INSERT INTO public."employee_task" VALUES ('0401e52d-86f3-473e-b513-506f8fd5683a
 INSERT INTO public."employee_task" VALUES ('14a07f02-f0be-403e-814d-db0aeb078208', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 77, 2, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('d666f788-fb2c-4bd3-9150-d1aab41dbeeb', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 74, 3, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('2c338aa0-19c9-4c8f-905b-493957d2b0fa', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 74, 33, '2022-06-30 11:01:24.166', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('073b5ea6-78fa-4c62-88ac-0ffaf3ceb915', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 38, 3, '2022-06-30 11:01:24.166', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('4976f21c-f6e1-4cc2-880f-be287d99da41', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 38, 3, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('077822c0-f710-4215-8e9c-300fcaeb85da', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 88, 2, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('cb2fa075-ae0d-4858-a85c-5a9286277757', 'fc967efe-500d-45f5-9333-bacda5e19354', false, 2, 1, '2022-06-30 11:01:24.166', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('f4897737-9bdd-4431-a2ed-db317a45e661', '6256a427-473a-4074-a6f1-44c56537c1bc', false, 2, 1, '2022-06-30 11:01:24.166', NULL, NULL);
@@ -1437,6 +1418,8 @@ INSERT INTO public."employee_task" VALUES ('f678ec8b-e956-4bc8-8879-e65f2b0c33a2
 INSERT INTO public."employee_task" VALUES ('3b76dd9a-0194-490f-9612-37c8f0b0cec7', 'f66b2af9-dbe5-4131-a4e0-67967d28667c', false, 222, 86, '2022-08-31 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('6462c6d5-86dc-4905-9630-2ae8cabca37b', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 105, 81, '2022-06-30 11:01:24.166', '2022-04-21 06:51:53.165', 81);
 INSERT INTO public."employee_task" VALUES ('7a10b7be-6ff1-414d-96d9-124aa0488e27', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 88, 81, '2022-06-30 11:01:24.166', '2022-04-26 08:04:11.247', 81);
+INSERT INTO public."employee_task" VALUES ('4976f21c-f6e1-4cc2-880f-be287d99da41', '6256a427-473a-4074-a6f1-44c56537c1bc', true, 38, 3, '2022-06-30 11:01:24.166', '2022-05-02 12:45:52.547', 3);
+INSERT INTO public."employee_task" VALUES ('073b5ea6-78fa-4c62-88ac-0ffaf3ceb915', 'fc967efe-500d-45f5-9333-bacda5e19354', true, 38, 3, '2022-06-30 11:01:24.166', '2022-05-02 12:45:54.673', 3);
 INSERT INTO public."employee_task" VALUES ('fdb6d45d-d18b-4cd3-aa53-d992f8a9f186', '238131dd-9fd7-4efd-be6b-43c3ad21cd08', true, 104, 1, '2020-09-17 00:00:00', '2022-03-16 08:38:56.892', 3);
 INSERT INTO public."employee_task" VALUES ('ac77c21e-83be-42e9-b5b6-21bfd789db26', 'be70ebf3-7f88-49f3-9fb7-01b6b4dee5a0', true, 104, 3, '2020-09-17 00:00:00', '2022-03-16 08:38:58.106', 3);
 INSERT INTO public."employee_task" VALUES ('ab7ae56a-fd7d-4424-a612-d36d81a3c522', 'fb80e06d-a99d-48b0-b2d8-85f950c5c07f', true, 104, 3, '2020-09-17 00:00:00', '2022-03-16 08:38:59.086', 3);
@@ -1479,29 +1462,31 @@ INSERT INTO public."employee_task" VALUES ('f9d033f3-d2fc-45d5-b773-25fa2ac57193
 INSERT INTO public."employee_task" VALUES ('2cf5c66f-8dc1-4a83-ab43-3494b5af1b72', '35a3938c-0623-4e4a-a9e3-31ecc5ad0b4f', false, 222, 3, '2022-08-01 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('a19ed353-ac07-41a4-b123-89c1a48c4581', '51398ccc-88b6-4988-bb1c-6c77a98badf1', false, 222, 86, '2022-08-01 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('88740b2c-fb59-402c-9a2f-6a19bd1cd052', 'b3cf9a5b-1a33-4461-9709-6c73dc697c2f', true, 196, 3, '2022-06-01 00:00:00', '2022-04-07 08:12:05.275', 3);
-INSERT INTO public."employee_task" VALUES ('5df8adb5-eaf5-4f85-aa4a-38662e3bb755', '0b3afbde-589f-4d0c-8456-09037fb7244d', false, 38, 3, '2022-01-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('99a5334c-918c-4815-b055-4b4dfdfc2d27', 'de23c75a-e477-4513-bfb1-63abc12f5b79', false, 38, 1, '2022-01-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('58f6ad61-9f42-4b0b-b319-ea5f9300a125', '4b2937e5-e203-44b0-8126-cdc6a37a846e', false, 38, 1, '2022-01-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('d6825941-1009-4dfb-b90b-9b7c1d24759f', '38ea2eec-27f8-4b95-89cf-b548c9b1f5f1', false, 38, 3, '2022-04-29 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('d4916c35-2fc7-4e24-bc4e-0a6d396be8da', '1a97873d-8cfb-407b-905d-8ee10b2a42ce', false, 38, 3, '2022-04-29 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('e3cd5749-7c85-416e-aff0-bf711b1cf025', 'b2a9b1f2-1bc1-4a3b-88a4-0fc549a33acb', false, 38, 3, '2022-04-29 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('06f06b2f-b8da-44eb-99e7-15029f878899', '77b0f944-9ecd-4891-9be6-2b535f694e75', false, 38, 3, '2022-04-29 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('15971ff9-9821-4013-82b7-0c3bb9ca43f2', '122a9b7f-1081-4304-a0c1-6edb80869aa6', false, 38, 3, '2022-04-29 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('27118182-c498-4b9c-8bee-31946b6649c5', '8922f07c-6fa7-4a8e-8e1b-967e223be179', false, 38, 3, '2022-04-29 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('c36d1bef-bffb-4fae-8ef6-0d52b892985d', '66e3d3bc-699a-47b0-bbbd-73b3e5832511', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('b589f779-c80d-46cb-9b63-4070ab8dcb3e', '933cafbc-5aa6-433a-8590-1b6dfdf3de47', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('2dc4c286-aafb-486b-8c0f-1e8da7863879', 'fb7f6d87-4a66-48ba-9cc6-284bbbc75b78', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('e4056329-719c-49c4-94c5-39553a795c41', 'b7f1a913-b99b-4c9f-b108-7b340fdfd52c', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('b8b7ccb9-73ca-470c-824d-dbefc738c227', '46916f30-a328-4500-9fc1-9be4ba2750c0', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('8149c68a-eef5-4f05-8636-4cf6da5f42fc', 'cd69ae45-bf19-41ee-9a17-604ea774e831', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('98f5db68-7bf6-4c89-a645-4516c6ad7eff', '0ca13289-fa92-4b63-b459-79a72b748a3c', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
+INSERT INTO public."employee_task" VALUES ('5810ce5a-fa11-408c-9c90-344c101dfc5f', '928682d9-4165-4b70-bcc9-93eb3e745909', true, 38, 64, '2022-03-31 11:08:46.085', '2022-05-02 07:00:54.067', 64);
+INSERT INTO public."employee_task" VALUES ('58f6ad61-9f42-4b0b-b319-ea5f9300a125', '4b2937e5-e203-44b0-8126-cdc6a37a846e', true, 38, 1, '2022-01-30 00:00:00', '2022-05-02 12:46:23.2', 3);
+INSERT INTO public."employee_task" VALUES ('5df8adb5-eaf5-4f85-aa4a-38662e3bb755', '0b3afbde-589f-4d0c-8456-09037fb7244d', true, 38, 3, '2022-01-30 00:00:00', '2022-05-02 12:47:05.161', 3);
+INSERT INTO public."employee_task" VALUES ('99a5334c-918c-4815-b055-4b4dfdfc2d27', 'de23c75a-e477-4513-bfb1-63abc12f5b79', true, 38, 1, '2022-01-30 00:00:00', '2022-05-03 07:30:01.881', 3);
+INSERT INTO public."employee_task" VALUES ('c48afc31-38f7-4618-aa44-eeb40877b77e', '928682d9-4165-4b70-bcc9-93eb3e745909', true, 75, 64, '2022-03-31 11:08:46.085', '2022-05-02 07:01:01.846', 64);
+INSERT INTO public."employee_task" VALUES ('d4916c35-2fc7-4e24-bc4e-0a6d396be8da', '1a97873d-8cfb-407b-905d-8ee10b2a42ce', true, 38, 3, '2022-04-29 00:00:00', '2022-05-02 12:47:56.763', 3);
+INSERT INTO public."employee_task" VALUES ('e3cd5749-7c85-416e-aff0-bf711b1cf025', 'b2a9b1f2-1bc1-4a3b-88a4-0fc549a33acb', true, 38, 3, '2022-04-29 00:00:00', '2022-05-02 12:48:01.665', 3);
+INSERT INTO public."employee_task" VALUES ('15971ff9-9821-4013-82b7-0c3bb9ca43f2', '122a9b7f-1081-4304-a0c1-6edb80869aa6', true, 38, 3, '2022-04-29 00:00:00', '2022-05-02 14:39:47.885', 3);
+INSERT INTO public."employee_task" VALUES ('d6825941-1009-4dfb-b90b-9b7c1d24759f', '38ea2eec-27f8-4b95-89cf-b548c9b1f5f1', true, 38, 3, '2022-04-29 00:00:00', '2022-05-02 14:40:51.388', 3);
+INSERT INTO public."employee_task" VALUES ('27118182-c498-4b9c-8bee-31946b6649c5', '8922f07c-6fa7-4a8e-8e1b-967e223be179', true, 38, 3, '2022-04-29 00:00:00', '2022-05-04 11:06:24.401', 3);
+INSERT INTO public."employee_task" VALUES ('06f06b2f-b8da-44eb-99e7-15029f878899', '77b0f944-9ecd-4891-9be6-2b535f694e75', true, 38, 3, '2022-04-29 00:00:00', '2022-05-04 12:25:20.85', 3);
+INSERT INTO public."employee_task" VALUES ('c36d1bef-bffb-4fae-8ef6-0d52b892985d', '66e3d3bc-699a-47b0-bbbd-73b3e5832511', true, 38, 3, '2022-04-30 00:00:00', '2022-05-04 11:09:15.79', 3);
+INSERT INTO public."employee_task" VALUES ('2dc4c286-aafb-486b-8c0f-1e8da7863879', 'fb7f6d87-4a66-48ba-9cc6-284bbbc75b78', true, 38, 3, '2022-04-30 00:00:00', '2022-05-04 11:11:23.652', 3);
+INSERT INTO public."employee_task" VALUES ('98f5db68-7bf6-4c89-a645-4516c6ad7eff', '0ca13289-fa92-4b63-b459-79a72b748a3c', true, 38, 3, '2022-04-30 00:00:00', '2022-05-04 11:15:56.066', 3);
+INSERT INTO public."employee_task" VALUES ('8149c68a-eef5-4f05-8636-4cf6da5f42fc', 'cd69ae45-bf19-41ee-9a17-604ea774e831', true, 38, 3, '2022-04-30 00:00:00', '2022-05-04 11:17:03.227', 3);
+INSERT INTO public."employee_task" VALUES ('b8b7ccb9-73ca-470c-824d-dbefc738c227', '46916f30-a328-4500-9fc1-9be4ba2750c0', true, 38, 3, '2022-04-30 00:00:00', '2022-05-04 11:18:40.364', 3);
+INSERT INTO public."employee_task" VALUES ('b589f779-c80d-46cb-9b63-4070ab8dcb3e', '933cafbc-5aa6-433a-8590-1b6dfdf3de47', true, 38, 3, '2022-04-30 00:00:00', '2022-05-04 11:26:38.552', 3);
+INSERT INTO public."employee_task" VALUES ('e4056329-719c-49c4-94c5-39553a795c41', 'b7f1a913-b99b-4c9f-b108-7b340fdfd52c', true, 38, 3, '2022-04-30 00:00:00', '2022-05-04 12:30:55.407', 3);
 INSERT INTO public."employee_task" VALUES ('36caec5c-4a6e-4dcd-b84f-4bda117e371b', 'd22ac8a8-8e3b-4c19-aadc-02031fa9901f', false, 38, 3, '2022-04-30 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('d12624df-5e2e-4310-807e-9404ba578f77', '5f0b6f8d-fdc7-4357-b32c-0e554dbc047b', false, 38, 2, '2022-05-07 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('e71744c6-c9dd-46e5-a635-0320ed067fc2', 'f6595f6a-387a-4277-adef-5f61eb360ade', false, 38, 3, '2022-05-07 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('f145089b-066d-40e9-b0f3-6b75c9f34ffa', 'd2a76530-cfb7-4b29-8b2f-ed7345981800', false, 38, 3, '2022-05-07 00:00:00', NULL, NULL);
 INSERT INTO public."employee_task" VALUES ('5e81d97f-9d4c-476d-9757-ee3be2253826', '89dd5aa7-4856-481d-a617-9c5fa6dc15ce', false, 38, 3, '2022-05-07 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('02818cc3-1d74-45a6-852c-fc9c6c549751', 'c0c382e9-f601-4cb6-9496-600bf5df3070', false, 38, 2, '2022-05-07 00:00:00', NULL, NULL);
-INSERT INTO public."employee_task" VALUES ('4600dbc1-e407-4ce0-8218-52d8ddd43ea6', '4725b956-d0fb-4e18-8624-cf9e99ea18a3', false, 38, 2, '2022-05-07 00:00:00', NULL, NULL);
+INSERT INTO public."employee_task" VALUES ('d12624df-5e2e-4310-807e-9404ba578f77', '5f0b6f8d-fdc7-4357-b32c-0e554dbc047b', true, 38, 2, '2022-05-07 00:00:00', '2022-05-05 10:45:35.917', 2);
+INSERT INTO public."employee_task" VALUES ('4600dbc1-e407-4ce0-8218-52d8ddd43ea6', '4725b956-d0fb-4e18-8624-cf9e99ea18a3', true, 38, 2, '2022-05-07 00:00:00', '2022-05-05 10:50:54.79', 2);
+INSERT INTO public."employee_task" VALUES ('f145089b-066d-40e9-b0f3-6b75c9f34ffa', 'd2a76530-cfb7-4b29-8b2f-ed7345981800', true, 38, 3, '2022-05-07 00:00:00', '2022-05-06 15:14:41.613', 3);
+INSERT INTO public."employee_task" VALUES ('02818cc3-1d74-45a6-852c-fc9c6c549751', 'c0c382e9-f601-4cb6-9496-600bf5df3070', true, 38, 2, '2022-05-07 00:00:00', '2022-05-09 17:49:02.964', 3);
 INSERT INTO public."employee_task" VALUES ('139b6306-6f05-486e-956d-59ecde89cdf5', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 3, 33, '2015-08-02 00:00:00', '2021-10-19 08:08:14.757', 2);
 INSERT INTO public."employee_task" VALUES ('f2b3483d-aa4f-451b-8459-1d0e284e03a2', '71fbf73c-4549-4a7c-8318-7c656b5b24a7', true, 73, 3, '2019-01-12 00:00:00', '2021-10-19 08:08:30.961', 2);
 INSERT INTO public."employee_task" VALUES ('20ca92d2-0071-4470-a766-ef2126861fe6', 'e66deaae-d1c5-4d7c-a35d-55edd9ca9178', true, 73, 3, '2019-01-12 00:00:00', '2021-10-19 08:08:31.685', 2);
@@ -1530,6 +1515,9 @@ INSERT INTO public."employee_task_comments" VALUES ('845fd939-0b62-47dd-b17f-7dc
 INSERT INTO public."employee_task_comments" VALUES ('9ecdc87a-d32a-461c-912e-28559bca7645', 'Eier ikke i blank invest, så ikke relevant', '2022-02-22 14:09:35.221', 3, '035f9f89-9585-4414-a63b-5bde98375e0e');
 INSERT INTO public."employee_task_comments" VALUES ('322b1c6e-db4b-4d70-9c58-81378bae5888', 'Offiece: Fjernet', '2022-02-22 15:01:23.162', 3, '215041ca-31ae-4074-b652-7e2062a0e924');
 INSERT INTO public."employee_task_comments" VALUES ('b9f572d5-2bde-425a-9ad0-03d941ad5685', 'Tester mentions @**Magne Davidsen** har du noe å tillegge rundt denne oppgaven? ', '2022-03-07 16:32:19.48', 3, '0b135e02-14d7-4322-b74d-7d46a9ff9509');
+INSERT INTO public."employee_task_comments" VALUES ('d864a38d-e2b2-4b5d-98f8-dc13018ca501', 'Fjernet fra:  Figma, Adobe, Trello
+', '2022-05-04 11:14:23.517', 3, 'e4056329-719c-49c4-94c5-39553a795c41');
+INSERT INTO public."employee_task_comments" VALUES ('6557f87f-8c13-43dd-9e3f-92b299ac57ab', 'Lagt til corteslo@hotmail.com i #blankinvest', '2022-05-04 12:31:10.398', 3, 'f145089b-066d-40e9-b0f3-6b75c9f34ffa');
 
 
 --
@@ -1898,6 +1886,23 @@ INSERT INTO public."notification" (id, "employee_id", "created_at", read, descri
 INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('eb0cbb65-1d0c-41a6-8782-870e2c39b974', 86, '2022-03-25 02:00:42.126', true, 'Du har oppgaver som utgår idag', NULL);
 INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('50d61060-1cfb-4d68-be2f-71a86faac6db', 86, '2022-04-01 02:00:51.975', true, 'Du har oppgaver som utgår idag', NULL);
 INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('5c0b9ad2-f1a1-4eab-95d6-1aabfa8a3682', 3, '2022-04-29 02:00:46.242', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('da795ba2-8ad5-42aa-9fdc-2f0845b783d8', 15, '2022-04-30 02:00:46.693', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('36be4cd3-f18c-4d9a-ad3b-de8d5739c51a', 3, '2022-04-30 02:00:46.693', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('f4f3e8f4-7b9f-491a-9ba3-ca25885e7541', 3, '2022-04-30 02:00:46.693', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('25c315c9-4ec6-49bf-a71b-5c103047c571', 3, '2022-04-30 02:00:46.693', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('e5ad02dd-8e43-4b68-9b55-08bf6391190b', 33, '2022-04-30 02:00:46.695', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('4d25e4b6-1e96-4f30-8db9-fef618e5acb1', 74, '2022-04-30 02:00:46.695', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('d324cabe-d032-4ec8-83ea-317386f138a0', 1, '2022-04-30 02:00:46.693', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('a50fdf11-1ccb-4fd2-be09-a4e230988344', 2, '2022-04-30 02:00:46.704', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('7927e16a-7c2f-44f0-8725-16addf7aa88d', 2, '2022-04-30 02:00:46.703', false, 'Du har oppgaver som utgår om en uke', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('819af351-520a-483f-835c-1fc172e9e59e', 2, '2022-05-07 02:00:33.404', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('03bd892f-1d08-42ab-9efc-2fee8f92b48d', 2, '2022-05-07 02:00:33.404', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('0f3e0fd5-b204-4f7e-a89f-d3f7160a4b7d', 1, '2022-05-07 02:00:33.404', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('c77bc14f-f7fb-4588-8eb8-436d7592bc6f', 33, '2022-05-07 02:00:33.404', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('ed7a8f9c-cf10-485b-bd3d-a27feab23993', 3, '2022-05-07 02:00:33.405', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('54f1f0c5-7353-4ce6-811b-6fe266a46a06', 3, '2022-05-07 02:00:33.405', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('fdbbe4cb-2ba0-455b-a6ec-2c53409cc16b', 15, '2022-05-07 02:00:33.405', false, 'Du har oppgaver som utgår idag', NULL);
+INSERT INTO public."notification" (id, "employee_id", "created_at", read, description, "created_by") VALUES ('41458abe-5d8f-432e-9d0a-c30f47352b10', 74, '2022-05-07 02:00:33.405', false, 'Du har oppgaver som utgår idag', NULL);
 
 
 --
@@ -1909,8 +1914,6 @@ INSERT INTO public."notification" (id, "employee_id", "created_at", read, descri
 --
 -- Data for Name: _ProfessionToTask; Type: TABLE DATA; Schema: public; Owner: ciybepooplmzfy
 --
-
-
 INSERT INTO public."profession_task" VALUES ('designer', '6256a427-473a-4074-a6f1-44c56537c1bc');
 INSERT INTO public."profession_task" VALUES ('annet', '6256a427-473a-4074-a6f1-44c56537c1bc');
 INSERT INTO public."profession_task" VALUES ('teknolog', '6256a427-473a-4074-a6f1-44c56537c1bc');
@@ -1961,9 +1964,6 @@ INSERT INTO public."profession_task" VALUES ('teknolog', '0ca13289-fa92-4b63-b45
 INSERT INTO public."profession_task" VALUES ('designer', 'd22ac8a8-8e3b-4c19-aadc-02031fa9901f');
 INSERT INTO public."profession_task" VALUES ('annet', 'd22ac8a8-8e3b-4c19-aadc-02031fa9901f');
 INSERT INTO public."profession_task" VALUES ('teknolog', 'd22ac8a8-8e3b-4c19-aadc-02031fa9901f');
-INSERT INTO public."profession_task" VALUES ('designer', 'c0c382e9-f601-4cb6-9496-600bf5df3070');
-INSERT INTO public."profession_task" VALUES ('annet', 'c0c382e9-f601-4cb6-9496-600bf5df3070');
-INSERT INTO public."profession_task" VALUES ('teknolog', 'c0c382e9-f601-4cb6-9496-600bf5df3070');
 INSERT INTO public."profession_task" VALUES ('designer', '4725b956-d0fb-4e18-8624-cf9e99ea18a3');
 INSERT INTO public."profession_task" VALUES ('annet', '4725b956-d0fb-4e18-8624-cf9e99ea18a3');
 INSERT INTO public."profession_task" VALUES ('teknolog', '4725b956-d0fb-4e18-8624-cf9e99ea18a3');
@@ -1976,9 +1976,6 @@ INSERT INTO public."profession_task" VALUES ('teknolog', 'c691b305-081b-4d07-b50
 INSERT INTO public."profession_task" VALUES ('designer', 'f6595f6a-387a-4277-adef-5f61eb360ade');
 INSERT INTO public."profession_task" VALUES ('annet', 'f6595f6a-387a-4277-adef-5f61eb360ade');
 INSERT INTO public."profession_task" VALUES ('teknolog', 'f6595f6a-387a-4277-adef-5f61eb360ade');
-INSERT INTO public."profession_task" VALUES ('designer', 'd2a76530-cfb7-4b29-8b2f-ed7345981800');
-INSERT INTO public."profession_task" VALUES ('annet', 'd2a76530-cfb7-4b29-8b2f-ed7345981800');
-INSERT INTO public."profession_task" VALUES ('teknolog', 'd2a76530-cfb7-4b29-8b2f-ed7345981800');
 INSERT INTO public."profession_task" VALUES ('designer', '89dd5aa7-4856-481d-a617-9c5fa6dc15ce');
 INSERT INTO public."profession_task" VALUES ('annet', '89dd5aa7-4856-481d-a617-9c5fa6dc15ce');
 INSERT INTO public."profession_task" VALUES ('teknolog', '89dd5aa7-4856-481d-a617-9c5fa6dc15ce');
@@ -2151,3 +2148,15 @@ INSERT INTO public."profession_task" VALUES ('annet', '5f0b6f8d-fdc7-4357-b32c-0
 INSERT INTO public."profession_task" VALUES ('teknolog', '5f0b6f8d-fdc7-4357-b32c-0e554dbc047b');
 INSERT INTO public."profession_task" VALUES ('teknolog', '56f4595b-8e8b-4dfd-8d25-bdcb94d04ec0');
 INSERT INTO public."profession_task" VALUES ('designer', '758e2f3a-fba7-403a-989c-bff78d64fc73');
+INSERT INTO public."profession_task" VALUES ('designer', 'beffd9af-1771-47e3-b299-1e332524748e');
+INSERT INTO public."profession_task" VALUES ('annet', 'beffd9af-1771-47e3-b299-1e332524748e');
+INSERT INTO public."profession_task" VALUES ('teknolog', 'beffd9af-1771-47e3-b299-1e332524748e');
+INSERT INTO public."profession_task" VALUES ('designer', 'c0c382e9-f601-4cb6-9496-600bf5df3070');
+INSERT INTO public."profession_task" VALUES ('annet', 'c0c382e9-f601-4cb6-9496-600bf5df3070');
+INSERT INTO public."profession_task" VALUES ('teknolog', 'c0c382e9-f601-4cb6-9496-600bf5df3070');
+INSERT INTO public."profession_task" VALUES ('designer', 'd2a76530-cfb7-4b29-8b2f-ed7345981800');
+INSERT INTO public."profession_task" VALUES ('annet', 'd2a76530-cfb7-4b29-8b2f-ed7345981800');
+INSERT INTO public."profession_task" VALUES ('teknolog', 'd2a76530-cfb7-4b29-8b2f-ed7345981800');
+
+
+
