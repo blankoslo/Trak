@@ -302,7 +302,7 @@ model task {
   responsible_type    responsible_type  @default(HR_MANAGER)
   phase               phase?            @relation(fields: [phase_id], references: [id], onUpdate: NoAction)
   responsible         employees?        @relation(fields: [responsible_id], references: [id], onUpdate: NoAction)
-  employee_task       employee_task[]
+  employee_tasks      employee_task[]
   professions         profession_task[]
 }
 

@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         select: {
           tasks: {
             select: {
-              employee_task: {
+              employee_tasks: {
                 where: {
                   AND: [
                     {
@@ -138,8 +138,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         collect(el.phases, result);
       } else if (el.tasks) {
         collect(el.tasks, result);
-      } else if (el.employee_task) {
-        collect(el.employee_task, result);
+      } else if (el.employee_tasks) {
+        collect(el.employee_tasks, result);
       } else {
         result.push(el.employee);
       }
