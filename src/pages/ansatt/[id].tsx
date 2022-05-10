@@ -360,10 +360,10 @@ export const Task = ({ employeeTask, employeeId }) => {
             backgroundColor: accordianBackgroundColor,
           }}
         >
-          {employeeTask.completedById && (
+          {employeeTask.completed_by_id && (
             <>
-              <Typography variant='body2'>{`Fullført den ${prismaDateToFormatedDate(employeeTask.completedDate)}`}</Typography>
-              <Typography gutterBottom variant='body2'>{`av ${employeeTask.completedBy.first_name} ${employeeTask.completedBy.last_name}`}</Typography>
+              <Typography variant='body2'>{`Fullført den ${prismaDateToFormatedDate(employeeTask.completed_date)}`}</Typography>
+              <Typography gutterBottom variant='body2'>{`av ${employeeTask.completed_by.first_name} ${employeeTask.completed_by.last_name}`}</Typography>
             </>
           )}
           <Typography variant='body2'>{`Oppgaveansvarlig: ${employeeTask.responsible.first_name} ${employeeTask.responsible.last_name}`}</Typography>
