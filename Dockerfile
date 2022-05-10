@@ -1,5 +1,9 @@
 # Dockerfile
 FROM node:lts
+ARG TRAK_DB_URL
+ARG NEXT_PUBLIC_TRAK_URL
+ENV TRAK_DB_URL=$TRAK_DB_URL
+ENV NEXT_PUBLIC_TRAK_URL=$NEXT_PUBLIC_TRAK_URL
 
 # create & set working directory
 RUN mkdir -p /usr/src
