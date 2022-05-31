@@ -128,9 +128,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 const ProcessTemplateSelector = ({ active, onClick }) => {
   const classes = useStyles();
   const options = [
+    { title: 'Onboarding', slug: 'onboarding' },
     { title: 'Løpende', slug: 'lopende' },
     { title: 'Offboarding', slug: 'offboarding' },
-    { title: 'Onboarding', slug: 'onboarding' },
   ];
   return (
     <Stack className={classes.rootSelector} direction='row' spacing={2}>
