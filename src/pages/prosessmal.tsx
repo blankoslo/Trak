@@ -11,9 +11,19 @@ import { DataProvider } from 'context/Data';
 import { trakClient } from 'lib/prisma';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
-import { Fragment, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { Fragment, useState } from 'react';
 import { IPhase } from 'utils/types';
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  if (!context.query?.prosess) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/prosessmal?prosess=lopende',
+      },
+      props: {},
+    };
+  }
   await trakClient.process_template.createMany({
     data: [
       { title: 'Onboarding', slug: 'onboarding' },
@@ -23,9 +33,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     skipDuplicates: true,
   });
 
-  const processTemplatesQuery = await trakClient.process_template.findMany({
-    orderBy: {
-      title: 'asc',
+  const processTemplateQuery = await trakClient.process_template.findUnique({
+    where: {
+      slug: context.query.prosess.toString(),
     },
     include: {
       phases: {
@@ -84,21 +94,19 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   });
 
-  const processTemplates = processTemplatesQuery.map((processTemplate) => {
-    return {
-      ...processTemplate,
-      phases: processTemplate.phases.map((phase) => {
-        return {
-          ...phase,
-          tasks: phase.tasks.map((task) => {
-            return { ...task, professions: task.professions.map((profession) => profession.profession) };
-          }),
-        };
-      }),
-    };
-  });
+  const process_template = {
+    ...processTemplateQuery,
+    phases: processTemplateQuery.phases.map((phase) => {
+      return {
+        ...phase,
+        tasks: phase.tasks.map((task) => {
+          return { ...task, professions: task.professions.map((profession) => profession.profession) };
+        }),
+      };
+    }),
+  };
 
-  return { props: { processTemplates } };
+  return { props: { process_template } };
 };
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -125,7 +133,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ProcessTemplateSelector = ({ active, onClick }) => {
+const ProcessTemplateSelector = ({ process_template }) => {
+  const router = useRouter();
   const classes = useStyles();
   const options = [
     { title: 'Onboarding', slug: 'onboarding' },
@@ -136,7 +145,16 @@ const ProcessTemplateSelector = ({ active, onClick }) => {
     <Stack className={classes.rootSelector} direction='row' spacing={2}>
       {options.map((value, index) => (
         <Fragment key={value.title}>
-          <Typography className={index === active ? classes.activeOption : classes.option} key={value.slug} onClick={() => onClick(index)}>
+          <Typography
+            className={value.slug === process_template.slug ? classes.activeOption : classes.option}
+            key={value.slug}
+            onClick={() =>
+              router.push({
+                pathname: '/prosessmal',
+                query: { ...router.query, prosess: value.slug },
+              })
+            }
+          >
             {value.title}
           </Typography>
           {index < options.length - 1 && <Typography className={classes.divider}>/</Typography>}
@@ -146,17 +164,8 @@ const ProcessTemplateSelector = ({ active, onClick }) => {
   );
 };
 
-const ProcessTemplate = ({ processTemplates }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ProcessTemplate = ({ process_template }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
-  const [selectedProcessTemplate, setSelectedProcessTemplate] = useState(0);
-  const [process_template, setProcessTemplate] = useState(processTemplates[selectedProcessTemplate]);
-  useEffect(() => {
-    setProcessTemplate(processTemplates[selectedProcessTemplate]);
-  }, [selectedProcessTemplate]);
-
-  useEffect(() => {
-    setProcessTemplate(processTemplates[selectedProcessTemplate]);
-  }, [processTemplates]);
   return (
     <>
       <Head>
@@ -164,7 +173,7 @@ const ProcessTemplate = ({ processTemplates }: InferGetServerSidePropsType<typeo
       </Head>
       <Container maxWidth='lg' sx={{ marginTop: '16px' }}>
         <Box display='flex' justifyContent='flex-end' mb={4}>
-          <ProcessTemplateSelector active={selectedProcessTemplate} onClick={setSelectedProcessTemplate} />
+          <ProcessTemplateSelector process_template={process_template} />
         </Box>
         <DataProvider>
           {process_template?.phases.map((phase: IPhase) => (
