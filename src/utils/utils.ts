@@ -33,14 +33,10 @@ export const axiosBuilder = (
   axiosFunc
     .then(() => {
       closeModal();
-      router
-        .push({
-          pathname: router.asPath,
-        })
-        .finally(() => {
-          showProgressbar(false);
-          showSnackbar(text, 'success');
-        });
+      router.replace(router.asPath).finally(() => {
+        showProgressbar(false);
+        showSnackbar(text, 'success');
+      });
     })
     .catch((error) => {
       showProgressbar(false);
