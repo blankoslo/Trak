@@ -38,13 +38,13 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { id } = query;
   const parsedId = typeof id === 'string' && parseInt(id);
 
-  const employeeQuery = await trakClient.employees.findUnique({
+  const employeeQuery = await trakClient.employee.findUnique({
     where: {
       id: parsedId,
     },
     include: {
       profession: true,
-      employee_tasks: {
+      employee_task: {
         orderBy: [
           {
             due_date: 'asc',
@@ -118,7 +118,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
   });
   const employee = JSON.parse(safeJsonStringify(employeeQuery));
-  const tasks = chain(employee.employee_tasks)
+  const tasks = chain(employee.employee_task)
     .groupBy('task.phase.process_template_id')
     .map((value, key) => ({ title: key, tasks: value }))
     .value()

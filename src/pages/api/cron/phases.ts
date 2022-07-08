@@ -59,7 +59,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       tasks: phase.tasks.map((task) => ({ ...task, professions: task.professions.map((profession) => profession.profession_id) })),
     }));
 
-    const employees = await trakClient.employees.findMany({
+    const employees = await trakClient.employee.findMany({
       select: {
         id: true,
         first_name: true,
@@ -83,7 +83,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             },
           },
         },
-        employee_tasks: {
+        employee_task: {
           select: {
             id: true,
             completed: true,
@@ -106,7 +106,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
       },
     });
-    const responsibleEmployees = await trakClient.employees.findMany({
+    const responsibleEmployees = await trakClient.employee.findMany({
       where: {
         responsible_tasks: {
           some: {
@@ -191,7 +191,7 @@ const lopendeEmployeeTaskCreator = (employee: IEmployee, lopendePhases: IPhase[]
   const index = lopendePhases.findIndex((phase) => phase.id === nextPhase.id);
   const currentPhaseIndex = index === 0 ? lopendePhases.length - 1 : index - 1;
   const currentPhase = lopendePhases[currentPhaseIndex];
-  const hasTasksInNextPhase = employee.employee_tasks?.some(
+  const hasTasksInNextPhase = employee.employee_task?.some(
     (employeeTask: IEmployeeTask) => employeeTask.task.phase.id === nextPhase.id && getYear(employeeTask.due_date) === getYear(today),
   );
 
@@ -236,7 +236,7 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
 };
 
 const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
-  employee.employee_tasks?.some((employeeTask) => employeeTask.task.phase.process_template.slug === processTitle);
+  employee.employee_task?.some((employeeTask) => employeeTask.task.phase.process_template.slug === processTitle);
 
 const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase) => {
   if (phase.process_template_id !== Process.LOPENDE) {

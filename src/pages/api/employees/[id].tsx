@@ -9,7 +9,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     query: { id },
   } = req;
   if (req.method === 'GET') {
-    const employee = await trakClient.employees.findUnique({
+    const employee = await trakClient.employee.findUnique({
       where: {
         id: toInteger(id),
       },

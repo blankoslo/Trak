@@ -7,7 +7,7 @@ const updateTask = async (blankEmployees) => {
     date_of_employment: employee.date_of_employment,
     termination_date: employee.termination_date,
   }));
-  const updatedTrakEmployee = await trakClient.employees.findMany({
+  const updatedTrakEmployee = await trakClient.employee.findMany({
     where: {
       NOT: {
         OR: blankEmployeeStartEndDate,
@@ -15,7 +15,7 @@ const updateTask = async (blankEmployees) => {
     },
     select: {
       id: true,
-      employee_tasks: {
+      employee_task: {
         where: {
           task: {
             phase: {
@@ -82,7 +82,7 @@ const updateOrDeleteTask = async (employee, blankEmployeeData) =>
         },
       });
     }),
-    trakClient.employees.update({
+    trakClient.employee.update({
       where: {
         id: employee.id,
       },
@@ -93,7 +93,7 @@ const updateOrDeleteTask = async (employee, blankEmployeeData) =>
     }),
   ]);
 export async function syncTrakDatabase() {
-  const blankEmployees = await trakClient.employees.findMany({
+  const blankEmployees = await trakClient.employee.findMany({
     select: {
       id: true,
       first_name: true,

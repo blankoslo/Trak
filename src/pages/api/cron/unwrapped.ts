@@ -27,7 +27,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       });
       const responsible_employee_ids = await compact(await uniq(await flatten(await employeeTasks.map((e) => [e.responsible_id, e.completed_by_id]))));
       await responsible_employee_ids.map(async (id) => {
-        const employee_data = await trakClient.employees.findFirst({
+        const employee_data = await trakClient.employee.findFirst({
           where: {
             id: id,
           },

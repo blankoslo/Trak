@@ -65,7 +65,7 @@ export const EmployeeSelectorComponent = ({
     profession: undefined,
     hr_manager: undefined,
     employees: undefined,
-    employee_tasks: undefined,
+    employee_task: undefined,
     employee_settings: undefined,
   },
 }: EmployeeSelectorComponentProps) => {

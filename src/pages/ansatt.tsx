@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         select: {
           tasks: {
             select: {
-              employee_tasks: {
+              employee_task: {
                 where: {
                   AND: [
                     {
@@ -138,8 +138,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         collect(el.phases, result);
       } else if (el.tasks) {
         collect(el.tasks, result);
-      } else if (el.employee_tasks) {
-        collect(el.employee_tasks, result);
+      } else if (el.employee_task) {
+        collect(el.employee_task, result);
       } else {
         result.push(el.employee);
       }
@@ -226,7 +226,7 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
                           id={employee.id}
                           imageUrl={employee.image_url}
                           lastName={employee.last_name}
-                          nrOfMyTasks={getNrOfTasks(employee.employee_tasks, process_template.slug)}
+                          nrOfMyTasks={getNrOfTasks(employee.employee_task, process_template.slug)}
                           processTemplate={process_template.slug}
                           role={employee.profession.title}
                         />
@@ -242,4 +242,5 @@ const Employees: NextPage = ({ processTemplates, selectedOption }: InferGetServe
     </Stack>
   );
 };
+
 export default Employees;

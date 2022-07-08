@@ -24,7 +24,7 @@ export type IEmployee = {
   hr_manager_id?: number;
   employees: IEmployee[];
   employee_settings: IEmployeeSettings;
-  employee_tasks: IEmployeeTask[];
+  employee_task: IEmployeeTask[];
   notifications?: INotification[];
 };
 
@@ -111,7 +111,7 @@ export type ITask = {
   phase: IPhase;
   responsible_type: ResponsibleType;
   professions?: IProfession[];
-  employee_tasks: IEmployeeTask[];
+  employee_task: IEmployeeTask[];
   responsible?: IEmployee;
   responsible_id?: number;
   due_date_day_offset?: number;

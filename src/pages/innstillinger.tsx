@@ -24,7 +24,7 @@ import { prismaDateToFormatedDate } from 'utils/utils';
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
-  const employeeQuery = await trakClient.employees.findUnique({
+  const employeeQuery = await trakClient.employee.findUnique({
     where: {
       id: parseInt(session?.user?.id) || null,
     },

@@ -5,6 +5,7 @@ import Toggle from 'components/Toggle';
 import Process from 'components/views/oppgaver/Process';
 import addMonths from 'date-fns/addMonths';
 import { trakClient } from 'lib/prisma';
+import { syncEmployees } from 'lib/tripletex/syncEmployees';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
@@ -12,6 +13,7 @@ import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { selectedOptionEnum } from 'pages/ansatt';
 import safeJsonStringify from 'safe-json-stringify';
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!context.query?.mine) {
     return {
@@ -29,6 +31,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
   const threeMonthsFromNow = addMonths(new Date(), 3);
 
+  syncEmployees();
+
   const processTemplateQuery = await trakClient.process_template.findMany({
     select: {
       slug: true,
@@ -37,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         select: {
           tasks: {
             select: {
-              employee_tasks: {
+              employee_task: {
                 where: {
                   AND: [
                     {
@@ -160,8 +164,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         collect(el.phases, result);
       } else if (el.tasks) {
         collect(el.tasks, result);
-      } else if (el.employee_tasks) {
-        collect(el.employee_tasks, result);
+      } else if (el.employee_task) {
+        collect(el.employee_task, result);
       } else {
         result.push(el);
       }
@@ -180,7 +184,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const selectedOption = my ? selectedOptionEnum.Mine : selectedOptionEnum.Alle;
 
-  const employeesWithoutHrManagerQuery = await trakClient.employees.findMany({
+  const employeesWithoutHrManagerQuery = await trakClient.employee.findMany({
     where: {
       hr_manager: null,
       termination_date: null,
