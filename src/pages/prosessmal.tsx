@@ -14,6 +14,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
 import { IPhase } from 'utils/types';
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!context.query?.prosess) {
     return {
@@ -71,13 +72,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               responsible_type: true,
               link: true,
               professions: {
-                include: {
-                  profession: {
-                    select: {
-                      title: true,
-                      slug: true,
-                    },
-                  },
+                select: {
+                  title: true,
+                  slug: true,
                 },
               },
               responsible: {
@@ -100,7 +97,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         ...phase,
         tasks: phase.tasks.map((task) => {
-          return { ...task, professions: task.professions.map((profession) => profession.profession) };
+          return { ...task, professions: task.professions };
         }),
       };
     }),

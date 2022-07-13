@@ -5,9 +5,10 @@ import withAuth from 'lib/withAuth';
 import { groupBy } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { syncTrakDatabase } from 'utils/cron';
-import { IEmployee, IEmployeeTask, IPhase, ResponsibleType } from 'utils/types';
-import { Process } from 'utils/types';
+import { IEmployee, IEmployeeTask, IPhase, Process, ResponsibleType } from 'utils/types';
+
 let LAST_RUN = undefined;
+
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   const { notification } = req.query;
   const sendNotification = notification === undefined ? true : notification === 'true';
@@ -46,7 +47,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             responsible_id: true,
             professions: {
               select: {
-                profession_id: true,
+                slug: true,
               },
             },
           },
@@ -56,7 +57,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
 
     const phases = phasesQuery.map((phase) => ({
       ...phase,
-      tasks: phase.tasks.map((task) => ({ ...task, professions: task.professions.map((profession) => profession.profession_id) })),
+      tasks: phase.tasks.map((task) => ({ ...task, professions: task.professions.map((profession) => profession.slug) })),
     }));
 
     const employees = await trakClient.employee.findMany({
@@ -83,7 +84,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
             },
           },
         },
-        employee_task: {
+        employee_tasks: {
           select: {
             id: true,
             completed: true,
@@ -108,7 +109,8 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     });
     const responsibleEmployees = await trakClient.employee.findMany({
       where: {
-        responsible_tasks: {
+        responsible_employee_tasks: {
+          // Var employee_tasks. TODO Finn ut om dette er riktig.
           some: {
             completed: false,
           },
@@ -117,7 +119,8 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       select: {
         id: true,
         email: true,
-        responsible_tasks: {
+        responsible_employee_tasks: {
+          // Var employee_tasks. TODO Finn ut om dette er riktig.
           where: {
             completed: false,
           },
@@ -238,11 +241,12 @@ const offboardingEmployeeTaskCreator = async (phases: IPhase[], employee: IEmplo
 const employeeHasProcessTask = (employee: IEmployee, processTitle: string) =>
   employee.employee_task?.some((employeeTask) => employeeTask.task.phase.process_template.slug === processTitle);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase) => {
   if (phase.process_template_id !== Process.LOPENDE) {
     return;
   }
-
+  /*
   const projectsCount = await trakClient.staffing.groupBy({
     where: {
       employee: employee.id,
@@ -286,7 +290,8 @@ const getProjectManager = async (employee: IEmployee, phase: IPhase, lastPhase: 
   if (employeeIsProjectManager) {
     return employee.hr_manager_id;
   }
-  return projectManager.responsible;
+  return projectManager.responsible;*/
+  return null;
 };
 const createEmployeeTasks = async (employee: IEmployee, phase: IPhase, lastPhase: IPhase | undefined = undefined) => {
   const projectManager = getProjectManager(employee, phase, lastPhase);
@@ -355,9 +360,10 @@ const createNotification = async (responsibleEmployees: any | (IEmployee & { res
         }
       });
     });
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     // eslint-disable-next-line
-    console.error(err.message);
+    console.error(err?.message);
   }
 };
 

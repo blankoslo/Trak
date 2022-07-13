@@ -28,8 +28,8 @@ const withAuth = (handler) => {
           return handler(req, res, user);
         }
       }
-      // eslint-disable-next-line no-empty
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       // eslint-disable-next-line
       console.log(err);
       return res.json(err?.message);

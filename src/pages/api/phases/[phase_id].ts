@@ -40,7 +40,9 @@ const GET = async (res, phase_id) => {
       throw new Error();
     }
     res.status(HttpStatusCode.OK).json(phase);
-  } catch (err) {
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {
@@ -64,7 +66,9 @@ const PUT = async (req, res, phase_id) => {
       },
     });
     res.status(HttpStatusCode.OK).json(updatedPhase);
-  } catch (err) {
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {
@@ -85,7 +89,9 @@ const DELETE = async (res, phase_id) => {
     });
     const deletedPhase = await trakClient.phase.update({ where: { id: phase_id.toString() }, data: { active: false } });
     res.status(HttpStatusCode.OK).json(deletedPhase);
-  } catch (err) {
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {

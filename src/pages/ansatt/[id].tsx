@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
     include: {
       profession: true,
-      employee_task: {
+      employee_tasks: {
         orderBy: [
           {
             due_date: 'asc',

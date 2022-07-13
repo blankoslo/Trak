@@ -22,7 +22,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         slackMessager(email, slack_description);
       }
       res.status(HttpStatusCode.CREATED).json(newNotification);
-    } catch (err) {
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       if (err) {
         res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
       } else {

@@ -27,11 +27,11 @@ type CommentCardProps = {
 const CommentCard = ({ comment, ...args }: CommentCardProps) => {
   const user = useSession();
   const [displayEditComment, setDisplayEditComment] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
 
   const { control, handleSubmit } = useForm({ defaultValues: { comment: comment.text } });
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -41,7 +41,7 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
 
   const [mentions, setMentions] = useState<{ id: number; display: string; email: string }[]>([]);
 
-  const updateMentions = (id, display, email) => {
+  const updateMentions = (id: number, display: string, email: string) => {
     setMentions((m) => [...m, { id: id, display: display, email: email }]);
   };
 
@@ -55,11 +55,11 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
     const taskURL = `${process.env.NEXT_PUBLIC_TRAK_URL}/oppgave/${comment.employee_task_id}`;
     uniqueMentions.forEach((mention) => {
       axios.post('/api/notification', {
-        description: `Du er nevnt i "[${comment.employee_task.task.title}](${taskURL})"`,
-        slack_description: `Du er nevnt i "<${taskURL}|${comment.employee_task.task.title}>" av ${user.data.user.name}`,
+        description: `Du er nevnt i "[${comment.employee_task.task?.title}](${taskURL})"`,
+        slack_description: `Du er nevnt i "<${taskURL}|${comment.employee_task.task?.title}>" av ${user.data?.user.name}`,
         employee_id: mention.id,
         email: mention.email,
-        created_by: user.data.user,
+        created_by: user.data?.user,
       });
     });
     setDisplayEditComment(false);
@@ -97,7 +97,7 @@ const CommentCard = ({ comment, ...args }: CommentCardProps) => {
         </Stack>
         <ReactMarkdown>{comment.text}</ReactMarkdown>
       </Stack>
-      {parseInt(user.data.user.id) === comment.created_by_id && (
+      {Boolean(user.data?.user?.id) && parseInt(user.data.user.id) === comment.created_by_id && (
         <>
           <IconButton color='inherit' onClick={handleClick} sx={{ padding: '4px', width: 'fit-content', height: 'fit-content' }}>
             <MoreVertIcon />

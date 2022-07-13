@@ -147,14 +147,9 @@ const TaskCard = ({ employee_task }: { employee_task: IEmployeeTask }) => {
         <PersonaliaText smallText={''} text={`${employee_task.task.phase.process_template.title} / ${employee_task.task.phase.title}`} />
         <PersonaliaText smallText={'forfallsdato'} text={`${format(new Date(employee_task.due_date), 'dd MMM yyyy')}`} />
         {employee_task.task.link && (
-          <PersonaliaText
-            smallText={'ekstern link'}
-            text={
-              <a href={employee_task.task.link} style={{ color: theme.palette.primary.main }}>
-                {employee_task.task.link}
-              </a>
-            }
-          />
+          <a href={employee_task.task.link} style={{ color: theme.palette.primary.main }}>
+            <PersonaliaText smallText={'ekstern link'} text={employee_task.task.link} />
+          </a>
         )}
         <Markdown text={employee_task.task.description} />
       </Stack>

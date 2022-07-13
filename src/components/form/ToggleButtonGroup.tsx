@@ -21,7 +21,7 @@ export const ToggleButtonGroup = ({ professions = [], control, name }: ToggleBut
 export type ToggleButtonGroupComponentProps = {
   professions: IProfession[];
   value: IProfession[];
-  setValue: (IProfession) => void;
+  setValue: (value: IProfession[]) => void;
 };
 const ToggleButtonGroupComponent = ({ professions, value = [], setValue }: ToggleButtonGroupComponentProps) => {
   return (

@@ -32,7 +32,8 @@ const PUT = async (req, res, id) => {
       throw new Error('Ansattinnstillinger mangler i bodyen');
     }
     res.status(HttpStatusCode.OK).json(employeeSettings);
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {

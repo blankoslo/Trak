@@ -13,20 +13,18 @@ import axios from 'axios';
 import Avatar from 'components/Avatar';
 import useSnackbar from 'context/Snackbar';
 import { trakClient } from 'lib/prisma';
-import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import safeJsonStringify from 'safe-json-stringify';
 import { IEmployeeSettings } from 'utils/types';
 import { prismaDateToFormatedDate } from 'utils/utils';
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context);
 
-  const employeeQuery = await trakClient.employee.findUnique({
+async function getEmployee(userId?: number) {
+  return trakClient.employee.findUnique({
     where: {
-      id: parseInt(session?.user?.id) || null,
+      id: userId,
     },
     select: {
       id: true,
@@ -50,13 +48,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       employee_settings: true,
     },
   });
+}
 
-  const employee = JSON.parse(safeJsonStringify(employeeQuery));
+type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+type EmployeeWithProfession = ThenArg<ReturnType<typeof getEmployee>>;
+
+export const getServerSideProps: GetServerSideProps<{ employee: EmployeeWithProfession }> = async (context) => {
+  const session = await getSession(context);
+
+  const employee = await getEmployee(session?.user?.id ? parseInt(session.user.id) : undefined);
 
   return { props: { employee } };
 };
 
-const Settings: NextPage = ({ employee }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Settings: NextPage<{ employee: EmployeeWithProfession }> = ({ employee }) => {
   return (
     <Container maxWidth='md' sx={{ paddingTop: { xs: 2, md: 7 }, paddingBottom: 8 }}>
       <Stack
@@ -78,8 +83,13 @@ const Settings: NextPage = ({ employee }: InferGetServerSidePropsType<typeof get
   );
 };
 
-const PersonaliaPaper = ({ employee }) => {
+function PersonaliaPaper({ employee }: { employee: EmployeeWithProfession }) {
   const theme = useTheme();
+
+  if (!employee) {
+    return null;
+  }
+
   return (
     <Paper sx={{ padding: 2, width: { xs: 'auto', sm: 'auto', md: 'fit-content' } }}>
       <Stack alignItems='flex-start' direction='column' spacing={1}>
@@ -97,19 +107,19 @@ const PersonaliaPaper = ({ employee }) => {
           </a>
         </Typography>
         <Stack alignItems='center' direction='row' spacing={1}>
-          <Avatar firstName={employee.first_name} image={employee.image_url} lastName={employee.last_name} sx={{ width: 80, height: 80 }} />
+          <Avatar firstName={employee.first_name} image={employee.image_url || undefined} lastName={employee.last_name} sx={{ width: 80, height: 80 }} />
           <Stack alignItems='flex-start' direction='column' spacing={0.5}>
             <PersonaliaText smallText={''} text={`${employee.first_name} ${employee.last_name}`} />
             <PersonaliaText smallText={''} text={employee.email} />
           </Stack>
         </Stack>
-        <PersonaliaText smallText={'rolle'} text={employee.profession.title} />
-        <PersonaliaText smallText={'startet'} text={prismaDateToFormatedDate(employee.date_of_employment)} />
+        <PersonaliaText smallText={'rolle'} text={employee.profession?.title || 'Rolle ikke spesifisert'} />
+        <PersonaliaText smallText={'startet'} text={employee.date_of_employment ? prismaDateToFormatedDate(employee.date_of_employment) : 'Ukjent startdato'} />
         {employee.hr_manager && <PersonaliaText smallText={'ansvarlig'} text={`${employee.hr_manager.first_name} ${employee.hr_manager.last_name}`} />}
       </Stack>
     </Paper>
   );
-};
+}
 
 const UpdateSystemPaper = () => {
   const showSnackbar = useSnackbar();
@@ -176,8 +186,8 @@ const Toggle = ({ control, name, defaultValue, onSubmit, loading, label }: Toggl
   );
 };
 
-const NotificationPaper = ({ employee }) => {
-  const { control, handleSubmit } = useForm();
+const NotificationPaper = ({ employee }: { employee: EmployeeWithProfession }) => {
+  const { control, handleSubmit } = useForm<IEmployeeSettings>();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const showSnackbar = useSnackbar();
@@ -200,6 +210,10 @@ const NotificationPaper = ({ employee }) => {
       .catch((err) => showSnackbar(err.response?.data?.message || 'Noe gikk galt', 'error'));
   });
 
+  if (!employee?.employee_settings) {
+    return null;
+  }
+
   return (
     <Paper sx={{ width: { xs: 'auto', sm: 'auto', md: 'fit-content' } }}>
       <Stack alignItems='flex-start' direction='column' spacing={1} sx={{ padding: 2 }}>
@@ -210,7 +224,7 @@ const NotificationPaper = ({ employee }) => {
         <FormControl>
           <Toggle
             control={control}
-            defaultValue={employee.employee_settings.slack}
+            defaultValue={employee.employee_settings?.slack}
             label='Slack notifikasjoner'
             loading={loading}
             name='slack'
@@ -222,7 +236,7 @@ const NotificationPaper = ({ employee }) => {
           </Typography>
           <Toggle
             control={control}
-            defaultValue={employee.employee_settings.delegate}
+            defaultValue={employee.employee_settings?.delegate}
             label='Delegering av oppgave'
             loading={loading}
             name='delegate'
@@ -230,7 +244,7 @@ const NotificationPaper = ({ employee }) => {
           />
           <Toggle
             control={control}
-            defaultValue={employee.employee_settings.deadline}
+            defaultValue={employee.employee_settings?.deadline}
             label='Oppgave forfaller'
             loading={loading}
             name='deadline'
@@ -238,16 +252,16 @@ const NotificationPaper = ({ employee }) => {
           />
           <Toggle
             control={control}
-            defaultValue={employee.employee_settings.week_before_deadline}
+            defaultValue={employee.employee_settings?.week_before_deadline}
             label='En uke før oppgave(r) forfaller'
             loading={loading}
             name='week_before_deadline'
             onSubmit={onSubmit}
           />
-          <Toggle control={control} defaultValue={employee.employee_settings.hired} label='Ny ansatt' loading={loading} name='hired' onSubmit={onSubmit} />
+          <Toggle control={control} defaultValue={employee.employee_settings?.hired} label='Ny ansatt' loading={loading} name='hired' onSubmit={onSubmit} />
           <Toggle
             control={control}
-            defaultValue={employee.employee_settings.termination}
+            defaultValue={employee.employee_settings?.termination}
             label='Ansatt slutter'
             loading={loading}
             name='termination'
@@ -261,7 +275,7 @@ const NotificationPaper = ({ employee }) => {
   );
 };
 
-export const PersonaliaText = ({ smallText, text }) => {
+export const PersonaliaText = ({ smallText, text }: { smallText: string; text: string }) => {
   return (
     <Stack alignItems='flex-end' direction='row' spacing={1}>
       {smallText && <Typography sx={{ opacity: '0.85' }} variant='body2'>{`${smallText}:`}</Typography>}

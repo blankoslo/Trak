@@ -28,7 +28,7 @@ const BeforeToogle = ({ control, name }: BeforeToogleProps) => {
   );
 };
 export type ToggleComponentProps = {
-  setValue: (string) => void;
+  setValue: (newValue: string) => void;
   value: string;
 };
 export const SelectComponent = ({ setValue, value }: ToggleComponentProps) => {

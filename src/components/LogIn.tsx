@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const LogIn = () => {
   const classes = useStyles();
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       signIn();
     }

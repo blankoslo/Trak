@@ -8,20 +8,20 @@ datasource db {
   url      = env("TRAK_DB_URL")
 }
 
-model comment {
-  id                  String        @id @default(uuid())
-  text                String
-  created_at          DateTime      @default(now())
-  created_by_employee employee      @relation(fields: [created_by_id], references: [id])
-  created_by_id       Int
-  employee_task       employee_task @relation(fields: [employee_task_id], references: [id])
-  employee_task_id    String
+model employee_task_comment {
+  id               String        @id @default(uuid())
+  text             String
+  created_at       DateTime      @default(now())
+  created_by_id    Int
+  employee_task_id String
+  created_by       employee      @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employee_task    employee_task @relation(fields: [employee_task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model employee {
-  id                         Int                @id
-  email                      String             @unique
-  profession_id              Int?
+  id                         Int                     @id
+  email                      String                  @unique
+  profession_id              String?
   first_name                 String
   last_name                  String
   birth_date                 DateTime
@@ -30,17 +30,17 @@ model employee {
   termination_date           DateTime?
   image_url                  String?
   hr_manager_id              Int?
-  hr_manager                 employee?          @relation("EmployeeToEmployee", fields: [hr_manager_id], references: [id])
-  profession                 profession?        @relation(fields: [profession_id], references: [id])
-  employees                  employee[]         @relation("EmployeeToEmployee")
-  employee_settings          employee_settings? @relation("settings")
-  completed_tasks            employee_task[]    @relation("completed_by")
-  employee_tasks             employee_task[]    @relation("tasks")
-  responsible_employee_tasks employee_task[]    @relation("responsible_employee_task")
-  notifications              notification[]     @relation("employee")
-  responsible_task           task[]             @relation("responsible_tasks")
-  notification               notification[]     @relation("created_by_employee")
-  comments                   comment[]
+  hr_manager                 employee?               @relation("EmployeeToEmployee", fields: [hr_manager_id], references: [id])
+  profession                 profession?             @relation(fields: [profession_id], references: [slug])
+  employees                  employee[]              @relation("EmployeeToEmployee")
+  employee_settings          employee_settings?      @relation("settings")
+  completed_tasks            employee_task[]         @relation("completed_by")
+  employee_tasks             employee_task[]         @relation("tasks")
+  responsible_employee_tasks employee_task[]         @relation("responsible_employee_task")
+  notifications              notification[]          @relation("employee")
+  responsible_task           task[]                  @relation("responsible_tasks")
+  notification               notification[]          @relation("created_by_employee")
+  comments                   employee_task_comment[]
 }
 
 model employee_settings {
@@ -56,19 +56,19 @@ model employee_settings {
 }
 
 model employee_task {
-  id              String    @id @default(uuid())
+  id              String                  @id @default(uuid())
   task_id         String
-  completed       Boolean   @default(false)
+  completed       Boolean                 @default(false)
   employee_id     Int
   responsible_id  Int
   due_date        DateTime
   completed_date  DateTime?
   completed_by_id Int?
-  completed_by    employee? @relation("completed_by", fields: [completed_by_id], references: [id])
-  employee        employee  @relation("tasks", fields: [employee_id], references: [id])
-  responsible     employee  @relation("responsible_employee_task", fields: [responsible_id], references: [id])
-  task            task      @relation(fields: [task_id], references: [id])
-  comments        comment[]
+  completed_by    employee?               @relation("completed_by", fields: [completed_by_id], references: [id])
+  employee        employee                @relation("tasks", fields: [employee_id], references: [id])
+  responsible     employee                @relation("responsible_employee_task", fields: [responsible_id], references: [id])
+  task            task                    @relation(fields: [task_id], references: [id])
+  comments        employee_task_comment[]
 }
 
 model notification {
@@ -101,10 +101,21 @@ model process_template {
 }
 
 model profession {
-  id       Int        @id @default(autoincrement())
-  title    String     @unique
-  employee employee[]
-  tasks    task[]
+  slug      String            @id @default(uuid())
+  title     String            @unique
+  employees employee[]
+  tasks     profession_task[]
+  task      task?             @relation(fields: [task_id], references: [id])
+  task_id   String?
+}
+
+model profession_task {
+  profession_id String
+  task_id       String
+  profession    profession @relation(fields: [profession_id], references: [slug], onDelete: Cascade, onUpdate: NoAction)
+  task          task       @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([profession_id, task_id])
 }
 
 model tag {
@@ -114,23 +125,24 @@ model tag {
 }
 
 model task {
-  id                  String           @id @default(uuid())
+  id                  String            @id @default(uuid())
   title               String
   description         String?
   link                String?
-  global              Boolean          @default(true)
+  global              Boolean           @default(true)
   phase_id            String?
   responsible_id      Int?
-  created_at          DateTime         @default(now())
-  active              Boolean          @default(true)
+  created_at          DateTime          @default(now())
+  active              Boolean           @default(true)
   due_date_day_offset Int?
   due_date            DateTime?
-  responsible_type    responsible_type @default(value: HR_MANAGER)
-  phase               phase?           @relation(fields: [phase_id], references: [id])
-  responsible         employee?        @relation("responsible_tasks", fields: [responsible_id], references: [id])
+  responsible_type    responsible_type  @default(value: HR_MANAGER)
+  phase               phase?            @relation(fields: [phase_id], references: [id])
+  responsible         employee?         @relation("responsible_tasks", fields: [responsible_id], references: [id])
   employee_task       employee_task[]
   professions         profession[]
   tags                tag[]
+  profession_task     profession_task[]
 }
 
 enum gender {

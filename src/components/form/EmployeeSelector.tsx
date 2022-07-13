@@ -6,6 +6,7 @@ import { Controller } from 'react-hook-form';
 import useSWR from 'swr';
 import { IEmployee } from 'utils/types';
 import { fetcher } from 'utils/utils';
+
 export type EmployeeSelectorProps = {
   // eslint-disable-next-line
   control: any;
@@ -41,7 +42,7 @@ export const EmployeeSelector = ({ control, errors = {}, name, label, required =
 
 export type EmployeeSelectorComponentProps = {
   employees: IEmployee[];
-  setValue: (IEmployee) => void;
+  setValue: (value: IEmployee) => void;
   label: string;
   value: IEmployee;
   required: boolean;
@@ -71,10 +72,10 @@ export const EmployeeSelectorComponent = ({
 }: EmployeeSelectorComponentProps) => {
   return (
     <Autocomplete
-      getOptionLabel={(employee: IEmployee) => `${employee.first_name} ${employee.last_name}`.trim()}
+      getOptionLabel={(employee: IEmployee | string) => (typeof employee !== 'string' ? `${employee.first_name} ${employee.last_name}`.trim() : null)}
       loading={!employees.length}
       noOptionsText={'Ingen ansatte funnet'}
-      onChange={(_, employee) => setValue(employee)}
+      onChange={(_, employee) => typeof employee !== 'string' && setValue(employee)}
       options={employees}
       popupIcon={<></>}
       renderInput={(params) => (

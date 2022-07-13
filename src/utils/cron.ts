@@ -15,7 +15,7 @@ const updateTask = async (blankEmployees) => {
     },
     select: {
       id: true,
-      employee_task: {
+      employee_tasks: {
         where: {
           task: {
             phase: {
@@ -59,7 +59,7 @@ const updateTask = async (blankEmployees) => {
 };
 
 const updateOrDeleteTask = async (employee, blankEmployeeData) =>
-  await trakClient.$transaction([
+  trakClient.$transaction([
     ...employee.employeeTask.map((task) => {
       const onboardingDateRefrence = task.task.phase.process_template_id === 'onboarding' && blankEmployeeData.date_of_employment;
       const offboardingDateRefrence = task.task.phase.process_template_id === 'offboarding' && blankEmployeeData.termination_date;
@@ -98,13 +98,12 @@ export async function syncTrakDatabase() {
       id: true,
       first_name: true,
       last_name: true,
-      phone: true,
       email: true,
       birth_date: true,
       date_of_employment: true,
       gender: true,
       image_url: true,
-      role: true,
+      //role: true,
       hr_manager: true,
       termination_date: true,
     },

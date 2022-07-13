@@ -11,7 +11,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     } = req;
 
     try {
-      const newComment = await trakClient.employee_task_comments.create({
+      const newComment = await trakClient.employee_task_comment.create({
         data: {
           text: text.toString(),
           created_by_id: user.id,
@@ -23,7 +23,8 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
       });
       res.status(HttpStatusCode.OK).json(newComment);
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       if (err) {
         res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
       } else {
@@ -35,7 +36,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       query: { id },
     } = req;
     try {
-      const comments = await trakClient.employee_task_comments.findMany({
+      const comments = await trakClient.employee_task_comment.findMany({
         where: {
           employee_task_id: id.toString(),
         },
@@ -56,7 +57,8 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
       });
       res.json(comments);
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ message: err?.meta?.cause });
     }
   } else {

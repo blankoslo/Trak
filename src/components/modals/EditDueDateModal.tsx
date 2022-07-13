@@ -53,8 +53,9 @@ const EditDueDateModal = ({ employeeTask, isModalOpen, closeModal }: EditDueDate
           setIsSaving(false);
           showSnackbar('Forfallsdato endret', 'success');
         });
-    } catch (error) {
-      showSnackbar(error.response?.data?.message || 'Noe gikk galt', 'error');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      showSnackbar(error?.response?.data?.message || 'Noe gikk galt', 'error');
     } finally {
       setIsSaving(false);
     }

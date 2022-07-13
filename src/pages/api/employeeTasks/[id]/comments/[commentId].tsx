@@ -10,13 +10,14 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
     } = req;
 
     try {
-      await trakClient.employee_task_comments.delete({
+      await trakClient.employee_task_comment.delete({
         where: {
           id: commentId.toString(),
         },
       });
       res.status(HttpStatusCode.OK).json({ message: 'hei' });
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       if (err) {
         res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
       } else {
@@ -29,7 +30,7 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
       query: { commentId },
     } = req;
     try {
-      const updatedComment = await trakClient.employee_task_comments.update({
+      const updatedComment = await trakClient.employee_task_comment.update({
         where: {
           id: commentId.toString(),
         },
@@ -39,7 +40,8 @@ export default withAuth(async function (req: NextApiRequest, res: NextApiRespons
         },
       });
       res.status(HttpStatusCode.OK).json(updatedComment);
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       if (err) {
         res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
       } else {

@@ -77,6 +77,7 @@ export type INotification = {
   read: boolean;
   description: string;
   employee: IEmployee;
+  created_by_employee: IEmployee;
 };
 
 export type IPhase = {

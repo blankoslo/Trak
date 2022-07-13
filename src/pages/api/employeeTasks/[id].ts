@@ -79,7 +79,8 @@ const GET = async (res, id) => {
       throw new Error();
     }
     res.status(HttpStatusCode.OK).json(employeeTask);
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {
@@ -139,7 +140,8 @@ const PUT = async (req, res, id, user) => {
       },
     });
     res.status(HttpStatusCode.OK).json(updatedEmployeeTask);
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {

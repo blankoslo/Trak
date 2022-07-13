@@ -10,7 +10,7 @@ import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import NotificationCard from 'components/NotificationCard';
 import useSWR, { mutate } from 'swr';
-import { IEmployee } from 'utils/types';
+import { IEmployee, INotification } from 'utils/types';
 import { fetcher } from 'utils/utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -33,7 +33,7 @@ type NotificationsMenuProps = {
 } & MenuProps;
 
 const NotificationsMenu = ({ user, ...args }: NotificationsMenuProps) => {
-  const { data } = useSWR(`/api/employees/${user.id}/notifications`, fetcher);
+  const { data } = useSWR<INotification[]>(`/api/employees/${user.id}/notifications`, fetcher);
   const classes = useStyles();
 
   const markAsRead = () => {

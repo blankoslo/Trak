@@ -21,10 +21,10 @@ type CommentEditorProps = {
 };
 const CommentEditor = ({ onSubmit, control, cancel, cancelText, confirmText, updateMentions }: CommentEditorProps) => {
   const { data: session } = useSession();
-  const { data: employees } = useSWR(session?.user ? `/api/employees` : null, fetcher);
+  const { data: employees } = useSWR<IEmployee[]>(session?.user ? `/api/employees` : null, fetcher);
   const theme = useTheme();
 
-  const formatedEmployees: IEmployee[] = employees?.map((e: IEmployee) => {
+  const formatedEmployees = employees?.map((e: IEmployee) => {
     return { id: e.id, display: `${e.first_name} ${e.last_name}` };
   });
 
@@ -75,7 +75,7 @@ const CommentEditor = ({ onSubmit, control, cancel, cancelText, confirmText, upd
                 markup={'@**__display__**'}
                 onAdd={(id, display) => {
                   const employee = employees.find((employee) => employee.id === id);
-                  updateMentions(id, display, employee.email);
+                  updateMentions(id as number, display, employee.email);
                 }}
                 trigger='@'
               />

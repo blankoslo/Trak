@@ -41,12 +41,8 @@ const GET = async (res, task_id) => {
         due_date_day_offset: true,
         professions: {
           select: {
-            profession: {
-              select: {
-                title: true,
-                slug: true,
-              },
-            },
+            title: true,
+            slug: true,
           },
         },
         responsible: {
@@ -59,13 +55,14 @@ const GET = async (res, task_id) => {
         },
       },
     });
-    const task = { ...taskQuery, professions: taskQuery.professions.map((profession) => profession.profession) };
+    const task = { ...taskQuery, professions: taskQuery.professions };
     if (!task) {
       throw new Error('Fant ikke oppgave');
     } else {
       res.status(HttpStatusCode.OK).json(task);
     }
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {
@@ -131,7 +128,8 @@ const PUT = async (req, res, task_id) => {
       },
     });
     res.status(HttpStatusCode.OK).json(updatedTask);
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {
@@ -143,7 +141,8 @@ const DELETE = async (res, task_id) => {
   try {
     const deletedTask = await trakClient.task.update({ where: { id: task_id.toString() }, data: { active: false } });
     res.status(HttpStatusCode.OK).json(deletedTask);
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (err) {
       res.status(HttpStatusCode.NOT_FOUND).send({ message: err?.meta?.cause });
     } else {

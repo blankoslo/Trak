@@ -8,21 +8,21 @@ import { useSession } from 'next-auth/react';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
-import { IEmployeeTask } from 'utils/types';
+import { IComment, IEmployeeTask } from 'utils/types';
 import { fetcher } from 'utils/utils';
 type CommentProps = {
   employeeTask: IEmployeeTask;
 };
 
 const Comments = ({ employeeTask }: CommentProps) => {
-  const { data: comments, mutate } = useSWR(`/api/employeeTasks/${employeeTask.id}/comments`, fetcher);
+  const { data: comments, mutate } = useSWR<IComment[]>(`/api/employeeTasks/${employeeTask.id}/comments`, fetcher);
   const [addComment, setAddComment] = useState(false);
   const { control, handleSubmit, reset } = useForm();
   const scrollRef = useRef(null);
   const user = useSession();
   const [mentions, setMentions] = useState<{ id: number; display: string; email: string }[]>([]);
 
-  const updateMentions = (id, display, email) => {
+  const updateMentions = (id: number, display: string, email: string) => {
     setMentions((m) => [...m, { id: id, display: display, email: email }]);
   };
 

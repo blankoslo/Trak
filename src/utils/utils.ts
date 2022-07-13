@@ -12,7 +12,7 @@ export type TimeSectionType = {
   defaultOpen?: boolean;
 };
 
-export const prismaDateToFormatedDate = (date: string, isSmallFormat = false) => {
+export const prismaDateToFormatedDate = (date: string | Date, isSmallFormat = false) => {
   if (isSmallFormat) {
     return new Date(date).toLocaleDateString('nb-NO', { year: 'numeric', month: 'short', day: 'numeric' });
   }
@@ -25,8 +25,8 @@ export const axiosBuilder = (
   axiosFunc: Promise<unknown>,
   text: string,
   router: NextRouter,
-  showProgressbar: (boolean) => void,
-  showSnackbar: (arg0: string, arg1: string) => void,
+  showProgressbar: (show: boolean) => void,
+  showSnackbar: (arg0: string, arg1: 'error' | 'success') => void,
   closeModal: () => void,
 ) => {
   showProgressbar(true);
@@ -48,13 +48,13 @@ export const toggleCheckBox = async (
   employeeTask: IEmployeeTask,
   completed: boolean,
   setCompleted: Dispatch<SetStateAction<boolean>>,
-  showSnackbar: (arg0: string, arg1: string) => void,
+  showSnackbar: (arg0: string, arg1: 'error' | 'success') => void,
 ) => {
   await axios
     .put(`/api/employeeTasks/${employeeTask.id}`, {
       completed: !completed,
       due_date: employeeTask.due_date,
-      responsible_id: employeeTask.responsible.id,
+      responsible_id: employeeTask.responsible?.id,
     })
     .then(() => {
       showSnackbar(`Oppgave markert som ${completed ? 'ikke' : ''} fullført`, 'success');
@@ -98,7 +98,7 @@ export const slackMessager = async (email: string, text: string) => {
   }
 };
 
-export const isToday = (someDate) => {
+export const isToday = (someDate: Date) => {
   const today = new Date();
   return someDate.getDate() === today.getDate() && someDate.getMonth() === today.getMonth() && someDate.getFullYear() === today.getFullYear();
 };

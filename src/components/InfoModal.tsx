@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
 import { IEmployeeTask } from 'utils/types';
 import { fetcher } from 'utils/utils';
+
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
     marginRight: theme.spacing(1),
@@ -43,6 +44,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: theme.spacing(24),
   },
 }));
+
 export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeTask }) => {
   const [hasSelectedNewResponsible, setHasSelectedNewResponsible] = useState<boolean>(false);
   const classes = useStyles();
@@ -103,7 +105,8 @@ export const ResponsibleSelector = ({ employeeTask }: { employeeTask: IEmployeeT
           .finally(() => {
             showSnackbar('Ansvarlig byttet', 'success');
           });
-      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
         showSnackbar(error.response?.data?.message || 'Noe gikk galt', 'error');
       }
     }
