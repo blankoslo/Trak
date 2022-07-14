@@ -5,7 +5,6 @@ import Toggle from 'components/Toggle';
 import Process from 'components/views/oppgaver/Process';
 import addMonths from 'date-fns/addMonths';
 import { trakClient } from 'lib/prisma';
-import { syncEmployees } from 'lib/tripletex/syncEmployees';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
@@ -30,8 +29,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const session = await getSession(context);
   const threeMonthsFromNow = addMonths(new Date(), 3);
-
-  syncEmployees();
 
   const processTemplateQuery = await trakClient.process_template.findMany({
     select: {

@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import safeJsonStringify from 'safe-json-stringify';
 import { IEmployeeSettings } from 'utils/types';
 import { prismaDateToFormatedDate } from 'utils/utils';
 
@@ -58,7 +59,7 @@ export const getServerSideProps: GetServerSideProps<{ employee: EmployeeWithProf
 
   const employee = await getEmployee(session?.user?.id ? parseInt(session.user.id) : undefined);
 
-  return { props: { employee } };
+  return { props: { employee: JSON.parse(safeJsonStringify(employee)) } };
 };
 
 const Settings: NextPage<{ employee: EmployeeWithProfession }> = ({ employee }) => {
