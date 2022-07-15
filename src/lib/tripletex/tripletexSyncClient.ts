@@ -1,5 +1,6 @@
 import { employee as DbEmployee } from '@prisma/client';
 import { UpstreamEmployeeSync, UpstreamSyncClient } from 'lib/upstreamSync';
+import { toIsoDateString } from 'utils/utils';
 
 import { getEmployees, getEmployment } from './tripletexClient';
 import { TripletexEmployee, TripletexEmployeeWithEmploymentDates } from './types';
@@ -13,10 +14,10 @@ function toPrismaEmployee(ttEmployee: TripletexEmployeeWithEmploymentDates): DbE
     email: ttEmployee.email,
     date_of_employment: ttEmployee.startDate && new Date(ttEmployee.startDate),
     termination_date: ttEmployee.endDate && new Date(ttEmployee.endDate),
-    profession_id: null,
-    image_url: null,
-    hr_manager_id: null,
-    gender: null,
+    profession_id: undefined,
+    image_url: undefined,
+    hr_manager_id: undefined,
+    gender: undefined,
   };
 }
 
@@ -29,10 +30,6 @@ function isEmployeeChanged(oldEmployee: DbEmployee, ttEmployee: TripletexEmploye
     toIsoDateString(oldEmployee.date_of_employment) !== ttEmployee.startDate ||
     toIsoDateString(oldEmployee.termination_date) !== ttEmployee.endDate
   );
-}
-
-function toIsoDateString(date: Date): string {
-  return date.toISOString().slice(0, 10);
 }
 
 function isInactiveEmployee(oldEmployee: DbEmployee): boolean {

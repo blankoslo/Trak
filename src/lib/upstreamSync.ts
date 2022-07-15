@@ -45,5 +45,5 @@ async function syncEmployees() {
 }
 
 export async function syncTrakWithUpstream() {
-  syncEmployees();
+  await syncEmployees();
 }

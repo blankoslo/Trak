@@ -128,3 +128,7 @@ export const getEmoji = (role: string, gender: string) => {
     return anotherEmojies[number];
   }
 };
+
+export function toIsoDateString(date: Date | null): string | null {
+  return date?.toISOString()?.slice(0, 10);
+}
