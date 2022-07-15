@@ -1,11 +1,11 @@
 import HttpStatusCode from 'http-status-typed';
-import { syncEmployees } from 'lib/tripletex/syncEmployees';
+import { syncTrakWithUpstream } from 'lib/upstreamSync';
 import withAuth from 'lib/withAuth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default withAuth(async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    await syncEmployees();
+    await syncTrakWithUpstream();
 
     res.status(HttpStatusCode.OK).end();
   } else {

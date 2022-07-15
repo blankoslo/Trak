@@ -1,4 +1,5 @@
-import { employee as DbEmployee, employee_settings as DbEmployeeSettings } from '@prisma/client';
+import { employee as DbEmployee } from '@prisma/client';
+import { UpstreamEmployeeSync, UpstreamSyncClient } from 'lib/upstreamSync';
 
 import { getEmployees, getEmployment } from './tripletexClient';
 import { TripletexEmployee, TripletexEmployeeWithEmploymentDates } from './types';
@@ -16,18 +17,6 @@ function toPrismaEmployee(ttEmployee: TripletexEmployeeWithEmploymentDates): DbE
     image_url: null,
     hr_manager_id: null,
     gender: null,
-  };
-}
-
-function toPrismaEmployeeSettings(ttEmployee: TripletexEmployeeWithEmploymentDates): DbEmployeeSettings {
-  return {
-    employee_id: ttEmployee.id,
-    slack: true,
-    delegate: true,
-    deadline: true,
-    week_before_deadline: true,
-    hired: true,
-    termination: true,
   };
 }
 
@@ -70,9 +59,7 @@ async function getEmployeeWithEmploymentDates(ttEmployee: TripletexEmployee): Pr
   };
 }
 
-export async function syncEmployees() {
-  const existingEmployees = await trakClient.employee.findMany();
-
+async function getUpstreamEmployees(existingEmployees: DbEmployee[]): Promise<UpstreamEmployeeSync> {
   const inactiveEmployees = new Set(existingEmployees.filter(isInactiveEmployee).map((employee) => employee.id));
   const existingEmployeeIds = new Set(existingEmployees.map((employee) => employee.id));
 
@@ -97,16 +84,14 @@ export async function syncEmployees() {
       return isEmployeeChanged(oldEmployee, employee);
     });
 
-  await trakClient
-    .$transaction([
-      trakClient.employee.createMany({ data: createEmployees.map(toPrismaEmployee) }),
-      trakClient.employee_settings.createMany({ data: createEmployees.map(toPrismaEmployeeSettings) }),
-    ])
-    .catch((err) => console.error(err)); // eslint-disable-line
-
-  await trakClient
-    .$transaction(
-      updateEmployees.map((updateEmployee) => trakClient.employee.update({ data: toPrismaEmployee(updateEmployee), where: { id: updateEmployee.id } })),
-    )
-    .catch((err) => console.error(err)); // eslint-disable-line
+  return {
+    createEmployees: createEmployees.map(toPrismaEmployee),
+    updateEmployees: updateEmployees.map(toPrismaEmployee),
+  };
 }
+
+const tripletexSyncClient: UpstreamSyncClient = {
+  getUpstreamEmployees,
+};
+
+export default tripletexSyncClient;
