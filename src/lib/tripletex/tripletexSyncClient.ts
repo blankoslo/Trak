@@ -1,11 +1,11 @@
-import { employee as DbEmployee } from '@prisma/client';
+import { employee as TrakDbEmployee } from '@prisma/client';
 import { UpstreamEmployeeSync, UpstreamSyncClient } from 'lib/upstreamSync';
 import { toIsoDateString } from 'utils/utils';
 
 import { getEmployees, getEmployment } from './tripletexClient';
 import { TripletexEmployee, TripletexEmployeeWithEmploymentDates } from './types';
 
-function toPrismaEmployee(ttEmployee: TripletexEmployeeWithEmploymentDates): DbEmployee {
+function toTrakEmployee(ttEmployee: TripletexEmployeeWithEmploymentDates): TrakDbEmployee {
   return {
     id: ttEmployee.id,
     first_name: ttEmployee.firstName,
@@ -21,7 +21,7 @@ function toPrismaEmployee(ttEmployee: TripletexEmployeeWithEmploymentDates): DbE
   };
 }
 
-function isEmployeeChanged(oldEmployee: DbEmployee, ttEmployee: TripletexEmployeeWithEmploymentDates): boolean {
+function isEmployeeChanged(oldEmployee: TrakDbEmployee, ttEmployee: TripletexEmployeeWithEmploymentDates): boolean {
   return (
     oldEmployee.first_name !== ttEmployee.firstName ||
     oldEmployee.last_name !== ttEmployee.lastName ||
@@ -32,7 +32,7 @@ function isEmployeeChanged(oldEmployee: DbEmployee, ttEmployee: TripletexEmploye
   );
 }
 
-function isInactiveEmployee(oldEmployee: DbEmployee): boolean {
+function isInactiveEmployee(oldEmployee: TrakDbEmployee): boolean {
   return oldEmployee.termination_date && oldEmployee.termination_date < new Date();
 }
 
@@ -56,7 +56,7 @@ async function getEmployeeWithEmploymentDates(ttEmployee: TripletexEmployee): Pr
   };
 }
 
-async function getUpstreamEmployees(existingEmployees: DbEmployee[]): Promise<UpstreamEmployeeSync> {
+async function getUpstreamEmployees(existingEmployees: TrakDbEmployee[]): Promise<UpstreamEmployeeSync> {
   const inactiveEmployees = new Set(existingEmployees.filter(isInactiveEmployee).map((employee) => employee.id));
   const existingEmployeeIds = new Set(existingEmployees.map((employee) => employee.id));
 
@@ -82,8 +82,8 @@ async function getUpstreamEmployees(existingEmployees: DbEmployee[]): Promise<Up
     });
 
   return {
-    createEmployees: createEmployees.map(toPrismaEmployee),
-    updateEmployees: updateEmployees.map(toPrismaEmployee),
+    createEmployees: createEmployees.map(toTrakEmployee),
+    updateEmployees: updateEmployees.map(toTrakEmployee),
   };
 }
 
