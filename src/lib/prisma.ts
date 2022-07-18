@@ -1,5 +1,4 @@
 // https://github.com/prisma/prisma/issues/1983
-
 import { PrismaClient as TrakClient } from '@prisma/client';
 
 declare global {
